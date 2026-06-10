@@ -25,6 +25,10 @@ body{font-family:"IBM Plex Sans Thai",sans-serif;background:var(--bg);color:var(
 .logo span{display:block;font-size:10.5px;color:var(--ice);font-weight:500;letter-spacing:.04em}
 .topbar .right{margin-left:auto;display:flex;align-items:center;gap:14px;font-size:12px;color:var(--ice)}
 .topbar .right a{color:#fff;cursor:pointer;font-weight:600}
+.appsw{display:flex;gap:3px;background:rgba(255,255,255,.08);padding:3px;border-radius:10px;margin-left:8px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.appsw a{padding:6px 12px;border-radius:7px;font-size:13px;font-weight:600;color:var(--ice);text-decoration:none;font-family:"Bai Jamjuree";white-space:nowrap;transition:background .12s}
+.appsw a:hover{background:rgba(255,255,255,.12);color:#fff}
+.appsw a.cur{background:#fff;color:var(--navy)}
 .wrap{max-width:980px;margin:0 auto;padding:22px 18px 60px}
 
 label{display:block;font-size:13px;font-weight:600;color:var(--navy);margin:0 0 6px}
@@ -146,7 +150,8 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--navy-2);
     <svg viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="7" fill="#1E2761"/><path d="M16 6c-3 4-5 6-5 9.5A5 5 0 0 0 16 20a5 5 0 0 0 5-4.5C21 12 19 10 16 6z" fill="#D62828"/><rect x="9" y="23" width="14" height="2.4" rx="1.2" fill="#CADCFC"/></svg>
     <div><b>FHS Admin</b><span>SECURITY &amp; COMPLIANCE</span></div>
   </div>
-  <div class="right"><span id="adminName"></span><a href="index.html">แอปตรวจ ↗</a><a id="logout">ออกระบบ</a></div>
+  <nav class="appsw"><a href="index.html">ตรวจ</a><a href="dashboard.html">Dashboard</a><a href="report.html">รายงาน</a><a href="admin.html" class="cur">Admin</a></nav>
+  <div class="right"><span id="adminName"></span><a id="logout">ออกระบบ</a></div>
 </div>
 
 <div class="wrap">
