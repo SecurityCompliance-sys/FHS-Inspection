@@ -287,7 +287,7 @@ async function gateLogin(){
     const u=snap.data();
     if(u.role!=='admin')throw new Error('บัญชีนี้ไม่มีสิทธิ์ Admin');
     if((await sha256((u.salt||'')+pw))!==u.passwordHash)throw new Error('รหัสผ่านไม่ถูกต้อง');
-    ADMIN={id,name:u.name||id}; sessionStorage.setItem('fhs_admin',JSON.stringify(ADMIN));
+    ADMIN={id,name:u.name||id,role:u.role}; sessionStorage.setItem('fhs_admin',JSON.stringify(ADMIN));
     bootApp();
   }catch(e){a.innerHTML=`<div class="alert err">${esc(e.message)}</div>`;}
   finally{btn.disabled=false;btn.textContent='เข้าสู่ระบบ';}

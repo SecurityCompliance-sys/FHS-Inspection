@@ -103,7 +103,7 @@ tr:hover td{background:var(--surface-2);cursor:pointer}
 .tag-result{font-weight:600}.tag-result.pass{color:var(--green)}.tag-result.fail,.tag-result.needs_repair{color:var(--red)}
 
 /* modal */
-.modal{display:none;position:fixed;inset:0;background:rgba(15,26,46,.55);z-index:50;padding:20px;overflow-y:auto;align-items:flex-start;justify-content:center}
+.modal{display:none;position:fixed;inset:0;background:rgba(15,26,46,.55);z-index:1500;padding:20px;overflow-y:auto;align-items:flex-start;justify-content:center}
 .modal.on{display:flex}
 .modal-box{background:var(--surface);border-radius:16px;max-width:620px;width:100%;margin:auto;box-shadow:0 20px 60px rgba(0,0,0,.3);animation:up .25s ease}
 @keyframes up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
@@ -152,7 +152,7 @@ tr:hover td{background:var(--surface-2);cursor:pointer}
 .alert-grp .gh{font-family:"Bai Jamjuree";font-weight:700;font-size:14px;margin-bottom:8px;display:flex;align-items:center;gap:8px}
 .alert-grp .gh .ct{font-size:11px;background:var(--red);color:#fff;padding:1px 8px;border-radius:10px}
 
-#gate{position:fixed;inset:0;background:var(--bg);z-index:100;display:grid;place-items:center;padding:20px}
+#gate{position:fixed;inset:0;background:var(--bg);z-index:1600;display:grid;place-items:center;padding:20px}
 #gate .box{background:var(--surface);border-radius:16px;box-shadow:var(--shadow);padding:30px;max-width:380px;width:100%}
 #gate h1{font-family:"Bai Jamjuree";font-weight:700;font-size:20px;color:var(--navy);text-align:center;margin-bottom:4px}
 #gate p{text-align:center;color:var(--muted);font-size:13px;margin-bottom:20px}
@@ -328,7 +328,7 @@ async function gateLogin(){
   }catch(e){a.innerHTML=`<div class="alert err">${esc(e.message)}</div>`;}
   finally{btn.disabled=false;btn.textContent='เข้าสู่ระบบ';}
 }
-function boot(){ $('gate').style.display='none'; $('adminName').textContent=`${ADMIN.name} · ${ADMIN.role}`; loadAll(); }
+function boot(){ $('gate').style.display='none'; $('adminName').textContent=`${ADMIN.name} · ${ADMIN.role||'admin'}`; loadAll(); }
 
 /* ===== LOAD ===== */
 async function loadAll(){
