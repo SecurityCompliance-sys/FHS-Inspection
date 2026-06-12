@@ -337,8 +337,12 @@ async function sendEmail(){
   let ok=0,err=0;
   for(const j of jobs){
     const {html,subject}=buildEmailHtml(off,j.site);
-    try{ await emailjs.send(EMAILJS.serviceId,EMAILJS.templateId,{to_email:j.to,subject,html_content:html}); ok++; }
-    catch(e){ err++; console.error(e); }
+    // split comma/semicolon-separated addresses so each send() gets one valid email
+    const addrs=j.to.split(/[,;]/).map(s=>s.trim()).filter(Boolean);
+    for(const addr of addrs){
+      try{ await emailjs.send(EMAILJS.serviceId,EMAILJS.templateId,{email:addr,subject,html_content:html}); ok++; }
+      catch(e){ err++; console.error(e); }
+    }
   }
   btn.disabled=false; btn.textContent='📧 ส่งอีเมล';
   a.innerHTML=`<div class="alert ${err?'err':'ok'}">ส่งสำเร็จ ${ok} ฉบับ${err?` · ล้มเหลว ${err} (ดู console)`:''}</div>`;
