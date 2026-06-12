@@ -149,12 +149,9 @@ const FIREBASE_CONFIG = {
 };
 // EmailJS — สมัครที่ emailjs.com → สร้าง service + template ที่มีตัวแปร {{to_email}} {{subject}} {{{html_content}}}
 const EMAILJS = { publicKey: "jlcMr7JQb8exygtzY", serviceId: "service_x1ikhw4", templateId: "template_5jp881p" };
-// ผู้รับอีเมลแยกตามไซต์ (E4) — ใส่หลายอีเมลคั่นด้วย , ; _all = ผู้บริหาร/ส่วนกลางได้รับทุกไซต์
+// ผู้รับอีเมล — ใส่หลายอีเมลคั่นด้วย , ; _all = ได้รับทุกไซต์; เพิ่มรายไซต์ได้ เช่น LLKDC: "a@x.com" (ส่งเฉพาะสัปดาห์ที่ไซต์นั้นมีข้อมูล)
 const SITE_RECIPIENTS = {
-  LLKDC: "llkdc-manager@bevchain.co.th",
-  NDC:   "ndc-manager@bevchain.co.th",
-  Wangnoi: "wangnoi-manager@bevchain.co.th",
-  _all:  "Pongsatorn_Untharindr@bevchain.co.th, Wanida_Kongcharit@bevchain.co.th, Surat_Pumyu@BevChain.co.th, jakkaphan_boonnarangsri@bevchain.co.th"
+  _all:  "Pongsatorn_Untharindr@bevchain.co.th, Wanida_Kongcharit@bevchain.co.th, Surat_Pumyu@BevChain.co.th, jakkaphan_boonnarangsri@bevchain.co.th, Sayan_Nuangthanee@BevChain.co.th"
 };
 const REPORT_BASE_URL = location.href.replace(/report\.html.*$/,'dashboard.html'); // ลิงก์ดูรายละเอียดในอีเมล
 /* ================================ */
@@ -320,7 +317,7 @@ function buildEmailHtml(off, site){
   if(uninsp.length) h+=`<div style="background:#fff6ef;border:1px solid #f0c9a8;border-radius:8px;padding:12px;margin-bottom:18px"><b style="color:${amber}">ยังไม่ได้ตรวจ ${uninsp.length} สถานี:</b> ${uninsp.map(s=>esc(s.id)).join(', ')}</div>`;
   h+=`<div style="text-align:center;margin:8px 0"><a href="${REPORT_BASE_URL}" style="background:${c};color:#fff;text-decoration:none;padding:11px 22px;border-radius:8px;font-weight:600;display:inline-block">ดูรายละเอียดทั้งหมด →</a></div>
     </div><div style="background:#f4f6fa;padding:12px;text-align:center;color:${mut};font-size:11px">ระบบ FHS Inspection · อีเมลอัตโนมัติ ห้ามตอบกลับ</div></div>`;
-  return {html:h,subject:`[FHS] รายงานสัปดาห์ ${site||'ทุกไซต์'} · ${periodTxt} · ไม่ผ่าน ${fails.length}`};
+  return {html:h,subject:`[FHS] รายงานตรวจสอบสถานีหัวดับเพลิง · ${periodTxt} · ไม่ผ่าน ${fails.length}`};
 }
 
 async function sendEmail(){
