@@ -316,7 +316,7 @@ function buildEmailHtml(off, site){
   } else h+=`<div style="color:${green};font-weight:600;margin-bottom:18px">✓ ทุกสถานีที่ตรวจผ่านหมด</div>`;
   if(uninsp.length) h+=`<div style="background:#fff6ef;border:1px solid #f0c9a8;border-radius:8px;padding:12px;margin-bottom:18px"><b style="color:${amber}">ยังไม่ได้ตรวจ ${uninsp.length} สถานี:</b> ${uninsp.map(s=>esc(s.id)).join(', ')}</div>`;
   h+=`<div style="text-align:center;margin:8px 0"><a href="${REPORT_BASE_URL}" style="background:${c};color:#fff;text-decoration:none;padding:11px 22px;border-radius:8px;font-weight:600;display:inline-block">ดูรายละเอียดทั้งหมด →</a></div>
-    </div></div>`;
+    </div><div style="background:#f4f6fa;padding:12px;text-align:center;color:${mut};font-size:11px">ระบบ FHS Inspection · อีเมลอัตโนมัติ ห้ามตอบกลับ</div></div>`;
   return {html:h,subject:`[FHS] รายงานตรวจสอบสถานีหัวดับเพลิง · ${periodTxt} · ไม่ผ่าน ${fails.length}`};
 }
 
