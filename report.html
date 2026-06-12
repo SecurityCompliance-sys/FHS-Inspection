@@ -340,7 +340,7 @@ async function sendEmail(){
     // split comma/semicolon-separated addresses so each send() gets one valid email
     const addrs=j.to.split(/[,;]/).map(s=>s.trim()).filter(Boolean);
     for(const addr of addrs){
-      try{ await emailjs.send(EMAILJS.serviceId,EMAILJS.templateId,{to_email:addr,subject,html_content:html}); ok++; }
+      try{ await emailjs.send(EMAILJS.serviceId,EMAILJS.templateId,{email:addr,subject,html_content:html}); ok++; }
       catch(e){ err++; console.error(e); }
     }
   }
