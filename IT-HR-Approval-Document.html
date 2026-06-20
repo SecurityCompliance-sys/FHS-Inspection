@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>เอกสารชี้แจงระบบ FHS Inspection — ขออนุมัติใช้งาน</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
+
+  :root {
+    --navy: #0D2137;
+    --navy2: #1A3A5C;
+    --blue: #2563EB;
+    --green: #15803D;
+    --amber: #B45309;
+    --red: #B91C1C;
+    --line: #CBD5E1;
+    --bg: #F8FAFC;
+    --surface: #FFFFFF;
+    --ink: #0F172A;
+    --muted: #64748B;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Sarabun', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 15px;
+    line-height: 1.8;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* ---- page wrapper ---- */
+  .page { max-width: 960px; margin: 0 auto; padding: 40px 32px 80px; }
+
+  /* ---- cover ---- */
+  .cover {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy2) 100%);
+    color: #fff;
+    padding: 48px 40px;
+    border-radius: 16px;
+    margin-bottom: 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::after {
+    content: "";
+    position: absolute;
+    right: -60px; top: -60px;
+    width: 260px; height: 260px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.05);
+  }
+  .cover::before {
+    content: "";
+    position: absolute;
+    right: 100px; bottom: -80px;
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.03);
+  }
+  .cover-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2);
+    border-radius: 20px; padding: 5px 14px; font-size: 12.5px; font-weight: 600;
+    margin-bottom: 20px; letter-spacing: .04em;
+  }
+  .cover h1 {
+    font-size: 28px; font-weight: 700; line-height: 1.35; margin-bottom: 10px;
+  }
+  .cover .sub {
+    font-size: 16px; opacity: .8; margin-bottom: 28px;
+  }
+  .cover-meta {
+    display: flex; flex-wrap: wrap; gap: 20px;
+    border-top: 1px solid rgba(255,255,255,.15); padding-top: 20px;
+  }
+  .cover-meta-item { font-size: 13px; }
+  .cover-meta-item .l { opacity: .6; font-size: 11.5px; text-transform: uppercase; letter-spacing: .06em; }
+  .cover-meta-item .v { font-weight: 600; margin-top: 2px; }
+  .doc-ref {
+    position: absolute; top: 20px; right: 24px;
+    font-size: 11px; opacity: .5; font-family: monospace; letter-spacing: .05em;
+  }
+
+  /* ---- toc ---- */
+  .toc {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 12px; padding: 24px 28px; margin-bottom: 40px;
+  }
+  .toc h4 {
+    font-size: 12px; text-transform: uppercase; letter-spacing: .08em;
+    color: var(--muted); margin-bottom: 14px;
+  }
+  .toc ol { padding-left: 20px; }
+  .toc li { margin: 5px 0; }
+  .toc a { color: var(--blue); text-decoration: none; font-size: 14px; }
+  .toc a:hover { text-decoration: underline; }
+
+  /* ---- sections ---- */
+  .section { margin-bottom: 44px; }
+  .section-h {
+    display: flex; align-items: center; gap: 12px;
+    border-bottom: 2px solid var(--navy); padding-bottom: 10px; margin-bottom: 22px;
+  }
+  .section-num {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: var(--navy); color: #fff;
+    display: grid; place-items: center;
+    font-weight: 700; font-size: 14px; flex: none;
+  }
+  .section h2 { font-size: 20px; font-weight: 700; color: var(--navy); }
+  h3 { font-size: 16px; font-weight: 700; color: var(--navy2); margin: 22px 0 10px; }
+  p { margin-bottom: 10px; }
+  ul, ol { padding-left: 22px; margin-bottom: 12px; }
+  li { margin: 5px 0; }
+
+  /* ---- cards ---- */
+  .card {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 12px; padding: 20px 24px; margin-bottom: 16px;
+  }
+  .card-title {
+    font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title .dot {
+    width: 10px; height: 10px; border-radius: 50%; flex: none;
+  }
+
+  /* ---- info boxes ---- */
+  .info-box {
+    padding: 14px 18px; border-radius: 10px; margin-bottom: 14px;
+    display: flex; gap: 12px; align-items: flex-start; font-size: 14px;
+  }
+  .info-box.blue { background: #EFF6FF; border: 1px solid #BFDBFE; color: #1E40AF; }
+  .info-box.green { background: #F0FDF4; border: 1px solid #BBF7D0; color: #166534; }
+  .info-box.amber { background: #FFFBEB; border: 1px solid #FDE68A; color: #92400E; }
+  .info-box.red { background: #FEF2F2; border: 1px solid #FECACA; color: #991B1B; }
+  .info-box .ico { font-size: 18px; flex: none; margin-top: 1px; }
+
+  /* ---- table ---- */
+  table { width: 100%; border-collapse: collapse; margin: 14px 0 20px; font-size: 14px; }
+  th {
+    background: var(--navy); color: #fff;
+    padding: 10px 14px; text-align: left; font-weight: 600;
+    font-size: 13px;
+  }
+  th:first-child { border-radius: 8px 0 0 0; }
+  th:last-child { border-radius: 0 8px 0 0; }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) td { background: #F8FAFC; }
+
+  /* ---- risk matrix ---- */
+  .risk-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin: 16px 0; }
+  .risk-card {
+    border-radius: 10px; padding: 16px;
+    font-size: 13px;
+  }
+  .risk-card.high { background: #FEF2F2; border: 1.5px solid #FECACA; }
+  .risk-card.medium { background: #FFFBEB; border: 1.5px solid #FDE68A; }
+  .risk-card.low { background: #F0FDF4; border: 1.5px solid #BBF7D0; }
+  .risk-card .rl { font-weight: 700; font-size: 12px; text-transform: uppercase;
+    letter-spacing: .06em; margin-bottom: 6px; }
+  .risk-card.high .rl { color: #B91C1C; }
+  .risk-card.medium .rl { color: #B45309; }
+  .risk-card.low .rl { color: #15803D; }
+  .risk-card .rt { font-weight: 600; margin-bottom: 4px; }
+  .risk-card .rd { color: var(--muted); line-height: 1.5; }
+
+  /* ---- data flow ---- */
+  .flow {
+    display: flex; align-items: center; flex-wrap: wrap; gap: 0;
+    margin: 16px 0; background: var(--surface); border: 1px solid var(--line);
+    border-radius: 12px; overflow: hidden;
+  }
+  .flow-step {
+    flex: 1; min-width: 120px; padding: 14px 16px; text-align: center;
+    font-size: 13px; position: relative;
+  }
+  .flow-step + .flow-step::before {
+    content: "→";
+    position: absolute; left: -8px; top: 50%; transform: translateY(-50%);
+    color: var(--muted); font-size: 16px;
+  }
+  .flow-step .fs-ico { font-size: 22px; display: block; margin-bottom: 4px; }
+  .flow-step .fs-lbl { font-weight: 600; color: var(--navy); }
+  .flow-step .fs-sub { color: var(--muted); font-size: 11.5px; }
+
+  /* ---- badges ---- */
+  .badge {
+    display: inline-block; padding: 2px 9px; border-radius: 20px;
+    font-size: 12px; font-weight: 600;
+  }
+  .badge.green { background: #DCFCE7; color: #166534; }
+  .badge.amber { background: #FEF3C7; color: #92400E; }
+  .badge.red { background: #FEE2E2; color: #991B1B; }
+  .badge.blue { background: #DBEAFE; color: #1E40AF; }
+  .badge.gray { background: #F1F5F9; color: #475569; }
+
+  /* ---- checklist ---- */
+  .checklist { list-style: none; padding: 0; }
+  .checklist li {
+    padding: 8px 12px; display: flex; align-items: flex-start; gap: 10px;
+    border-bottom: 1px solid var(--line); font-size: 14px;
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist li::before { content: "✓"; color: var(--green); font-weight: 700; flex: none; }
+  .checklist li.x::before { content: "✕"; color: var(--red); }
+  .checklist li.o::before { content: "○"; color: var(--amber); }
+
+  /* ---- approval box ---- */
+  .approval {
+    background: var(--surface); border: 2px solid var(--navy);
+    border-radius: 16px; padding: 30px 32px; margin-top: 40px;
+  }
+  .approval h3 {
+    font-size: 18px; text-align: center; margin-bottom: 24px; color: var(--navy);
+  }
+  .sig-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; }
+  .sig-box {
+    text-align: center;
+  }
+  .sig-line {
+    height: 60px; border-bottom: 1.5px solid var(--ink); margin-bottom: 8px;
+    position: relative;
+  }
+  .sig-role { font-size: 12px; font-weight: 600; color: var(--navy); }
+  .sig-name { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+  .sig-date { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+
+  /* ---- footer ---- */
+  .doc-footer {
+    margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--line);
+    text-align: center; font-size: 11.5px; color: var(--muted);
+  }
+  .confidential-banner {
+    background: #FFFBEB; border: 1px solid #FDE68A; color: #92400E;
+    text-align: center; padding: 8px; font-size: 12.5px; font-weight: 600;
+    letter-spacing: .04em; border-radius: 8px; margin-bottom: 32px;
+  }
+
+  /* ---- print ---- */
+  @media print {
+    body { background: #fff; font-size: 13px; }
+    .page { padding: 20px; max-width: 100%; }
+    .cover { page-break-after: always; }
+    .section { page-break-inside: avoid; }
+    .risk-grid { grid-template-columns: repeat(3,1fr); }
+  }
+
+  @media (max-width: 600px) {
+    .page { padding: 20px 16px; }
+    .sig-grid { grid-template-columns: 1fr; }
+    .risk-grid { grid-template-columns: 1fr; }
+    .flow { flex-direction: column; }
+    .flow-step + .flow-step::before { content: "↓"; left: 50%; transform: translateX(-50%); top: -8px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- COVER -->
+  <div class="cover">
+    <div class="doc-ref">DOC-IT-FHS-2026-001 · Rev 1.0</div>
+    <div class="cover-badge">
+      <span>🔒</span> CONFIDENTIAL — For Internal Use Only
+    </div>
+    <h1>เอกสารชี้แจงระบบและรูปแบบการใช้งาน<br>ระบบตรวจสอบสถานีหัวดับเพลิง (FHS Inspection)</h1>
+    <p class="sub">เพื่อขออนุมัติการใช้งานระบบจากฝ่าย MD / IT / HR</p>
+    <div class="cover-meta">
+      <div class="cover-meta-item">
+        <div class="l">ระบบ</div>
+        <div class="v">BRF FHS Inspection v1.0</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="l">หน่วยงานเจ้าของ</div>
+        <div class="v">BevChain Thailand — Security &amp; Compliance</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="l">วันที่จัดทำ</div>
+        <div class="v">20 มิถุนายน 2569</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="l">เวอร์ชันเอกสาร</div>
+        <div class="v">1.0</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="l">สถานะ</div>
+        <div class="v">รอการอนุมัติ</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="confidential-banner">
+    ⚠ เอกสารนี้มีข้อมูลที่เป็นความลับของบริษัท — ห้ามเผยแพร่ภายนอก
+  </div>
+
+  <!-- TOC -->
+  <div class="toc">
+    <h4>สารบัญ</h4>
+    <ol>
+      <li><a href="#s1">ภาพรวมและวัตถุประสงค์ของระบบ</a></li>
+      <li><a href="#s2">รูปแบบการใช้งาน (Use Cases)</a></li>
+      <li><a href="#s3">สถาปัตยกรรมระบบและกระแสข้อมูล</a></li>
+      <li><a href="#s4">ข้อมูลส่วนบุคคลที่ระบบประมวลผล (PDPA)</a></li>
+      <li><a href="#s5">การประเมินความเสี่ยงด้านข้อมูล (Data Risk)</a></li>
+      <li><a href="#s6">ความเสี่ยงการรั่วไหลของข้อมูล (Data Leak)</a></li>
+      <li><a href="#s7">มาตรการรักษาความปลอดภัย (Security Controls)</a></li>
+      <li><a href="#s8">นโยบายและแนวปฏิบัติสำหรับผู้ใช้งาน</a></li>
+      <li><a href="#s9">บริการภายนอก (Third-Party Services)</a></li>
+      <li><a href="#s10">แผนรับมือเหตุการณ์ข้อมูลรั่วไหล</a></li>
+      <li><a href="#s11">สรุปและคำขออนุมัติ</a></li>
+    </ol>
+  </div>
+
+  <!-- SECTION 1 -->
+  <div class="section" id="s1">
+    <div class="section-h">
+      <div class="section-num">1</div>
+      <h2>ภาพรวมและวัตถุประสงค์ของระบบ</h2>
+    </div>
+
+    <p><strong>FHS Inspection</strong> (Fire Hose Station Inspection) คือระบบดิจิทัลสำหรับการตรวจสอบและบริหารจัดการสถานีหัวดับเพลิงภายในคลังสินค้าและไซต์งานของ BevChain Thailand พัฒนาขึ้นเพื่อแทนที่กระบวนการตรวจสอบแบบกระดาษ ซึ่งเสี่ยงต่อการสูญหายและไม่สามารถติดตามผลได้แบบ real-time</p>
+
+    <div class="info-box blue">
+      <span class="ico">ℹ️</span>
+      <div>ระบบนี้พัฒนาในรูปแบบ <strong>Progressive Web App (PWA)</strong> สามารถติดตั้งและใช้งานบนสมาร์ทโฟน/แท็บเล็ตได้โดยไม่ต้องผ่าน App Store ทำงานได้แม้ไม่มีสัญญาณอินเทอร์เน็ต (Offline Mode)</div>
+    </div>
+
+    <h3>วัตถุประสงค์หลัก</h3>
+    <ul>
+      <li>บันทึกและติดตามผลการตรวจสอบสถานีหัวดับเพลิงรายสถานีอย่างเป็นระบบ</li>
+      <li>ลดความเสี่ยงด้านความปลอดภัยอัคคีภัยด้วยการแจ้งเตือนเมื่อพบข้อบกพร่อง</li>
+      <li>สร้างหลักฐานเอกสารสำหรับการตรวจสอบจากหน่วยงานภายนอก (Audit Trail)</li>
+      <li>บริหารจัดการกรณีอุปกรณ์สูญหายผ่านระบบสอบสวน CCTV</li>
+      <li>สร้างรายงานสรุปเพื่อการบริหารความเสี่ยงด้านความปลอดภัยอาชีวอนามัย</li>
+    </ul>
+
+    <h3>ไซต์ที่ใช้งาน</h3>
+    <table>
+      <tr><th>ไซต์</th><th>รหัส</th><th>หมายเหตุ</th></tr>
+      <tr><td>ลาดกระบัง Distribution Center</td><td>LLKDC</td><td>ไซต์หลัก</td></tr>
+      <tr><td>นครหลวง Distribution Center</td><td>NDC</td><td></td></tr>
+      <tr><td>วังน้อย</td><td>Wangnoi</td><td></td></tr>
+    </table>
+  </div>
+
+  <!-- SECTION 2 -->
+  <div class="section" id="s2">
+    <div class="section-h">
+      <div class="section-num">2</div>
+      <h2>รูปแบบการใช้งาน (Use Cases)</h2>
+    </div>
+
+    <h3>2.1 ผู้ใช้งานและบทบาท</h3>
+    <table>
+      <tr><th>บทบาท</th><th>สิทธิ์การเข้าถึง</th><th>ผู้ใช้งาน</th></tr>
+      <tr>
+        <td><span class="badge blue">Inspector</span></td>
+        <td>บันทึกผลการตรวจสอบ, สแกน QR/NFC, ถ่ายรูป, รายงานอุปกรณ์หาย</td>
+        <td>เจ้าหน้าที่ Safety / ทีม Security</td>
+      </tr>
+      <tr>
+        <td><span class="badge red">Admin</span></td>
+        <td>เข้าถึงทุกฟีเจอร์ + จัดการผู้ใช้, สถานี, กล้อง CCTV, ดูและแก้ไขเคส</td>
+        <td>หัวหน้าแผนก Security &amp; Compliance</td>
+      </tr>
+      <tr>
+        <td><span class="badge gray">Viewer</span></td>
+        <td>ดู Dashboard, รายงาน, ประวัติการตรวจ — ไม่สามารถแก้ไขข้อมูล</td>
+        <td>MD, HR Manager, ผู้บริหาร</td>
+      </tr>
+    </table>
+
+    <h3>2.2 กระบวนการตรวจสอบหลัก (Inspector Workflow)</h3>
+    <div class="flow">
+      <div class="flow-step">
+        <span class="fs-ico">📲</span>
+        <div class="fs-lbl">สแกน QR/NFC</div>
+        <div class="fs-sub">ระบุสถานีที่จะตรวจ</div>
+      </div>
+      <div class="flow-step">
+        <span class="fs-ico">🔐</span>
+        <div class="fs-lbl">เข้าสู่ระบบ</div>
+        <div class="fs-sub">รหัสพนักงาน + รหัสผ่าน</div>
+      </div>
+      <div class="flow-step">
+        <span class="fs-ico">📍</span>
+        <div class="fs-lbl">ยืนยัน GPS</div>
+        <div class="fs-sub">ตรวจสอบระยะทาง ≤60 ม.</div>
+      </div>
+      <div class="flow-step">
+        <span class="fs-ico">✅</span>
+        <div class="fs-lbl">ตรวจ Checklist</div>
+        <div class="fs-sub">11 รายการ + แรงดัน</div>
+      </div>
+      <div class="flow-step">
+        <span class="fs-ico">📷</span>
+        <div class="fs-lbl">ถ่ายรูป</div>
+        <div class="fs-sub">หลักฐานประกอบ</div>
+      </div>
+      <div class="flow-step">
+        <span class="fs-ico">☁️</span>
+        <div class="fs-lbl">บันทึกระบบ</div>
+        <div class="fs-sub">อัปโหลด Firebase</div>
+      </div>
+    </div>
+
+    <h3>2.3 รายการตรวจสอบ (Inspection Checklist)</h3>
+    <table>
+      <tr><th>รหัส</th><th>รายการตรวจ</th><th>ตัวเลือก</th></tr>
+      <tr><td>B1</td><td>ตู้/สถานีเข้าถึงได้ ไม่มีของวางบัง</td><td rowspan="11">ผ่าน / ไม่ผ่าน / N/A</td></tr>
+      <tr><td>B2</td><td>กระจก/ประตูตู้สมบูรณ์ (กรณี break-glass)</td></tr>
+      <tr><td>B3</td><td>สายดับเพลิงครบ ไม่ชำรุด/ไม่ขึ้นรา/ไม่รั่ว</td></tr>
+      <tr><td>B4</td><td>หัวฉีดทองเหลืองอยู่ครบ (สินค้ามีมูลค่าสูง)</td></tr>
+      <tr><td>B5</td><td>วาล์ว/landing valve ใช้งานได้ ไม่เป็นสนิม ไม่รั่ว</td></tr>
+      <tr><td>B6</td><td>ข้อต่อ/coupling สมบูรณ์</td></tr>
+      <tr><td>B7</td><td>ป้าย/สัญลักษณ์มองเห็นชัด</td></tr>
+      <tr><td>B8</td><td>ไฟส่องสว่างบริเวณเพียงพอ</td></tr>
+      <tr><td>B11</td><td>ป้ายวันตรวจล่าสุด / tag อัปเดต</td></tr>
+      <tr><td>B12</td><td>ถังดับเพลิงข้างเคียง แรงดัน+วันหมดอายุปกติ</td></tr>
+      <tr><td>B13</td><td>ขวาน/อุปกรณ์เสริมในตู้ครบ</td></tr>
+      <tr><td>I7</td><td>แรงดันน้ำ (Water Pressure)</td><td>ตัวเลข 4.5–12 bar</td></tr>
+    </table>
+
+    <h3>2.4 การจัดการกล้อง CCTV และการสอบสวน</h3>
+    <p>เมื่อพนักงานตรวจพบอุปกรณ์สูญหาย ระบบจะสร้าง "เคสสอบสวน" โดยอัตโนมัติ เชื่อมโยงกับกล้อง CCTV ที่ครอบคลุมสถานีนั้น ผู้ดูแลระบบ (Admin) สามารถติดตามสถานะเคส ได้แก่ กำลังสอบสวน / พบแล้ว / เปลี่ยนใหม่ / ปิดเคส</p>
+  </div>
+
+  <!-- SECTION 3 -->
+  <div class="section" id="s3">
+    <div class="section-h">
+      <div class="section-num">3</div>
+      <h2>สถาปัตยกรรมระบบและกระแสข้อมูล</h2>
+    </div>
+
+    <h3>3.1 องค์ประกอบระบบ</h3>
+    <table>
+      <tr><th>ชั้น</th><th>เทคโนโลยี</th><th>หน้าที่</th></tr>
+      <tr>
+        <td>Frontend / UI</td>
+        <td>HTML5, JavaScript (ES Module), PWA</td>
+        <td>แสดงผลและรับ Input จากผู้ใช้</td>
+      </tr>
+      <tr>
+        <td>Authentication</td>
+        <td>Firebase Firestore + SHA-256 Hash + Salt</td>
+        <td>ยืนยันตัวตนผู้ใช้ (ไม่ใช้ Firebase Auth)</td>
+      </tr>
+      <tr>
+        <td>Database</td>
+        <td>Google Firebase Firestore (NoSQL)</td>
+        <td>จัดเก็บข้อมูลสถานี, ผู้ใช้, ผลการตรวจ</td>
+      </tr>
+      <tr>
+        <td>Image Storage</td>
+        <td>Cloudinary CDN</td>
+        <td>จัดเก็บรูปภาพหลักฐานการตรวจ</td>
+      </tr>
+      <tr>
+        <td>Offline Cache</td>
+        <td>IndexedDB + Service Worker</td>
+        <td>ทำงานได้เมื่อไม่มีอินเทอร์เน็ต</td>
+      </tr>
+      <tr>
+        <td>Hosting</td>
+        <td>GitHub Pages / Web Server</td>
+        <td>ให้บริการไฟล์ HTML/JS/CSS</td>
+      </tr>
+    </table>
+
+    <h3>3.2 กระแสข้อมูล (Data Flow)</h3>
+    <div class="card">
+      <div class="card-title">การบันทึกผลการตรวจ</div>
+      <ol>
+        <li>ผู้ใช้สแกน QR Code / NFC บนสถานี → แอปโหลดข้อมูลสถานีจาก Firestore</li>
+        <li>ผู้ใช้เข้าสู่ระบบด้วยรหัสพนักงาน + รหัสผ่าน → ตรวจสอบกับ Hash ใน Firestore</li>
+        <li>ระบบดึงพิกัด GPS → เปรียบเทียบกับพิกัดสถานี → แสดงระยะห่าง</li>
+        <li>ผู้ใช้กรอก Checklist + แรงดัน + สถานะอุปกรณ์</li>
+        <li>ผู้ใช้ถ่ายรูป → อัปโหลดไปที่ Cloudinary → ได้รับ URL กลับมา</li>
+        <li>ข้อมูลทั้งหมดถูกรวมและบันทึกลง Firestore ใน collection <code>inspections</code></li>
+        <li>หากพบอุปกรณ์สูญหาย → ระบบสร้าง document ใน collection <code>cases</code></li>
+      </ol>
+    </div>
+
+    <h3>3.3 โครงสร้างข้อมูลใน Firestore</h3>
+    <table>
+      <tr><th>Collection</th><th>ข้อมูลที่จัดเก็บ</th><th>ผู้เข้าถึง</th></tr>
+      <tr>
+        <td><code>users</code></td>
+        <td>รหัสพนักงาน, ชื่อ, บทบาท, ไซต์, passwordHash, salt, failedAttempts, lockedUntil, active</td>
+        <td>Admin เท่านั้น</td>
+      </tr>
+      <tr>
+        <td><code>stations</code></td>
+        <td>รหัสสถานี, ชื่อ, ไซต์, ที่ตั้ง, พิกัด GPS, รายการอุปกรณ์, กล้อง CCTV</td>
+        <td>ผู้ใช้ทุกคน (อ่าน), Admin (เขียน)</td>
+      </tr>
+      <tr>
+        <td><code>inspections</code></td>
+        <td>ผลการตรวจ, รหัสผู้ตรวจ, วันเวลา, พิกัด GPS, แรงดัน, สถานะ checklist, URL รูปภาพ</td>
+        <td>ผู้ใช้ทุกคน (เขียน), Admin/Viewer (อ่าน)</td>
+      </tr>
+      <tr>
+        <td><code>cases</code></td>
+        <td>รหัสเคส, รหัสสถานี, ชื่ออุปกรณ์, ผู้แจ้ง, วันแจ้ง, สถานะ, กล้อง CCTV ที่เกี่ยวข้อง</td>
+        <td>Admin เท่านั้น</td>
+      </tr>
+      <tr>
+        <td><code>cctvCameras</code></td>
+        <td>รหัสกล้อง, ชื่อ, ที่ตั้ง, สถานีที่ครอบคลุม</td>
+        <td>Admin เท่านั้น</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- SECTION 4 -->
+  <div class="section" id="s4">
+    <div class="section-h">
+      <div class="section-num">4</div>
+      <h2>ข้อมูลส่วนบุคคลที่ระบบประมวลผล (PDPA)</h2>
+    </div>
+
+    <div class="info-box amber">
+      <span class="ico">⚠️</span>
+      <div>ระบบนี้เกี่ยวข้องกับ <strong>พระราชบัญญัติคุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562 (PDPA)</strong> เนื่องจากมีการเก็บรวบรวมและประมวลผลข้อมูลส่วนบุคคลของพนักงาน</div>
+    </div>
+
+    <h3>4.1 ประเภทข้อมูลส่วนบุคคลที่เก็บรวบรวม</h3>
+    <table>
+      <tr><th>ประเภทข้อมูล</th><th>ตัวอย่าง</th><th>ฐานทางกฎหมาย PDPA</th><th>ความจำเป็น</th></tr>
+      <tr>
+        <td>ข้อมูลประจำตัวพนักงาน</td>
+        <td>รหัสพนักงาน, ชื่อ-นามสกุล</td>
+        <td>สัญญาจ้างงาน / ประโยชน์โดยชอบด้วยกฎหมาย</td>
+        <td>สูง — ระบุผู้ตรวจ</td>
+      </tr>
+      <tr>
+        <td>ข้อมูลการทำงาน</td>
+        <td>ไซต์, บทบาท, วันเวลาเข้าใช้งาน</td>
+        <td>สัญญาจ้างงาน</td>
+        <td>สูง — บันทึกกิจกรรม</td>
+      </tr>
+      <tr>
+        <td>ข้อมูลพิกัดตำแหน่ง (GPS)</td>
+        <td>ละติจูด/ลองจิจูด ณ เวลาตรวจ</td>
+        <td>ประโยชน์โดยชอบด้วยกฎหมาย</td>
+        <td>ปานกลาง — ยืนยันว่าตรวจในสถานที่จริง</td>
+      </tr>
+      <tr>
+        <td>รูปภาพ</td>
+        <td>ภาพสถานีหัวดับเพลิง (อาจมีภาพบุคคลบางส่วน)</td>
+        <td>ประโยชน์โดยชอบด้วยกฎหมาย</td>
+        <td>ปานกลาง — หลักฐานการตรวจ</td>
+      </tr>
+      <tr>
+        <td>ข้อมูลความปลอดภัย</td>
+        <td>จำนวนครั้ง Login ผิด, เวลาล็อค</td>
+        <td>ประโยชน์โดยชอบด้วยกฎหมาย</td>
+        <td>สูง — ป้องกัน Brute Force</td>
+      </tr>
+    </table>
+
+    <h3>4.2 ข้อมูลที่ระบบไม่เก็บ</h3>
+    <ul class="checklist">
+      <li class="x">เลขบัตรประชาชน</li>
+      <li class="x">หมายเลขโทรศัพท์ส่วนตัว</li>
+      <li class="x">ที่อยู่บ้าน / ข้อมูลติดต่อส่วนตัว</li>
+      <li class="x">ข้อมูลสุขภาพ / ข้อมูลอ่อนไหว</li>
+      <li class="x">รหัสผ่านในรูปแบบ plain text (เก็บเฉพาะ SHA-256 Hash พร้อม Salt)</li>
+    </ul>
+
+    <h3>4.3 วัตถุประสงค์การใช้ข้อมูล</h3>
+    <ul>
+      <li>ยืนยันตัวตนผู้ใช้งานระบบ</li>
+      <li>บันทึก Audit Trail ว่าใครตรวจอะไร เมื่อไหร่ ที่ไหน</li>
+      <li>สร้างรายงานสรุปผลการตรวจสอบสำหรับการบริหาร</li>
+      <li>ใช้เป็นหลักฐานในกรณีสอบสวนหรือ Audit</li>
+    </ul>
+
+    <h3>4.4 ระยะเวลาเก็บรักษาข้อมูล (Data Retention)</h3>
+    <div class="info-box blue">
+      <span class="ico">📌</span>
+      <div>
+        <strong>ข้อเสนอแนะ:</strong> ระบบในปัจจุบันยังไม่มีนโยบาย Data Retention อัตโนมัติ ฝ่าย IT ควรกำหนดนโยบายดังนี้:
+        <ul style="margin-top:8px">
+          <li>ข้อมูลผลการตรวจ (<code>inspections</code>): เก็บ <strong>3 ปี</strong> เพื่อการ Audit</li>
+          <li>ข้อมูลเคสสอบสวน (<code>cases</code>): เก็บ <strong>5 ปี</strong></li>
+          <li>ข้อมูลผู้ใช้ (<code>users</code>): ลบออกภายใน <strong>30 วัน</strong> หลังพนักงานออกจากงาน</li>
+          <li>รูปภาพ Cloudinary: เก็บ <strong>1 ปี</strong> หรือตามนโยบายบริษัท</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>4.5 สิทธิ์ของเจ้าของข้อมูล (Data Subject Rights)</h3>
+    <table>
+      <tr><th>สิทธิ์ตาม PDPA</th><th>การรองรับของระบบ</th><th>ผู้ดำเนินการ</th></tr>
+      <tr><td>สิทธิ์รับทราบ (Right to be Informed)</td><td>แจ้งในนโยบายความเป็นส่วนตัวของบริษัท</td><td>HR</td></tr>
+      <tr><td>สิทธิ์เข้าถึง (Right of Access)</td><td>Admin สามารถส่งออกข้อมูลในรูปแบบ Excel</td><td>IT Admin</td></tr>
+      <tr><td>สิทธิ์แก้ไข (Right to Rectification)</td><td>Admin แก้ไขชื่อ/บทบาทผู้ใช้ได้</td><td>IT Admin</td></tr>
+      <tr><td>สิทธิ์ลบ (Right to Erasure)</td><td>Admin ลบ User ได้ (ข้อมูลการตรวจยังคงอยู่ตาม Retention)</td><td>IT Admin</td></tr>
+      <tr><td>สิทธิ์คัดค้าน (Right to Object)</td><td>พนักงานแจ้งต่อ HR เป็น Case-by-Case</td><td>HR</td></tr>
+    </table>
+  </div>
+
+  <!-- SECTION 5 -->
+  <div class="section" id="s5">
+    <div class="section-h">
+      <div class="section-num">5</div>
+      <h2>การประเมินความเสี่ยงด้านข้อมูล (Data Risk Assessment)</h2>
+    </div>
+
+    <h3>5.1 เมทริกซ์ความเสี่ยง</h3>
+    <div class="risk-grid">
+      <div class="risk-card high">
+        <div class="rl">HIGH RISK</div>
+        <div class="rt">Firebase API Key ใน Source Code</div>
+        <div class="rd">API Key ถูกฝังใน HTML ที่เปิดเผยต่อสาธารณะ หากไม่ตั้ง Firestore Security Rules จะเปิดให้ใครก็ได้อ่าน/เขียนข้อมูล</div>
+      </div>
+      <div class="risk-card high">
+        <div class="rl">HIGH RISK</div>
+        <div class="rt">Cloudinary API Key ใน Source Code</div>
+        <div class="rd">Upload Preset ถูกฝังใน HTML ทำให้บุคคลภายนอกอาจนำไปใช้อัปโหลดไฟล์เข้า account ของบริษัทได้</div>
+      </div>
+      <div class="risk-card medium">
+        <div class="rl">MEDIUM RISK</div>
+        <div class="rt">ข้อมูล Session ใน sessionStorage</div>
+        <div class="rd">ข้อมูลผู้ใช้ถูกเก็บใน sessionStorage ซึ่งโค้ด JavaScript บนหน้าเดิมอ่านได้ เสี่ยงหาก XSS โจมตีสำเร็จ (แต่มีการป้องกัน XSS แล้ว)</div>
+      </div>
+      <div class="risk-card medium">
+        <div class="rl">MEDIUM RISK</div>
+        <div class="rt">รูปภาพบน Cloudinary CDN</div>
+        <div class="rd">URL รูปภาพเมื่ออัปโหลดสำเร็จสามารถเข้าถึงได้โดยตรง หากได้รับ URL ไม่จำเป็นต้อง Login ก็ดูรูปได้</div>
+      </div>
+      <div class="risk-card medium">
+        <div class="rl">MEDIUM RISK</div>
+        <div class="rt">GPS Tracking พนักงาน</div>
+        <div class="rd">พิกัดของพนักงานถูกบันทึกทุกครั้งที่ตรวจ อาจถูกมองว่าเป็นการติดตามตำแหน่งต้องขอความยินยอม</div>
+      </div>
+      <div class="risk-card low">
+        <div class="rl">LOW RISK</div>
+        <div class="rt">รหัสผ่านถูก Hash แล้ว</div>
+        <div class="rd">รหัสผ่านถูกเข้ารหัสด้วย SHA-256 + Salt ก่อนบันทึก ความเสี่ยงต่ำแต่ SHA-256 ไม่ใช่ Password Hashing Function ที่ออกแบบมาเฉพาะ (แนะนำใช้ bcrypt หรือ Firebase Authentication แทน)</div>
+      </div>
+    </div>
+
+    <h3>5.2 ตารางการประเมินความเสี่ยงโดยละเอียด</h3>
+    <table>
+      <tr><th>ความเสี่ยง</th><th>โอกาสเกิด</th><th>ผลกระทบ</th><th>ระดับ</th><th>การจัดการ</th></tr>
+      <tr>
+        <td>Firestore Rules ไม่ปลอดภัย</td>
+        <td>สูง (หากยังไม่กำหนด)</td>
+        <td>สูงมาก</td>
+        <td><span class="badge red">Critical</span></td>
+        <td>กำหนด Security Rules ทันที</td>
+      </tr>
+      <tr>
+        <td>API Key รั่วไหลสู่สาธารณะ</td>
+        <td>กลาง</td>
+        <td>สูง</td>
+        <td><span class="badge red">High</span></td>
+        <td>จำกัด Domain ใน Firebase Console</td>
+      </tr>
+      <tr>
+        <td>Brute Force การเข้าสู่ระบบ</td>
+        <td>ต่ำ</td>
+        <td>สูง</td>
+        <td><span class="badge amber">Medium</span></td>
+        <td>มีระบบ Lockout 5 ครั้ง / 15 นาทีแล้ว</td>
+      </tr>
+      <tr>
+        <td>การเปิดเผยข้อมูลส่วนบุคคลผิดพลาด</td>
+        <td>ต่ำ</td>
+        <td>กลาง</td>
+        <td><span class="badge amber">Medium</span></td>
+        <td>จำกัด Role-Based Access Control</td>
+      </tr>
+      <tr>
+        <td>ข้อมูลสูญหายจาก Firebase</td>
+        <td>ต่ำมาก</td>
+        <td>สูง</td>
+        <td><span class="badge amber">Medium</span></td>
+        <td>Firebase มี SLA 99.95%, เปิด Backup</td>
+      </tr>
+      <tr>
+        <td>พนักงานใช้อุปกรณ์ส่วนตัว</td>
+        <td>กลาง</td>
+        <td>กลาง</td>
+        <td><span class="badge amber">Medium</span></td>
+        <td>Session หมดอายุเมื่อปิด Browser</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- SECTION 6 -->
+  <div class="section" id="s6">
+    <div class="section-h">
+      <div class="section-num">6</div>
+      <h2>ความเสี่ยงการรั่วไหลของข้อมูล (Data Leak Risk)</h2>
+    </div>
+
+    <h3>6.1 ช่องทางที่อาจเกิด Data Leak</h3>
+
+    <div class="card">
+      <div class="card-title"><div class="dot" style="background:#B91C1C"></div>ช่องทางที่ 1: Firebase API Key ที่เปิดเผยใน Source Code</div>
+      <p><strong>ลักษณะความเสี่ยง:</strong> API Key ถูกฝังตรงใน HTML File ซึ่งผู้ใช้สามารถดูได้ผ่าน Developer Tools บุคคลภายนอกอาจนำ API Key ไปเขียนสคริปต์โจมตีฐานข้อมูลได้</p>
+      <p><strong>ผลกระทบ:</strong> หากไม่มี Firestore Security Rules ที่เข้มงวด อาจทำให้ข้อมูลพนักงาน ผลการตรวจ และข้อมูลสถานีทั้งหมดถูกเข้าถึงโดยไม่ได้รับอนุญาต</p>
+      <p><strong>มาตรการบรรเทา:</strong></p>
+      <ul>
+        <li>จำกัด API Key ให้ใช้ได้เฉพาะ Domain ที่กำหนดใน Firebase Console (HTTP Referrer Restriction)</li>
+        <li>กำหนด <strong>Firestore Security Rules</strong> ให้ตรวจสอบ Authentication ก่อนอนุญาตเข้าถึงข้อมูลทุกครั้ง</li>
+        <li>เปิดใช้งาน Firebase App Check เพื่อยืนยันว่า Request มาจากแอปที่ถูกต้องเท่านั้น</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><div class="dot" style="background:#B45309"></div>ช่องทางที่ 2: รูปภาพบน Cloudinary สาธารณะ</div>
+      <p><strong>ลักษณะความเสี่ยง:</strong> รูปภาพที่อัปโหลดบน Cloudinary เข้าถึงได้ผ่าน URL โดยตรง (Public URL) บุคคลที่ได้รับ URL จากการรั่วไหลสามารถดูภาพได้โดยไม่ต้อง Login</p>
+      <p><strong>ผลกระทบ:</strong> รูปภาพอาจมีภาพภายในโกดัง หรืออาจมีบุคคลปรากฏในพื้นหลัง</p>
+      <p><strong>มาตรการบรรเทา:</strong></p>
+      <ul>
+        <li>กำหนด Folder Permissions ใน Cloudinary ให้เป็น Private</li>
+        <li>ใช้ Signed URL หรือ Access Control สำหรับการดูรูปภาพ</li>
+        <li>หลีกเลี่ยงการถ่ายรูปที่มีบุคคลปรากฏชัดเจน</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><div class="dot" style="background:#B45309"></div>ช่องทางที่ 3: Export ข้อมูลออกเป็น Excel</div>
+      <p><strong>ลักษณะความเสี่ยง:</strong> ระบบมีฟีเจอร์ Export ข้อมูลประวัติการตรวจ, เคส, และแผนการตรวจเป็นไฟล์ Excel ผู้ที่มีสิทธิ์ Admin/Viewer สามารถนำข้อมูลออกไปได้</p>
+      <p><strong>ผลกระทบ:</strong> ไฟล์ Excel ที่มีข้อมูลพนักงานอาจถูกส่งต่อหรือสูญหาย</p>
+      <p><strong>มาตรการบรรเทา:</strong></p>
+      <ul>
+        <li>จำกัดสิทธิ์ Export เฉพาะ Admin เท่านั้น</li>
+        <li>บันทึก Log ทุกครั้งที่มีการ Export ข้อมูล</li>
+        <li>กำหนดนโยบาย Data Classification สำหรับไฟล์ที่ Export</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><div class="dot" style="background:#15803D"></div>ช่องทางที่ 4: อุปกรณ์สูญหาย / ถูกขโมย</div>
+      <p><strong>ลักษณะความเสี่ยง:</strong> หากสมาร์ทโฟนของพนักงานถูกขโมยในขณะที่ยังเปิด Session อยู่</p>
+      <p><strong>มาตรการที่มีอยู่แล้ว:</strong></p>
+      <ul>
+        <li>ใช้ sessionStorage (ล้างอัตโนมัติเมื่อปิด Browser)</li>
+        <li>Admin สามารถระงับบัญชีผู้ใช้ (<code>active: false</code>) ได้ทันที</li>
+      </ul>
+    </div>
+
+    <h3>6.2 สรุประดับความเสี่ยง Data Leak ก่อนและหลังดำเนินมาตรการ</h3>
+    <table>
+      <tr><th>รายการ</th><th>ก่อนมาตรการ</th><th>หลังมาตรการ</th></tr>
+      <tr><td>API Key Exposure</td><td><span class="badge red">High</span></td><td><span class="badge amber">Low-Medium</span></td></tr>
+      <tr><td>Database Unauthorized Access</td><td><span class="badge red">Critical</span></td><td><span class="badge green">Low</span></td></tr>
+      <tr><td>Image Leak</td><td><span class="badge amber">Medium</span></td><td><span class="badge green">Low</span></td></tr>
+      <tr><td>Data Export Misuse</td><td><span class="badge amber">Medium</span></td><td><span class="badge green">Low</span></td></tr>
+      <tr><td>Session Hijacking</td><td><span class="badge amber">Medium</span></td><td><span class="badge green">Low</span></td></tr>
+      <tr><td>Password Leak</td><td><span class="badge green">Low</span></td><td><span class="badge green">Very Low</span></td></tr>
+    </table>
+  </div>
+
+  <!-- SECTION 7 -->
+  <div class="section" id="s7">
+    <div class="section-h">
+      <div class="section-num">7</div>
+      <h2>มาตรการรักษาความปลอดภัย (Security Controls)</h2>
+    </div>
+
+    <h3>7.1 มาตรการที่มีอยู่ในระบบปัจจุบัน</h3>
+    <ul class="checklist">
+      <li>รหัสผ่านถูก Hash ด้วย SHA-256 + Salt ก่อนจัดเก็บ (ไม่เก็บ Plain Text)</li>
+      <li>ระบบล็อคบัญชีอัตโนมัติหลังล็อกอินผิด 5 ครั้ง (Lock 15 นาที)</li>
+      <li>ป้องกัน XSS ด้วยการ Escape ทุก Input ก่อนแสดงผล</li>
+      <li>Role-Based Access Control (Admin / Inspector / Viewer)</li>
+      <li>ยืนยันพิกัด GPS เพื่อตรวจสอบว่าผู้ตรวจอยู่ในสถานที่จริง</li>
+      <li>Session ถูกล้างเมื่อปิด Browser (sessionStorage)</li>
+      <li>Admin สามารถระงับบัญชีพนักงานได้ทันที</li>
+      <li>Offline Mode ด้วย Service Worker — ไม่ส่งข้อมูลค้างออกไปเมื่อออนไลน์แล้ว</li>
+    </ul>
+
+    <h3>7.2 มาตรการที่แนะนำให้ดำเนินการเพิ่มเติม</h3>
+    <table>
+      <tr><th>มาตรการ</th><th>ความสำคัญ</th><th>ผู้รับผิดชอบ</th><th>กำหนดเสร็จ</th></tr>
+      <tr>
+        <td>กำหนด Firestore Security Rules อย่างเข้มงวด</td>
+        <td><span class="badge red">Critical</span></td>
+        <td>IT Admin</td>
+        <td>ก่อน Go-Live</td>
+      </tr>
+      <tr>
+        <td>จำกัด Firebase API Key ให้ใช้ได้เฉพาะ Domain ของบริษัท</td>
+        <td><span class="badge red">High</span></td>
+        <td>IT Admin</td>
+        <td>ก่อน Go-Live</td>
+      </tr>
+      <tr>
+        <td>เปิด Cloudinary Private Access / Signed URL</td>
+        <td><span class="badge amber">Medium</span></td>
+        <td>IT Admin</td>
+        <td>ภายใน 30 วัน</td>
+      </tr>
+      <tr>
+        <td>เปิด Firebase App Check</td>
+        <td><span class="badge amber">Medium</span></td>
+        <td>IT Admin</td>
+        <td>ภายใน 30 วัน</td>
+      </tr>
+      <tr>
+        <td>กำหนดนโยบาย Data Retention และตั้ง Automated Cleanup</td>
+        <td><span class="badge amber">Medium</span></td>
+        <td>IT + Legal</td>
+        <td>ภายใน 60 วัน</td>
+      </tr>
+      <tr>
+        <td>สร้าง Privacy Notice สำหรับพนักงานที่ใช้ระบบ</td>
+        <td><span class="badge amber">Medium</span></td>
+        <td>HR + Legal</td>
+        <td>ภายใน 30 วัน</td>
+      </tr>
+      <tr>
+        <td>เปลี่ยนมาใช้ Firebase Authentication (แทน Custom Hash)</td>
+        <td><span class="badge gray">Low</span></td>
+        <td>Developer</td>
+        <td>Phase 2</td>
+      </tr>
+      <tr>
+        <td>เปิดใช้ Firebase Firestore Backup อัตโนมัติ</td>
+        <td><span class="badge gray">Low</span></td>
+        <td>IT Admin</td>
+        <td>ภายใน 60 วัน</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- SECTION 8 -->
+  <div class="section" id="s8">
+    <div class="section-h">
+      <div class="section-num">8</div>
+      <h2>นโยบายและแนวปฏิบัติสำหรับผู้ใช้งาน</h2>
+    </div>
+
+    <h3>8.1 สิ่งที่ผู้ใช้ต้องปฏิบัติ</h3>
+    <ul>
+      <li>ใช้รหัสพนักงานและรหัสผ่านส่วนตัวเท่านั้น ห้ามใช้ Account ร่วมกัน</li>
+      <li>ออกจากระบบทุกครั้งหลังใช้งานเสร็จ โดยเฉพาะเมื่อใช้อุปกรณ์ส่วนกลาง</li>
+      <li>รายงาน IT ทันทีหากสงสัยว่าบัญชีถูก Login โดยผู้อื่น</li>
+      <li>ถ่ายรูปเฉพาะอุปกรณ์และสถานีหัวดับเพลิง หลีกเลี่ยงการถ่ายรูปที่มีบุคคลปรากฏ</li>
+      <li>ไม่แชร์ Link หรือ URL รูปภาพออกสู่ภายนอก</li>
+      <li>แจ้ง IT ทันทีหากอุปกรณ์ที่ใช้งานระบบสูญหายหรือถูกขโมย</li>
+    </ul>
+
+    <h3>8.2 สิ่งที่ผู้ใช้ห้ามทำ</h3>
+    <ul>
+      <li class="x" style="list-style:none">✕ ห้ามแชร์รหัสผ่านกับผู้อื่นไม่ว่ากรณีใด</li>
+      <li class="x" style="list-style:none">✕ ห้าม Export ข้อมูลโดยไม่ได้รับอนุญาตจาก Admin</li>
+      <li class="x" style="list-style:none">✕ ห้ามใช้ระบบเพื่อวัตถุประสงค์อื่นนอกจากการตรวจสอบสถานี</li>
+      <li class="x" style="list-style:none">✕ ห้ามพยายาม Login ด้วย Account ของผู้อื่น</li>
+      <li class="x" style="list-style:none">✕ ห้ามนำข้อมูลจากระบบไปเผยแพร่บน Social Media หรือช่องทางสาธารณะ</li>
+    </ul>
+  </div>
+
+  <!-- SECTION 9 -->
+  <div class="section" id="s9">
+    <div class="section-h">
+      <div class="section-num">9</div>
+      <h2>บริการภายนอก (Third-Party Services)</h2>
+    </div>
+
+    <div class="info-box amber">
+      <span class="ico">⚠️</span>
+      <div>ระบบใช้บริการจากผู้ให้บริการภายนอก ซึ่งมีการส่งข้อมูลออกนอกประเทศ (Cross-Border Data Transfer) กรุณาตรวจสอบให้แน่ใจว่าสัญญา Data Processing Agreement (DPA) มีผลบังคับใช้</div>
+    </div>
+
+    <table>
+      <tr><th>บริการ</th><th>ผู้ให้บริการ</th><th>ข้อมูลที่ส่ง</th><th>ที่ตั้งเซิร์ฟเวอร์</th><th>สถานะ DPA</th></tr>
+      <tr>
+        <td>Firebase Firestore</td>
+        <td>Google LLC</td>
+        <td>ข้อมูลผู้ใช้, ผลการตรวจ, สถานี, เคส</td>
+        <td>สหรัฐอเมริกา / Asia</td>
+        <td><span class="badge amber">ตรวจสอบ</span></td>
+      </tr>
+      <tr>
+        <td>Cloudinary CDN</td>
+        <td>Cloudinary Ltd.</td>
+        <td>รูปภาพหลักฐานการตรวจ</td>
+        <td>สหรัฐอเมริกา</td>
+        <td><span class="badge amber">ตรวจสอบ</span></td>
+      </tr>
+      <tr>
+        <td>Google Fonts</td>
+        <td>Google LLC</td>
+        <td>IP Address ของผู้ใช้ (Font Loading)</td>
+        <td>สหรัฐอเมริกา</td>
+        <td><span class="badge gray">N/A (Technical)</span></td>
+      </tr>
+      <tr>
+        <td>html5-qrcode (unpkg CDN)</td>
+        <td>npm Inc.</td>
+        <td>ไม่มีข้อมูลส่วนบุคคล (Library เท่านั้น)</td>
+        <td>สหรัฐอเมริกา</td>
+        <td><span class="badge green">ไม่เกี่ยวข้อง</span></td>
+      </tr>
+    </table>
+
+    <div class="info-box blue">
+      <span class="ico">📋</span>
+      <div>Google (Firebase) และ Cloudinary มี <strong>Standard Contractual Clauses (SCCs)</strong> และ <strong>GDPR-compliant DPA</strong> ให้บริการ แนะนำให้ Legal Team ทบทวนและลงนามก่อนเปิดใช้งาน</div>
+    </div>
+  </div>
+
+  <!-- SECTION 10 -->
+  <div class="section" id="s10">
+    <div class="section-h">
+      <div class="section-num">10</div>
+      <h2>แผนรับมือเหตุการณ์ข้อมูลรั่วไหล (Incident Response Plan)</h2>
+    </div>
+
+    <table>
+      <tr><th>ขั้นตอน</th><th>การดำเนินการ</th><th>ผู้รับผิดชอบ</th><th>กรอบเวลา</th></tr>
+      <tr>
+        <td><strong>1. ตรวจพบ</strong></td>
+        <td>พนักงาน / ระบบ Monitoring แจ้งเหตุต้องสงสัย</td>
+        <td>พนักงาน / IT</td>
+        <td>ทันที</td>
+      </tr>
+      <tr>
+        <td><strong>2. ประเมิน</strong></td>
+        <td>IT ประเมินขอบเขตและประเภทข้อมูลที่รั่วไหล</td>
+        <td>IT Manager</td>
+        <td>ภายใน 2 ชั่วโมง</td>
+      </tr>
+      <tr>
+        <td><strong>3. หยุดความเสียหาย</strong></td>
+        <td>ปิด API Key / ระงับบัญชีที่เกี่ยวข้อง / จำกัดการเข้าถึง</td>
+        <td>IT Admin</td>
+        <td>ภายใน 4 ชั่วโมง</td>
+      </tr>
+      <tr>
+        <td><strong>4. แจ้งผู้บริหาร</strong></td>
+        <td>รายงาน MD และ Legal ทันที</td>
+        <td>IT Manager</td>
+        <td>ภายใน 4 ชั่วโมง</td>
+      </tr>
+      <tr>
+        <td><strong>5. แจ้ง PDPA</strong></td>
+        <td>หากข้อมูลส่วนบุคคลรั่วไหล ต้องแจ้ง PDPC ภายใน 72 ชั่วโมง</td>
+        <td>Legal / DPO</td>
+        <td>ภายใน 72 ชั่วโมง</td>
+      </tr>
+      <tr>
+        <td><strong>6. แก้ไขและป้องกัน</strong></td>
+        <td>ดำเนินมาตรการแก้ไขและปรับปรุงระบบ</td>
+        <td>IT + Developer</td>
+        <td>ภายใน 7 วัน</td>
+      </tr>
+      <tr>
+        <td><strong>7. รายงานสรุป</strong></td>
+        <td>จัดทำรายงานเหตุการณ์และบทเรียน</td>
+        <td>IT Manager</td>
+        <td>ภายใน 14 วัน</td>
+      </tr>
+    </table>
+
+    <h3>ช่องทางแจ้งเหตุ</h3>
+    <div class="info-box green">
+      <span class="ico">📞</span>
+      <div>
+        หากพบเหตุต้องสงสัยหรือข้อมูลรั่วไหล ให้แจ้งทันทีผ่านช่องทาง:
+        <ul style="margin-top:6px">
+          <li><strong>IT Helpdesk:</strong> ติดต่อฝ่าย IT ของบริษัทโดยตรง</li>
+          <li><strong>Line Group:</strong> ช่อง "BevChain IT Security" (ถ้ามี)</li>
+          <li><strong>Email:</strong> it-security@bevchain.co.th</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 11 -->
+  <div class="section" id="s11">
+    <div class="section-h">
+      <div class="section-num">11</div>
+      <h2>สรุปและคำขออนุมัติ</h2>
+    </div>
+
+    <h3>11.1 สรุปความพร้อมของระบบ</h3>
+    <table>
+      <tr><th>หัวข้อ</th><th>สถานะ</th><th>หมายเหตุ</th></tr>
+      <tr><td>ฟังก์ชันการทำงานหลัก</td><td><span class="badge green">พร้อม</span></td><td>ครบถ้วนตามความต้องการ</td></tr>
+      <tr><td>การยืนยันตัวตน</td><td><span class="badge green">พร้อม</span></td><td>Hash + Lockout มีแล้ว</td></tr>
+      <tr><td>Role-Based Access Control</td><td><span class="badge green">พร้อม</span></td><td>3 ระดับ</td></tr>
+      <tr><td>Firestore Security Rules</td><td><span class="badge red">ต้องดำเนินการ</span></td><td>กำหนดก่อน Go-Live</td></tr>
+      <tr><td>API Key Restriction</td><td><span class="badge red">ต้องดำเนินการ</span></td><td>จำกัด Domain ก่อน Go-Live</td></tr>
+      <tr><td>Privacy Notice สำหรับพนักงาน</td><td><span class="badge amber">อยู่ระหว่างดำเนินการ</span></td><td>HR จัดทำ</td></tr>
+      <tr><td>Data Retention Policy</td><td><span class="badge amber">อยู่ระหว่างดำเนินการ</span></td><td>Legal พิจารณา</td></tr>
+      <tr><td>DPA กับ Third-Party</td><td><span class="badge amber">อยู่ระหว่างดำเนินการ</span></td><td>Legal ทบทวน</td></tr>
+      <tr><td>Cloudinary Private Access</td><td><span class="badge amber">อยู่ระหว่างดำเนินการ</span></td><td>ภายใน 30 วัน</td></tr>
+    </table>
+
+    <h3>11.2 ประโยชน์ที่คาดได้รับ</h3>
+    <ul>
+      <li>ลดเวลาตรวจสอบจาก ~30 นาที/สถานี เหลือ ~10 นาที</li>
+      <li>สร้าง Audit Trail ดิจิทัลที่ไม่สามารถแก้ไขย้อนหลังได้</li>
+      <li>ตรวจจับอุปกรณ์สูญหายได้เร็วกว่าเดิมด้วยระบบ Alert</li>
+      <li>ลดการใช้กระดาษและการจัดเก็บเอกสาร</li>
+      <li>ผู้บริหารดูภาพรวมได้ Real-time ผ่าน Dashboard</li>
+    </ul>
+
+    <h3>11.3 เงื่อนไขก่อนนำระบบไปใช้งาน (Pre-Go-Live Checklist)</h3>
+    <ul class="checklist">
+      <li>IT ดำเนินการตั้ง Firestore Security Rules</li>
+      <li>IT จำกัด Firebase API Key ให้ใช้ได้เฉพาะ Domain ของบริษัท</li>
+      <li>HR จัดทำ Privacy Notice และแจ้งพนักงานที่เกี่ยวข้อง</li>
+      <li>Legal ทบทวน DPA กับ Google (Firebase) และ Cloudinary</li>
+      <li>IT อบรมผู้ใช้งาน (Inspector และ Admin) ก่อนเริ่มใช้จริง</li>
+      <li>กำหนดผู้รับผิดชอบดูแลระบบ (System Owner) อย่างเป็นทางการ</li>
+    </ul>
+
+    <!-- APPROVAL BOX -->
+    <div class="approval">
+      <h3>แบบฟอร์มอนุมัติการใช้งานระบบ<br>FHS Inspection · BevChain Thailand</h3>
+
+      <div class="info-box blue" style="margin-bottom:24px">
+        <span class="ico">📄</span>
+        <div>ข้าพเจ้าได้อ่านและทำความเข้าใจเอกสารชี้แจงระบบฉบับนี้แล้ว และขออนุมัติให้นำระบบ <strong>FHS Inspection v1.0</strong> ไปใช้งานภายในองค์กร ภายใต้เงื่อนไขและมาตรการที่กำหนดในเอกสารนี้</div>
+      </div>
+
+      <div class="sig-grid">
+        <div class="sig-box">
+          <div class="sig-line"></div>
+          <div class="sig-role">ผู้เสนอ / System Owner</div>
+          <div class="sig-name">Security &amp; Compliance Dept.</div>
+          <div class="sig-date">วันที่: ......../......../........</div>
+        </div>
+        <div class="sig-box">
+          <div class="sig-line"></div>
+          <div class="sig-role">IT Manager</div>
+          <div class="sig-name">ฝ่ายเทคโนโลยีสารสนเทศ</div>
+          <div class="sig-date">วันที่: ......../......../........</div>
+        </div>
+        <div class="sig-box">
+          <div class="sig-line"></div>
+          <div class="sig-role">อนุมัติ / MD</div>
+          <div class="sig-name">Managing Director</div>
+          <div class="sig-date">วันที่: ......../......../........</div>
+        </div>
+      </div>
+
+      <div style="margin-top:24px; padding:14px; background:#F8FAFC; border-radius:10px; font-size:13px; color:var(--muted);">
+        <strong>หมายเหตุ:</strong> การอนุมัตินี้ครอบคลุมการใช้งานระบบในไซต์ LLKDC, NDC, และ Wangnoi เท่านั้น หากต้องการขยายขอบเขตการใช้งาน กรุณาจัดทำเอกสารแก้ไขเพิ่มเติม
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="doc-footer">
+    <p><strong>BevChain Thailand — Security &amp; Compliance Department</strong></p>
+    <p>เอกสารฉบับนี้จัดทำขึ้นเพื่อการขออนุมัติภายในองค์กรเท่านั้น ห้ามเผยแพร่ภายนอกโดยไม่ได้รับอนุญาต</p>
+    <p style="margin-top:6px">DOC-IT-FHS-2026-001 · Rev 1.0 · จัดทำวันที่ 20 มิถุนายน 2569</p>
+  </div>
+
+</div>
+</body>
+</html>
