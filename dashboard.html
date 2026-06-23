@@ -259,10 +259,10 @@ tr:hover td{background:var(--surface-2);cursor:pointer}
     <div class="filters">
       <select id="planSite"><option value="">ทุกไซต์</option></select>
       <select id="planAssignee"><option value="">ผู้รับผิดชอบทั้งหมด</option></select>
-      <select id="planStatus"><option value="">ทุกสถานะ</option><option value="overdue">เกินกำหนด</option><option value="soon">ใกล้ครบ (≤2 วัน)</option><option value="ontrack">ตรงเวลา</option><option value="never">ยังไม่เคยตรวจ</option></select>
+      <select id="planStatus"><option value="">ทุกสถานะ</option><option value="overdue">พลาดกะก่อน</option><option value="soon">รอตรวจกะนี้</option><option value="ontrack">ครบกะนี้</option><option value="never">ยังไม่เคยตรวจ</option></select>
       <button class="btn btn-green btn-sm" id="exportPlan" style="margin-left:auto">⬇ Export Excel</button>
     </div>
-    <div class="panel" style="overflow-x:auto"><table id="planTable"><thead><tr><th>สถานี</th><th>ไซต์</th><th>ผู้รับผิดชอบ</th><th>ความถี่</th><th>ตรวจล่าสุด</th><th>ครบกำหนด</th><th>สถานะ</th></tr></thead><tbody id="planBody"><tr><td colspan="7"><div class="empty">กำลังโหลด…</div></td></tr></tbody></table></div>
+    <div class="panel" style="overflow-x:auto"><table id="planTable"><thead><tr><th>สถานี</th><th>ไซต์</th><th>ผู้รับผิดชอบ</th><th>กะวันนี้ ☀️/🌙</th><th>ตรวจล่าสุด</th><th>กะปัจจุบัน</th><th>สถานะ</th></tr></thead><tbody id="planBody"><tr><td colspan="7"><div class="empty">กำลังโหลด…</div></td></tr></tbody></table></div>
   </div>
 
   <!-- ALERTS -->
@@ -299,8 +299,8 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "568964415233",
   appId: "1:568964415233:web:4be7220d2d14644fbce500"
 };
-const OVERDUE_DAYS = 7;        // สถานีไม่ถูกตรวจเกินกี่วัน = เกินกำหนด (G2)
 const STALE_CASE_DAYS = 14;    // เคสเปิดค้างเกินกี่วัน = ค้างนาน (G3)
+const SHIFT_DAY_START = 7, SHIFT_DAY_END = 19; // กะกลางวัน 07:00–19:00 / กะกลางคืน 19:00–07:00 (ตรวจ 2 ครั้ง/วัน)
 /* ============================================================ */
 
 const app=initializeApp(FIREBASE_CONFIG); const db=getFirestore(app);
@@ -311,8 +311,22 @@ const tsDate=ts=>ts?(ts.toDate?ts.toDate():new Date(ts)):null;
 const fmt=d=>d?d.toLocaleString('th-TH',{day:'2-digit',month:'short',year:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
 const fmtD=d=>d?d.toLocaleDateString('th-TH',{day:'2-digit',month:'short',year:'2-digit'}):'—';
 const daysAgo=d=>d?Math.floor((Date.now()-d.getTime())/86400000):null;
+const shiftOf=d=>{ const h=(d instanceof Date?d:new Date(d)).getHours(); return (h>=SHIFT_DAY_START&&h<SHIFT_DAY_END)?'day':'night'; };
+const shiftLabel=s=>s==='day'?'กลางวัน':'กลางคืน';
+const shiftEmoji=s=>s==='day'?'☀️':'🌙';
+const inspTime=i=>tsDate(i.createdAt)||(i.clientTime?new Date(i.clientTime):null);
+function shiftWindow(now=new Date()){ const h=now.getHours(),start=new Date(now),end=new Date(now);
+  if(h>=SHIFT_DAY_START&&h<SHIFT_DAY_END){ start.setHours(7,0,0,0); end.setHours(19,0,0,0); return {shift:'day',start,end}; }
+  if(h>=SHIFT_DAY_END){ start.setHours(19,0,0,0); end.setDate(end.getDate()+1); end.setHours(7,0,0,0); return {shift:'night',start,end}; }
+  start.setDate(start.getDate()-1); start.setHours(19,0,0,0); end.setHours(7,0,0,0); return {shift:'night',start,end}; }
+function prevShiftWindow(now=new Date()){ const cur=shiftWindow(now),end=new Date(cur.start),start=new Date(cur.start); start.setHours(start.getHours()-12); return {shift:cur.shift==='day'?'night':'day',start,end}; }
+function todayWindows(now=new Date()){ const d={shift:'day'},n={shift:'night'};
+  d.start=new Date(now); d.start.setHours(7,0,0,0); d.end=new Date(now); d.end.setHours(19,0,0,0);
+  n.start=new Date(now); n.start.setHours(19,0,0,0); n.end=new Date(now); n.end.setDate(n.end.getDate()+1); n.end.setHours(7,0,0,0); return {day:d,night:n}; }
+function coveredIn(stationId,win){ return INSPECTIONS.some(i=>{ if(i.stationId!==stationId)return false; const t=inspTime(i); return t&&t>=win.start&&t<win.end; }); }
 
 let STATIONS=[],INSPECTIONS=[],CASES=[],CAMERAS=[],ADMIN=null,map=null,markers=[];
+const CHECKLIST_LABELS={B1:'ตู้/สถานีเข้าถึงได้ ไม่มีของวางบัง',B2:'กระจก/ประตูตู้สมบูรณ์ (กรณี break-glass)',B3:'สายดับเพลิงครบ ไม่ชำรุด/ไม่ขึ้นรา/ไม่รั่ว',B4:'หัวฉีดทองเหลืองอยู่ครบ',B5:'วาล์ว/landing valve ใช้งานได้ ไม่เป็นสนิม ไม่รั่ว',B6:'ข้อต่อ/coupling สมบูรณ์',B7:'ป้าย/สัญลักษณ์มองเห็นชัด',B8:'ไฟส่องสว่างบริเวณเพียงพอ',B11:'ป้ายวันตรวจล่าสุด / tag อัปเดต',B12:'ถังดับเพลิงข้างเคียง (ถ้ามี) แรงดัน+วันหมดอายุปกติ',B13:'ขวาน/อุปกรณ์เสริมในตู้ครบ'};
 
 /* ===== GATE ===== */
 async function gateLogin(){
@@ -349,16 +363,15 @@ async function loadAll(){
 }
 
 /* ===== METRICS / DASHBOARD ===== */
-function freqOf(s){ return s.inspectionFrequencyDays||OVERDUE_DAYS; }
 function planInfo(s){
-  // schedule status per station based on its own frequency
-  const li=tsDate(s.lastInspectionAt); const freq=freqOf(s);
-  if(!li) return {status:'never', due:null, overBy:null, label:'ยังไม่เคยตรวจ'};
-  const due=new Date(li.getTime()+freq*86400000);
-  const overBy=Math.floor((Date.now()-due.getTime())/86400000);
-  if(overBy>0) return {status:'overdue', due, overBy, label:`เกิน ${overBy} วัน`};
-  if(overBy>=-2) return {status:'soon', due, overBy, label:`อีก ${Math.abs(overBy)} วัน`};
-  return {status:'ontrack', due, overBy, label:`อีก ${Math.abs(overBy)} วัน`};
+  // shift-based: ตรวจ 2 ครั้ง/วัน (กลางวัน/กลางคืน)
+  const cur=shiftWindow(), prev=prevShiftWindow();
+  const ever=INSPECTIONS.some(i=>i.stationId===s.id);
+  const doneCur=coveredIn(s.id,cur), donePrev=coveredIn(s.id,prev);
+  if(!ever) return {status:'never', label:'ยังไม่เคยตรวจ', doneCur, donePrev, cur, prev};
+  if(!donePrev) return {status:'overdue', label:'พลาดกะก่อนหน้า', doneCur, donePrev, cur, prev};
+  if(!doneCur) return {status:'soon', label:'รอตรวจกะนี้', doneCur, donePrev, cur, prev};
+  return {status:'ontrack', label:'ครบกะปัจจุบัน', doneCur, donePrev, cur, prev};
 }
 function stationStatus(s){
   const openCase=CASES.some(c=>c.stationId===s.id&&c.status==='investigating');
@@ -372,16 +385,17 @@ const STATUS_COLOR={green:'#0E8A5F',amber:'#E65100',red:'#D62828',gray:'#64708A'
 
 function renderDash(){
   const total=STATIONS.length;
-  const inspected=STATIONS.filter(s=>tsDate(s.lastInspectionAt)&&daysAgo(tsDate(s.lastInspectionAt))<=OVERDUE_DAYS).length;
-  const compliance=total?Math.round(inspected/total*100):0;
+  const cur=shiftWindow();
+  const coveredCur=STATIONS.filter(s=>coveredIn(s.id,cur)).length;
+  const compliance=total?Math.round(coveredCur/total*100):0;
   const openCases=CASES.filter(c=>c.status==='investigating').length;
-  const overdue=STATIONS.filter(s=>{const li=tsDate(s.lastInspectionAt);return !li||daysAgo(li)>OVERDUE_DAYS;}).length;
+  const missed=STATIONS.filter(s=>planInfo(s).status==='overdue').length;
 
   $('statCards').innerHTML=`
-    <div class="stat s-navy"><div class="bar"></div><div class="lab">สถานีทั้งหมด</div><div class="val">${total}</div><div class="sub">${[...new Set(STATIONS.map(s=>s.site).filter(Boolean))].length} ไซต์</div></div>
-    <div class="stat ${compliance>=80?'s-green':compliance>=50?'s-amber':'s-red'}"><div class="bar"></div><div class="lab">Compliance (${OVERDUE_DAYS} วัน)</div><div class="val">${compliance}%</div><div class="sub">ตรวจตามกำหนด ${inspected}/${total}</div></div>
+    <div class="stat s-navy"><div class="bar"></div><div class="lab">สถานีทั้งหมด</div><div class="val">${total}</div><div class="sub">${[...new Set(STATIONS.map(s=>s.site).filter(Boolean))].length} ไซต์ · ตรวจ 2 ครั้ง/วัน</div></div>
+    <div class="stat ${compliance>=80?'s-green':compliance>=50?'s-amber':'s-red'}"><div class="bar"></div><div class="lab">Compliance · กะ${shiftLabel(cur.shift)} ${shiftEmoji(cur.shift)}</div><div class="val">${compliance}%</div><div class="sub">ตรวจแล้วกะนี้ ${coveredCur}/${total}</div></div>
     <div class="stat ${openCases?'s-red':'s-green'}"><div class="bar"></div><div class="lab">🎥 เคสของหายเปิดอยู่</div><div class="val">${openCases}</div><div class="sub">รอสอบสวน CCTV</div></div>
-    <div class="stat ${overdue?'s-amber':'s-green'}"><div class="bar"></div><div class="lab">เกินกำหนดตรวจ</div><div class="val">${overdue}</div><div class="sub">สถานีต้องตรวจด่วน</div></div>`;
+    <div class="stat ${missed?'s-amber':'s-green'}"><div class="bar"></div><div class="lab">พลาดกะก่อนหน้า</div><div class="val">${missed}</div><div class="sub">ยังไม่ตรวจกะที่ผ่านมา</div></div>`;
 
   renderMap(); renderIssueChart(); renderRecent();
 }
@@ -561,13 +575,14 @@ function renderHistory(){
 function openInsp(id){
   const i=INSPECTIONS.find(x=>x.id===id); if(!i)return;
   const cl=i.checklist||{};
-  const clHtml=Object.entries(cl).map(([code,v])=>`<div class="cl-line"><span class="cc ${v.status}">${esc(code)}</span><span style="flex:1">${v.status==='pass'?'ผ่าน':v.status==='fail'?'ไม่ผ่าน':'N/A'}${v.note?' — '+esc(v.note):''}</span></div>`).join('');
+  const clHtml=Object.entries(cl).map(([code,v])=>`<div class="cl-line" style="align-items:flex-start"><span class="cc ${v.status}">${esc(code)}</span><span style="flex:1">${esc(CHECKLIST_LABELS[code]||'')}<b style="display:block;margin-top:2px;color:${v.status==='pass'?'var(--green)':v.status==='fail'?'var(--red)':'var(--muted)'}">${v.status==='pass'?'✓ ผ่าน':v.status==='fail'?'✕ ไม่ผ่าน':'N/A'}${v.note?' — '+esc(v.note):''}</b></span></div>`).join('');
   const eq=(i.equipmentSnapshot||[]).map(e=>`<span class="badge ${e.status==='present'?'green':e.status==='missing'?'red':'amber'}">${esc(e.name)}: ${e.status==='present'?'ครบ':e.status==='missing'?'หาย':'ชำรุด'}</span>`).join(' ');
   $('inspBody').innerHTML=`
     <div class="inv-head"><div class="t">${esc(i.stationId)}</div><div class="s">${esc(i.stationName||'')} · ${esc(i.site||'')}</div></div>
     <div class="kv">
       <div class="k">ผู้ตรวจ</div><div class="v">${esc(i.inspectorName||'')}</div>
       <div class="k">วันเวลา</div><div class="v">${fmt(tsDate(i.createdAt))}</div>
+      <div class="k">กะ</div><div class="v">${i.shift?shiftEmoji(i.shift)+' '+shiftLabel(i.shift):'—'}</div>
       <div class="k">ผล</div><div class="v tag-result ${i.result}">${i.result==='pass'?'ผ่าน':i.result==='needs_repair'?'ต้องแก้ไข':'ไม่ผ่าน'}</div>
       <div class="k">GPS</div><div class="v">${i.gpsDistanceM!=null?'ห่าง '+i.gpsDistanceM+' ม.':'—'}</div>
       <div class="k">แรงดัน</div><div class="v">${i.pressureValue!=null?i.pressureValue+' bar':'—'}</div>
@@ -588,8 +603,8 @@ function getAlerts(){
   const out={missing:[],overdue:[],stale:[],seal:[]};
   // G1 missing items (open cases)
   CASES.filter(c=>c.status==='investigating').forEach(c=>out.missing.push(c));
-  // G2 overdue stations
-  STATIONS.forEach(s=>{ const li=tsDate(s.lastInspectionAt); const d=li?daysAgo(li):null; if(!li||d>OVERDUE_DAYS) out.overdue.push({s,days:d}); });
+  // G2 missed previous shift
+  STATIONS.forEach(s=>{ const p=planInfo(s); if(p.status==='overdue') out.overdue.push({s,p}); });
   // G3 stale cases
   CASES.filter(c=>c.status==='investigating'&&daysAgo(tsDate(c.reportedMissingAt))>STALE_CASE_DAYS).forEach(c=>out.stale.push(c));
   // G4 seal mismatch: seal changed between 2 latest inspections of a station
@@ -604,7 +619,7 @@ function renderAlerts(){
   const a=getAlerts(); const el=$('alertsBody'); let html='';
   if(!countAlerts()){ el.innerHTML='<div class="empty">ไม่มีการแจ้งเตือน ทุกอย่างปกติ ✓</div>'; return; }
   if(a.missing.length){ html+=`<div class="alert-grp"><div class="gh">🎥 อุปกรณ์หาย — รอสอบสวน <span class="ct">${a.missing.length}</span></div><div class="panel">${a.missing.map(c=>`<div class="row" data-case="${esc(c.id)}" style="cursor:pointer"><div class="av" style="background:rgba(214,40,40,.1);color:#D62828">!</div><div class="main"><b>${esc(c.itemName)}</b><div class="meta">${esc(c.stationId)} · แจ้ง ${fmt(tsDate(c.reportedMissingAt))}</div></div><span class="badge amber">เปิดเคส CCTV</span></div>`).join('')}</div></div>`; }
-  if(a.overdue.length){ html+=`<div class="alert-grp"><div class="gh">⏰ สถานีเกินกำหนดตรวจ (>${OVERDUE_DAYS} วัน) <span class="ct">${a.overdue.length}</span></div><div class="panel">${a.overdue.map(o=>`<div class="row"><div class="av" style="background:rgba(230,81,0,.13);color:#E65100">${o.days??'∞'}</div><div class="main"><b>${esc(o.s.id)} <span class="badge navy">${esc(o.s.site||'')}</span></b><div class="meta">${esc(o.s.name||'')} · ${o.days!=null?'ตรวจล่าสุด '+o.days+' วันก่อน':'ยังไม่เคยตรวจ'}</div></div><span class="badge amber">ตรวจด่วน</span></div>`).join('')}</div></div>`; }
+  if(a.overdue.length){ html+=`<div class="alert-grp"><div class="gh">⏰ พลาดกะที่ผ่านมา — ยังไม่ตรวจ <span class="ct">${a.overdue.length}</span></div><div class="panel">${a.overdue.map(o=>`<div class="row"><div class="av" style="background:rgba(230,81,0,.13);color:#E65100">${shiftEmoji(o.p.prev.shift)}</div><div class="main"><b>${esc(o.s.id)} <span class="badge navy">${esc(o.s.site||'')}</span></b><div class="meta">${esc(o.s.name||'')} · ยังไม่ตรวจกะ${shiftLabel(o.p.prev.shift)}ที่ผ่านมา</div></div><span class="badge amber">ตรวจด่วน</span></div>`).join('')}</div></div>`; }
   if(a.stale.length){ html+=`<div class="alert-grp"><div class="gh">🐌 เคสค้างนาน (>${STALE_CASE_DAYS} วัน) <span class="ct">${a.stale.length}</span></div><div class="panel">${a.stale.map(c=>`<div class="row" data-case="${esc(c.id)}" style="cursor:pointer"><div class="av" style="background:rgba(214,40,40,.1);color:#D62828">${daysAgo(tsDate(c.reportedMissingAt))}</div><div class="main"><b>${esc(c.itemName)} @ ${esc(c.stationId)}</b><div class="meta">เปิดมาแล้ว ${daysAgo(tsDate(c.reportedMissingAt))} วัน ยังไม่ปิด</div></div><span class="badge red">เร่งติดตาม</span></div>`).join('')}</div></div>`; }
   if(a.seal.length){ html+=`<div class="alert-grp"><div class="gh">🔒 ซีลเปลี่ยน/ไม่ตรงกับครั้งก่อน <span class="ct">${a.seal.length}</span></div><div class="panel">${a.seal.map(x=>`<div class="row"><div class="av" style="background:rgba(230,81,0,.13);color:#E65100">🔒</div><div class="main"><b>${esc(x.s.id)}</b><div class="meta">ซีลล่าสุด <span class="mono">${esc(x.now)}</span> · ก่อนหน้า <span class="mono">${esc(x.prev)}</span></div></div><span class="badge amber">ตรวจสอบ</span></div>`).join('')}</div></div>`; }
   el.innerHTML=html;
@@ -614,9 +629,9 @@ function renderAlerts(){
 /* ===== EXPORT (H1–H3) ===== */
 function exportExcel(rows,name){ const ws=XLSX.utils.aoa_to_sheet(rows); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'data'); XLSX.writeFile(wb,name); }
 function exportHistory(){
-  const head=['วันเวลา','รหัสสถานี','ชื่อสถานี','ไซต์','ผู้ตรวจ','ผล','แรงดัน(bar)','ซีล','ของหาย','ระยะ GPS(ม.)','จำนวนรูป','หมายเหตุ'];
+  const head=['วันเวลา','รหัสสถานี','ชื่อสถานี','ไซต์','ผู้ตรวจ','กะ','ผล','แรงดัน(bar)','ซีล','ของหาย','ระยะ GPS(ม.)','จำนวนรูป','หมายเหตุ'];
   const rows=[head,...INSPECTIONS.map(i=>[fmt(tsDate(i.createdAt)),i.stationId,i.stationName||'',i.site||'',i.inspectorName||'',
-    i.result==='pass'?'ผ่าน':i.result==='needs_repair'?'ต้องแก้ไข':'ไม่ผ่าน',i.pressureValue??'',i.sealNumber||'',
+    i.shift?shiftLabel(i.shift):'',i.result==='pass'?'ผ่าน':i.result==='needs_repair'?'ต้องแก้ไข':'ไม่ผ่าน',i.pressureValue??'',i.sealNumber||'',
     (i.missingItems||[]).map(m=>m.name).join('; '),i.gpsDistanceM??'',(i.photos||[]).length,i.notes||''])];
   exportExcel(rows,`FHS_inspections_${new Date().toISOString().slice(0,10)}.xlsx`);
 }
@@ -638,40 +653,47 @@ function planList(){
     if(asg&&asg!=='_none'&&s.assignedTo!==asg)return false;
     if(st&&p.status!==st)return false;
     return true;
-  }).sort((a,b)=>{ // worst first: overdue → never → soon → ontrack, then by overBy
+  }).sort((a,b)=>{ // worst first: พลาดกะก่อน → ยังไม่เคยตรวจ → รอตรวจกะนี้ → ครบกะนี้
     const rank={overdue:0,never:1,soon:2,ontrack:3};
     if(rank[a.p.status]!==rank[b.p.status])return rank[a.p.status]-rank[b.p.status];
-    return (b.p.overBy??-999)-(a.p.overBy??-999);
+    return a.s.id.localeCompare(b.s.id);
   });
 }
 function renderPlan(){
-  const all=STATIONS.map(s=>planInfo(s));
-  const overdue=all.filter(p=>p.status==='overdue').length;
-  const soon=all.filter(p=>p.status==='soon').length;
+  const cur=shiftWindow();
+  const infos=STATIONS.map(s=>({s,p:planInfo(s)}));
+  const missed=infos.filter(x=>x.p.status==='overdue').length;
+  const pendingCur=infos.filter(x=>x.p.status==='soon').length;
   const noAsg=STATIONS.filter(s=>!s.assignedTo).length;
   $('planStats').innerHTML=`
-    <div class="stat ${overdue?'s-red':'s-green'}"><div class="bar"></div><div class="lab">เกินกำหนดตรวจ</div><div class="val">${overdue}</div><div class="sub">ตามรอบของแต่ละสถานี</div></div>
-    <div class="stat ${soon?'s-amber':'s-green'}"><div class="bar"></div><div class="lab">ใกล้ครบกำหนด (≤2 วัน)</div><div class="val">${soon}</div><div class="sub">ควรวางแผนตรวจ</div></div>
+    <div class="stat ${missed?'s-red':'s-green'}"><div class="bar"></div><div class="lab">พลาดกะก่อนหน้า</div><div class="val">${missed}</div><div class="sub">ยังไม่ตรวจกะที่ผ่านมา</div></div>
+    <div class="stat ${pendingCur?'s-amber':'s-green'}"><div class="bar"></div><div class="lab">รอตรวจกะปัจจุบัน (${shiftLabel(cur.shift)})</div><div class="val">${pendingCur}</div><div class="sub">ยังไม่ได้ตรวจกะนี้</div></div>
     <div class="stat ${noAsg?'s-amber':'s-navy'}"><div class="bar"></div><div class="lab">ยังไม่มอบหมายผู้ตรวจ</div><div class="val">${noAsg}</div><div class="sub">กำหนดได้ใน Admin</div></div>`;
   const list=planList(); const tb=$('planBody');
   if(!list.length){ tb.innerHTML='<tr><td colspan="7"><div class="empty">ไม่พบสถานีตามเงื่อนไข</div></td></tr>'; return; }
   const bc={overdue:'red',soon:'amber',ontrack:'green',never:'gray'};
-  const bl={overdue:'เกินกำหนด',soon:'ใกล้ครบ',ontrack:'ตรงเวลา',never:'ยังไม่เคยตรวจ'};
-  tb.innerHTML=list.map(({s,p})=>`<tr>
+  const bl={overdue:'พลาดกะก่อน',soon:'รอตรวจกะนี้',ontrack:'ครบกะนี้',never:'ยังไม่เคยตรวจ'};
+  const today=todayWindows();
+  tb.innerHTML=list.map(({s,p})=>{
+    const dDone=coveredIn(s.id,today.day), nDone=coveredIn(s.id,today.night);
+    const mk=ok=>ok?'<span style="color:var(--green);font-weight:700">✓</span>':'<span style="color:var(--muted)">—</span>';
+    return `<tr>
     <td class="mono">${esc(s.id)}<div style="font-size:11px;color:var(--muted)">${esc(s.name||'')}</div></td>
     <td>${esc(s.site||'')}</td>
     <td>${s.assignedToName?esc(s.assignedToName):'<span class="badge amber">ยังไม่มอบหมาย</span>'}</td>
-    <td>ทุก ${freqOf(s)} วัน</td>
+    <td style="white-space:nowrap">☀️ ${mk(dDone)} &nbsp; 🌙 ${mk(nDone)}</td>
     <td style="white-space:nowrap">${fmt(tsDate(s.lastInspectionAt))}</td>
-    <td style="white-space:nowrap">${p.due?fmtD(p.due):'—'}</td>
-    <td><span class="badge ${bc[p.status]}">${bl[p.status]}${p.status==='overdue'?' '+p.overBy+'ว':''}</span></td>
-  </tr>`).join('');
+    <td>${p.doneCur?'<span class="badge green">ครบ</span>':'<span class="badge amber">รอตรวจ</span>'}</td>
+    <td><span class="badge ${bc[p.status]}">${bl[p.status]}</span></td>
+  </tr>`;}).join('');
 }
 function exportPlan(){
-  const head=['รหัสสถานี','ชื่อสถานี','ไซต์','ผู้รับผิดชอบ','ความถี่(วัน)','ตรวจล่าสุด','ครบกำหนด','สถานะ'];
-  const bl={overdue:'เกินกำหนด',soon:'ใกล้ครบ',ontrack:'ตรงเวลา',never:'ยังไม่เคยตรวจ'};
-  const rows=[head,...planList().map(({s,p})=>[s.id,s.name||'',s.site||'',s.assignedToName||'(ยังไม่มอบหมาย)',freqOf(s),
-    fmt(tsDate(s.lastInspectionAt)),p.due?fmtD(p.due):'',bl[p.status]+(p.status==='overdue'?` (${p.overBy} วัน)`:'')])];
+  const head=['รหัสสถานี','ชื่อสถานี','ไซต์','ผู้รับผิดชอบ','กะกลางวันวันนี้','กะกลางคืนวันนี้','ตรวจล่าสุด','สถานะ'];
+  const bl={overdue:'พลาดกะก่อน',soon:'รอตรวจกะนี้',ontrack:'ครบกะนี้',never:'ยังไม่เคยตรวจ'};
+  const today=todayWindows();
+  const rows=[head,...planList().map(({s,p})=>[s.id,s.name||'',s.site||'',s.assignedToName||'(ยังไม่มอบหมาย)',
+    coveredIn(s.id,today.day)?'ตรวจแล้ว':'ยังไม่ตรวจ',coveredIn(s.id,today.night)?'ตรวจแล้ว':'ยังไม่ตรวจ',
+    fmt(tsDate(s.lastInspectionAt)),bl[p.status]])];
   exportExcel(rows,`FHS_plan_${new Date().toISOString().slice(0,10)}.xlsx`);
 }
 

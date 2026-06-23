@@ -108,6 +108,7 @@ textarea{resize:vertical;min-height:74px}
 .tog[data-on="pass"]{background:var(--green);border-color:var(--green);color:#fff}
 .tog[data-on="fail"]{background:var(--red);border-color:var(--red);color:#fff}
 .tog[data-on="na"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.tog[data-on="shift"]{background:var(--navy);border-color:var(--navy);color:#fff}
 .cl-note{margin-top:8px;display:none}
 .cl-note.show{display:block}
 .cl-note input{padding:9px 12px;font-size:13px;border-radius:9px}
@@ -245,6 +246,7 @@ const FIREBASE_CONFIG = {
 const CLOUDINARY_CONFIG = { cloudName: "diiqvxqqd", uploadPreset: "fhs_inspection" };
 const GPS_WARN_METERS = 60;          // เตือนถ้าห่างจากสถานีเกินระยะนี้ (A5)
 const MAX_LOGIN_FAILS = 5, LOCK_MINUTES = 15; // brute-force lockout (I1)
+const SHIFT_DAY_START = 7, SHIFT_DAY_END = 19; // กะกลางวัน 07:00–19:00 / กะกลางคืน 19:00–07:00
 /* ==================================================== */
 
 const app = initializeApp(FIREBASE_CONFIG);
@@ -273,6 +275,7 @@ const eqState = {};      // equipment statuses
 const photos = [];       // {url,label}
 let submitting = false;
 let gps = {lat:null,lng:null,distance:null,ok:false};
+let currentShift = 'day';
 
 /* ---------- helpers ---------- */
 const $ = id => document.getElementById(id);
@@ -280,6 +283,8 @@ const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'
 function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on')); $(id).classList.add('on'); window.scrollTo(0,0); }
 async function sha256(str){ const buf=await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str)); return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join(''); }
 function haversine(a,b,c,d){ const R=6371000,t=x=>x*Math.PI/180; const dLat=t(c-a),dLng=t(d-b); const h=Math.sin(dLat/2)**2+Math.cos(t(a))*Math.cos(t(c))*Math.sin(dLng/2)**2; return Math.round(R*2*Math.atan2(Math.sqrt(h),Math.sqrt(1-h))); }
+const shiftOf=d=>{ const h=(d instanceof Date?d:new Date(d)).getHours(); return (h>=SHIFT_DAY_START&&h<SHIFT_DAY_END)?'day':'night'; };
+const shiftLabel=s=>s==='day'?'กลางวัน':'กลางคืน';
 
 /* ============ AUTH (I1) ============ */
 async function doLogin(){
@@ -392,6 +397,16 @@ function enterInspection(){
     <div class="gps wait" id="gpsBox"><span class="dot"></span>กำลังระบุตำแหน่ง GPS…</div>
 
     <div class="card">
+      <div class="card-h"><div class="ix">🕐</div><h3>กะการตรวจ</h3><span class="sub">เลือกให้ตรง</span></div>
+      <div class="card-b">
+        <div class="cl-buttons" id="shiftBtns" style="grid-template-columns:1fr 1fr">
+          <button class="tog" data-shift="day">☀️ กลางวัน <span style="font-weight:400;font-size:11px">07:00–19:00</span></button>
+          <button class="tog" data-shift="night">🌙 กลางคืน <span style="font-weight:400;font-size:11px">19:00–07:00</span></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
       <div class="card-h"><div class="ix">B</div><h3>รายการตรวจสอบ</h3><span class="sub">${CHECKLIST.length} รายการ</span></div>
       <div class="card-b" id="clBody">${clRows}</div>
     </div>
@@ -452,6 +467,14 @@ function enterInspection(){
   $('photoInput').addEventListener('change', handlePhotos);
   $('btnSubmit').addEventListener('click', submitInspection);
   $('btnCancel').addEventListener('click', ()=>location.href=location.pathname);
+
+  currentShift = shiftOf(new Date());
+  $('shiftBtns').querySelectorAll('[data-shift]').forEach(b=>b.addEventListener('click',()=>{
+    currentShift=b.dataset.shift;
+    $('shiftBtns').querySelectorAll('[data-shift]').forEach(x=>x.removeAttribute('data-on'));
+    b.setAttribute('data-on','shift');
+  }));
+  $('shiftBtns').querySelector(`[data-shift="${currentShift}"]`)?.setAttribute('data-on','shift');
 
   show('scrInspect');
   initSignature(); // ต้อง init หลังหน้าจอแสดงผลแล้ว ไม่งั้น canvas วัดขนาดได้ 0×0 เซ็นไม่ติด
@@ -588,7 +611,7 @@ async function submitInspection(){
 
     const insp={
       stationId:CURRENT_STATION.id, stationName:CURRENT_STATION.name||'', site:CURRENT_STATION.site||'',
-      inspectorId:CURRENT_USER.id, inspectorName:CURRENT_USER.name,
+      inspectorId:CURRENT_USER.id, inspectorName:CURRENT_USER.name, shift:currentShift,
       serverTimestamp:serverTimestamp(), clientTime:new Date().toISOString(),
       gps:{lat:gps.lat,lng:gps.lng}, gpsDistanceM:gps.distance,
       checklist, photos, signatureUrl, result, equipmentSnapshot, missingItems,
@@ -641,6 +664,7 @@ function renderSuccess(id,result,missing){
     <div style="display:flex;justify-content:space-between;padding:6px 0"><span class="hint">สถานี</span><b class="mono">${esc(CURRENT_STATION.id)}</b></div>
     <div style="display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid var(--line)"><span class="hint">ผู้ตรวจ</span><b>${esc(CURRENT_USER.name)}</b></div>
     <div style="display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid var(--line)"><span class="hint">เวลา</span><b>${esc(new Date().toLocaleString('th-TH'))}</b></div>
+    <div style="display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid var(--line)"><span class="hint">กะ</span><b>${currentShift==='day'?'☀️ กลางวัน':'🌙 กลางคืน'}</b></div>
     <div style="display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid var(--line)"><span class="hint">ผล</span><b style="color:${resColor}">${esc(resLabel)}</b></div>`;
   if(missing.length){
     html+=`<div style="margin-top:10px;padding:11px;background:rgba(214,40,40,.06);border-radius:10px;border:1px solid rgba(214,40,40,.2)">

@@ -160,6 +160,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--navy-2);
     <button class="tab" data-tab="users">👤 ผู้ใช้</button>
     <button class="tab" data-tab="cameras">🎥 กล้อง CCTV</button>
     <button class="tab" data-tab="qr">⬛ QR &amp; พิมพ์</button>
+    <button class="tab" data-tab="data">🧹 ข้อมูล</button>
   </div>
 
   <!-- STATIONS -->
@@ -190,6 +191,29 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--navy-2);
     <div class="field" style="max-width:520px"><label>URL แอปตรวจ (ปลายทางของ QR)</label><input type="text" id="inspectUrl" class="mono"></div>
     <div class="qr-grid" id="qrGrid"><div class="empty">ยังไม่มีสถานี</div></div>
   </div>
+
+  <!-- DATA / CLEANUP -->
+  <div class="page" id="page-data">
+    <div class="page-head"><h2>จัดการ/ล้างข้อมูลการตรวจ</h2></div>
+    <div class="alert err" style="margin-bottom:14px">⚠️ <b>Danger Zone</b> — การลบเป็นการลบถาวร กู้คืนไม่ได้ ใช้เฉพาะเมื่อแน่ใจ (เช่น ล้างข้อมูลทดสอบ)</div>
+    <div class="card" style="padding:18px;max-width:560px">
+      <div class="two">
+        <div class="field"><label>ตั้งแต่วันที่</label><input type="date" id="clrFrom"></div>
+        <div class="field"><label>ถึงวันที่ (รวมทั้งวัน)</label><input type="date" id="clrTo"></div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+        <button class="btn btn-ghost btn-sm" id="clrLastWeek">สัปดาห์ที่แล้ว</button>
+        <button class="btn btn-ghost btn-sm" id="clrThisWeek">สัปดาห์นี้</button>
+        <button class="btn btn-ghost btn-sm" id="clrAll">ทั้งหมด</button>
+      </div>
+      <label class="chk" style="display:flex;gap:8px;align-items:center;margin-bottom:12px"><input type="checkbox" id="clrCases" checked> ลบเคส CCTV ในช่วงเดียวกันด้วย</label>
+      <div id="clrPreview" class="hint" style="margin:10px 0;font-size:14px"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-ghost" id="clrPreviewBtn">🔍 ตรวจสอบจำนวนที่จะลบ</button>
+        <button class="btn" id="clrDelBtn" style="display:none;background:var(--red);color:#fff">🗑 ลบข้อมูลในช่วงนี้</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- STATION MODAL -->
@@ -209,10 +233,8 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--navy-2);
     </div>
     <button class="btn btn-ghost btn-sm" id="smGps" style="margin-bottom:14px">📍 ใช้ตำแหน่งปัจจุบัน</button>
     <div class="field"><label>กล้อง CCTV ที่ครอบคลุม</label><select id="smCams" multiple size="3" style="height:auto"></select><p class="hint">กด Ctrl/Cmd ค้างเพื่อเลือกหลายตัว</p></div>
-    <div class="two">
-      <div class="field"><label>ความถี่การตรวจ (ทุกกี่วัน)</label><input type="number" id="smFreq" min="1" placeholder="เช่น 7" value="7"></div>
-      <div class="field"><label>ผู้รับผิดชอบ</label><select id="smAssignee"><option value="">— ไม่ระบุ —</option></select></div>
-    </div>
+    <div class="field"><label>ผู้รับผิดชอบ</label><select id="smAssignee"><option value="">— ไม่ระบุ —</option></select></div>
+    <div class="alert info" style="margin-bottom:14px">ความถี่การตรวจ: <b>2 ครั้ง/วัน</b> — กะกลางวัน (07:00–19:00) และกะกลางคืน (19:00–07:00) ทุกสถานี</div>
     <label style="margin-top:6px">อุปกรณ์ในสถานี (รายชิ้น)</label>
     <div id="smEquip"></div>
     <button class="btn btn-ghost btn-sm" id="smAddEq" style="margin-top:4px">+ เพิ่มอุปกรณ์</button>
@@ -273,8 +295,10 @@ const $=id=>document.getElementById(id);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); // escape quotes ด้วย เพราะใช้ใน attribute
 async function sha256(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');}
 function randSalt(){return [...crypto.getRandomValues(new Uint8Array(16))].map(b=>b.toString(16).padStart(2,'0')).join('');}
+const tsDate=ts=>ts?(ts.toDate?ts.toDate():new Date(ts)):null;
+const inspTime=i=>tsDate(i.createdAt)||(i.clientTime?new Date(i.clientTime):null);
 
-let STATIONS=[], USERS=[], CAMERAS=[], ADMIN=null, editStationId=null, editUserId=null, editCameraId=null;
+let STATIONS=[], USERS=[], CAMERAS=[], INSPECTIONS=[], CASES=[], ADMIN=null, editStationId=null, editUserId=null, editCameraId=null;
 
 /* ===== LOGIN GATE ===== */
 async function gateLogin(){
@@ -310,7 +334,8 @@ function bootApp(){
 }
 
 /* ===== LOAD ===== */
-async function loadAll(){ await Promise.all([loadStations(),loadUsers(),loadCameras()]); }
+async function loadAll(){ await Promise.all([loadStations(),loadUsers(),loadCameras(),loadInsCases()]); }
+async function loadInsCases(){ const [i,c]=await Promise.all([getDocs(collection(db,'inspections')),getDocs(collection(db,'cases'))]); INSPECTIONS=i.docs.map(d=>({id:d.id,...d.data()})); CASES=c.docs.map(d=>({id:d.id,...d.data()})); }
 async function loadStations(){ const s=await getDocs(collection(db,'stations')); STATIONS=s.docs.map(d=>({id:d.id,...d.data()})); renderStations(); renderQR(); }
 async function loadUsers(){ const s=await getDocs(collection(db,'users')); USERS=s.docs.map(d=>({id:d.id,...d.data()})); renderUsers(); }
 async function loadCameras(){ const s=await getDocs(collection(db,'cctvCameras')); CAMERAS=s.docs.map(d=>({id:d.id,...d.data()})); renderCameras(); }
@@ -347,7 +372,7 @@ function openStation(id){
   $('smId').value=s?s.id:''; $('smId').disabled=!!id;
   $('smSite').value=s?.site||''; $('smName').value=s?.name||''; $('smLoc').value=s?.location||'';
   $('smLat').value=s?.gps?.lat??''; $('smLng').value=s?.gps?.lng??'';
-  $('smFreq').value=s?.inspectionFrequencyDays??7; $('smAssignee').value=s?.assignedTo||'';
+  $('smAssignee').value=s?.assignedTo||'';
   [...$('smCams').options].forEach(o=>o.selected=(s?.cctvCameras||[]).includes(o.value));
   $('smEquip').innerHTML=''; (s?.equipment||[]).forEach(addEqRow);
   if(!s||!(s.equipment||[]).length){ addEqRow({name:'หัวฉีดทองเหลือง',type:'หัวฉีด',isBrass:true}); addEqRow({name:'สายดับเพลิง',type:'สาย'}); }
@@ -379,7 +404,7 @@ async function saveStation(){
   const data={stationId:id,site,name:$('smName').value.trim(),location:$('smLoc').value.trim(),
     gps:($('smLat').value&&$('smLng').value)?{lat:parseFloat($('smLat').value),lng:parseFloat($('smLng').value)}:null,
     cctvCameras:cams,equipment,status:'active',
-    inspectionFrequencyDays:parseInt($('smFreq').value)||7, assignedTo:assignee, assignedToName:assigneeName};
+    assignedTo:assignee, assignedToName:assigneeName};
   const btn=$('smSave');btn.disabled=true;btn.innerHTML='<div class="spinner"></div>';
   try{
     if(editStationId) await updateDoc(doc(db,'stations',id),data);
@@ -389,6 +414,40 @@ async function saveStation(){
   finally{btn.disabled=false;btn.textContent='บันทึก';}
 }
 async function delStation(id){ if(!confirm(`ลบสถานี ${id}?\n(ประวัติการตรวจที่บันทึกไว้จะยังคงอยู่)`))return; await deleteDoc(doc(db,'stations',id)); await loadStations(); }
+
+/* ===== DATA CLEANUP (ล้างข้อมูลการตรวจ) ===== */
+const pad2=n=>String(n).padStart(2,'0');
+const toDateInput=d=>`${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+function mondayOf(d){const x=new Date(d);x.setHours(0,0,0,0);const k=(x.getDay()+6)%7;x.setDate(x.getDate()-k);return x;}
+function clrRange(){ const f=$('clrFrom').value,t=$('clrTo').value; return {start:f?new Date(f+'T00:00:00'):null, end:t?new Date(t+'T23:59:59.999'):null}; }
+function clrMatches(){ const {start,end}=clrRange(); const inR=d=>d&&(!start||d>=start)&&(!end||d<=end);
+  const ins=INSPECTIONS.filter(i=>inR(inspTime(i)));
+  const cs=$('clrCases').checked?CASES.filter(c=>inR(tsDate(c.reportedMissingAt))):[];
+  return {ins,cs}; }
+function previewClr(){
+  const {start,end}=clrRange();
+  if(!start&&!end){ $('clrPreview').innerHTML='<span style="color:var(--red)">เลือกช่วงวันที่ก่อน (หรือกดปุ่มลัด)</span>'; $('clrDelBtn').style.display='none'; return; }
+  const {ins,cs}=clrMatches();
+  $('clrPreview').innerHTML=`พบ <b>${ins.length}</b> การตรวจ${$('clrCases').checked?` และ <b>${cs.length}</b> เคส CCTV`:''} ในช่วงที่เลือก`;
+  $('clrDelBtn').style.display=(ins.length||cs.length)?'inline-flex':'none';
+}
+function setClrRange(start,end){ $('clrFrom').value=toDateInput(start); $('clrTo').value=toDateInput(end); previewClr(); }
+async function doClr(){
+  const {ins,cs}=clrMatches();
+  if(!ins.length&&!cs.length){alert('ไม่มีข้อมูลในช่วงที่เลือก');return;}
+  if(!confirm(`ยืนยันลบถาวร ${ins.length} การตรวจ${cs.length?` + ${cs.length} เคส`:''}?\nกู้คืนไม่ได้`))return;
+  if(prompt('พิมพ์ DELETE เพื่อยืนยันการลบถาวร')!=='DELETE'){alert('ยกเลิกการลบ');return;}
+  const btn=$('clrDelBtn');btn.disabled=true;btn.innerHTML='<div class="spinner"></div>กำลังลบ…';
+  let n=0;
+  try{
+    for(const i of ins){ await deleteDoc(doc(db,'inspections',i.id)); n++; }
+    for(const c of cs){ await deleteDoc(doc(db,'cases',c.id)); n++; }
+    await loadInsCases();
+    $('clrPreview').innerHTML=`<b style="color:var(--green)">ลบแล้ว ${n} รายการ ✓</b>`;
+    $('clrDelBtn').style.display='none';
+  }catch(e){ alert('ลบไม่สำเร็จ: '+e.message); }
+  finally{ btn.disabled=false; btn.innerHTML='🗑 ลบข้อมูลในช่วงนี้'; }
+}
 
 /* ===== USERS ===== */
 function renderUsers(){
@@ -524,6 +583,12 @@ $('cmSave').onclick=saveCamera;
 $('smGps').onclick=()=>{ if(!navigator.geolocation){alert('ไม่รองรับ GPS');return;} $('smGps').textContent='📍 กำลังระบุ…'; navigator.geolocation.getCurrentPosition(p=>{$('smLat').value=p.coords.latitude.toFixed(6);$('smLng').value=p.coords.longitude.toFixed(6);$('smGps').textContent='📍 บันทึกพิกัดแล้ว';},()=>{$('smGps').textContent='📍 ใช้ตำแหน่งปัจจุบัน';alert('เข้าถึง GPS ไม่ได้');}); };
 $('selectAll').onclick=()=>{ const cbs=[...document.querySelectorAll('[data-qr]')]; const all=cbs.every(c=>c.checked); cbs.forEach(c=>c.checked=!all); };
 $('printSel').onclick=printSelected;
+$('clrPreviewBtn').onclick=previewClr;
+$('clrDelBtn').onclick=doClr;
+$('clrCases').onchange=()=>{ if($('clrFrom').value||$('clrTo').value)previewClr(); };
+$('clrLastWeek').onclick=()=>{ const m=mondayOf(new Date()); const start=new Date(m); start.setDate(start.getDate()-7); const end=new Date(m); end.setDate(end.getDate()-1); setClrRange(start,end); };
+$('clrThisWeek').onclick=()=>{ setClrRange(mondayOf(new Date()),new Date()); };
+$('clrAll').onclick=()=>{ const times=INSPECTIONS.map(inspTime).filter(Boolean).sort((a,b)=>a-b); if(!times.length){$('clrPreview').innerHTML='ไม่มีข้อมูลการตรวจ';return;} setClrRange(times[0],new Date()); };
 $('inspectUrl').onchange=renderQR;
 $('gBtn').onclick=gateLogin;
 $('gPw').addEventListener('keydown',e=>{if(e.key==='Enter')gateLogin();});

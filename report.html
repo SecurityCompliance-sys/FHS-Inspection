@@ -189,6 +189,8 @@ async function boot(){
   renderReport();
 }
 
+const inspTime=i=>tsDate(i.createdAt)||(i.clientTime?new Date(i.clientTime):null);
+const shiftOf=d=>{ const h=(d instanceof Date?d:new Date(d)).getHours(); return (h>=7&&h<19)?'day':'night'; };
 function inRange(i,r){ const d=tsDate(i.createdAt); return d&&d>=r.start&&d<r.end; }
 function compute(off){
   const cur=weekRange(off), prev=weekRange(off+1);
@@ -196,7 +198,8 @@ function compute(off){
   const stat=arr=>{ const pass=arr.filter(i=>i.result==='pass').length; const fail=arr.length-pass;
     const issues=arr.reduce((s,i)=>s+(i.missingItems?.length||0),0);
     const stationsDone=new Set(arr.map(i=>i.stationId)).size;
-    return {count:arr.length,pass,fail,issues,stationsDone,rate:arr.length?Math.round(pass/arr.length*100):0}; };
+    const dayCount=arr.filter(i=>shiftOf(inspTime(i))==='day').length;
+    return {count:arr.length,pass,fail,issues,stationsDone,dayCount,nightCount:arr.length-dayCount,rate:arr.length?Math.round(pass/arr.length*100):0}; };
   const c=stat(ci), p=stat(pi);
   const uninspected=STATIONS.filter(s=>!ci.some(i=>i.stationId===s.id));
   const failList=ci.filter(i=>i.result!=='pass');
@@ -233,6 +236,12 @@ function renderReport(){
     <div class="kpi ${R.c.rate>=80?'green':R.c.rate>=50?'amber':'red'}"><div class="v">${R.c.rate}%</div><div class="l">อัตราผ่าน</div>${delta(R.c.rate,R.p.rate)}</div>
     <div class="kpi ${R.c.fail?'red':'green'}"><div class="v">${R.c.fail}</div><div class="l">ไม่ผ่าน/ต้องแก้</div>${delta(R.c.fail,R.p.fail,true)}</div>
     <div class="kpi ${R.c.issues?'red':'green'}"><div class="v">${R.c.issues}</div><div class="l">อุปกรณ์หาย</div>${delta(R.c.issues,R.p.issues,true)}</div>
+  </div></div>`;
+
+  // shift breakdown (กะกลางวัน/กลางคืน)
+  html+=`<div class="sec"><h3>🕐 แยกตามกะ (สัปดาห์นี้)</h3><div class="kpis" style="grid-template-columns:1fr 1fr">
+    <div class="kpi navy"><div class="v">☀️ ${R.c.dayCount}</div><div class="l">ตรวจกะกลางวัน</div>${delta(R.c.dayCount,R.p.dayCount)}</div>
+    <div class="kpi navy"><div class="v">🌙 ${R.c.nightCount}</div><div class="l">ตรวจกะกลางคืน</div>${delta(R.c.nightCount,R.p.nightCount)}</div>
   </div></div>`;
 
   // fail table with photos (E3)
@@ -307,7 +316,8 @@ function buildEmailHtml(off, site){
       <td style="text-align:center;padding:10px;border:1px solid #eee"><div style="font-size:24px;font-weight:700;color:${rate>=80?green:rate>=50?amber:red}">${rate}%</div><div style="font-size:11px;color:${mut}">อัตราผ่าน</div></td>
       <td style="text-align:center;padding:10px;border:1px solid #eee"><div style="font-size:24px;font-weight:700;color:${fails.length?red:green}">${fails.length}</div><div style="font-size:11px;color:${mut}">ไม่ผ่าน</div></td>
       <td style="text-align:center;padding:10px;border:1px solid #eee"><div style="font-size:24px;font-weight:700;color:${issues?red:green}">${issues}</div><div style="font-size:11px;color:${mut}">ของหาย</div></td>
-    </tr></table>`;
+    </tr></table>
+    <div style="text-align:center;color:${mut};font-size:12px;margin:-6px 0 16px">☀️ กะกลางวัน ${ci.filter(i=>shiftOf(inspTime(i))==='day').length} · 🌙 กะกลางคืน ${ci.filter(i=>shiftOf(inspTime(i))==='night').length} ครั้ง</div>`;
   if(fails.length){
     h+=`<div style="font-weight:700;color:${c};margin-bottom:8px">⚠️ รายการที่ไม่ผ่าน</div><table width="100%" style="border-collapse:collapse;font-size:13px;margin-bottom:18px">
       <tr style="background:#f4f6fa"><th align="left" style="padding:7px">สถานี</th><th align="left" style="padding:7px">ผู้ตรวจ</th><th align="left" style="padding:7px">ผล</th></tr>`;
