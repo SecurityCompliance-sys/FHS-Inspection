@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>คู่มือผู้ตรวจ · ระบบตรวจสอบสถานีหัวดับเพลิง · BevChain</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#15234A">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@500;600;700&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#E9ECF2; --surface:#FFFFFF; --surface-2:#F4F6FA;
+  --ink:#0F1A2E; --navy:#15234A; --navy-2:#1E2761;
+  --red:#D62828; --red-deep:#9B1B1B; --amber:#E65100; --green:#0E8A5F;
+  --line:#D7DDE8; --muted:#64708A; --ice:#CADCFC;
+  --shadow:0 1px 2px rgba(15,26,46,.06),0 8px 24px rgba(15,26,46,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:"IBM Plex Sans Thai",sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;font-size:15px;-webkit-font-smoothing:antialiased}
+.mono{font-family:"IBM Plex Mono",monospace;letter-spacing:.02em}
+.hazard{height:6px;background:repeating-linear-gradient(135deg,var(--amber) 0 14px,var(--ink) 14px 28px)}
+
+/* topbar */
+.topbar{background:var(--navy);color:#fff;padding:14px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:30}
+.logo{display:flex;align-items:center;gap:10px}.logo svg{width:30px;height:30px;flex:none}
+.logo b{font-family:"Bai Jamjuree";font-weight:700;font-size:15px;line-height:1.1}
+.logo span{display:block;font-size:10.5px;color:var(--ice);font-weight:500;letter-spacing:.04em}
+.topbar .right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.topbar .right a{color:#fff;text-decoration:none;font-size:12.5px;font-weight:600;font-family:"Bai Jamjuree";background:rgba(255,255,255,.12);padding:7px 13px;border-radius:8px;transition:background .12s}
+.topbar .right a:hover{background:rgba(255,255,255,.22)}
+
+.wrap{max-width:880px;margin:0 auto;padding:24px 18px 70px}
+
+/* hero */
+.hero{background:linear-gradient(135deg,var(--navy),var(--navy-2));color:#fff;border-radius:16px;padding:30px 26px;position:relative;overflow:hidden;box-shadow:var(--shadow);margin-bottom:22px}
+.hero::after{content:"";position:absolute;right:-50px;top:-50px;width:200px;height:200px;border-radius:50%;background:rgba(202,220,252,.08)}
+.hero .kicker{font-size:12px;font-weight:600;letter-spacing:.1em;color:var(--ice);text-transform:uppercase}
+.hero h1{font-family:"Bai Jamjuree";font-weight:700;font-size:27px;margin-top:6px;line-height:1.2}
+.hero p{color:var(--ice);font-size:14px;margin-top:8px;max-width:600px;position:relative;z-index:1}
+.hero .ver{display:inline-block;margin-top:14px;background:rgba(255,255,255,.14);padding:5px 14px;border-radius:20px;font-size:12px;font-weight:600}
+
+/* TOC */
+.toc{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 20px;box-shadow:var(--shadow);margin-bottom:22px}
+.toc h2{font-family:"Bai Jamjuree";font-weight:700;font-size:15px;color:var(--navy);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.toc ol{list-style:none;counter-reset:toc;display:grid;grid-template-columns:1fr 1fr;gap:6px 18px}
+.toc ol li{counter-increment:toc}
+.toc ol li a{display:flex;align-items:center;gap:10px;padding:7px 9px;border-radius:9px;text-decoration:none;color:var(--ink);font-size:13.5px;font-weight:500;transition:background .12s}
+.toc ol li a:hover{background:var(--surface-2)}
+.toc ol li a::before{content:counter(toc);font-family:"Bai Jamjuree";font-weight:700;font-size:12px;width:24px;height:24px;border-radius:7px;background:var(--navy);color:#fff;display:grid;place-items:center;flex:none}
+
+/* sections */
+.sec{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);margin-bottom:18px;overflow:hidden;scroll-margin-top:80px}
+.sec-h{background:var(--surface-2);border-bottom:1px solid var(--line);padding:16px 22px;display:flex;align-items:center;gap:13px}
+.sec-h .n{width:34px;height:34px;border-radius:9px;background:var(--navy);color:#fff;display:grid;place-items:center;font-family:"Bai Jamjuree";font-weight:700;font-size:16px;flex:none}
+.sec-h h2{font-family:"Bai Jamjuree";font-weight:700;font-size:18px;color:var(--navy)}
+.sec-h .tag{margin-left:auto;font-size:11px;font-weight:600;color:var(--muted);background:var(--surface);border:1px solid var(--line);padding:4px 10px;border-radius:20px}
+.sec-b{padding:22px}
+.sec-b > p{margin-bottom:12px}
+.sec-b h3{font-family:"Bai Jamjuree";font-weight:600;font-size:15.5px;color:var(--navy-2);margin:18px 0 10px;display:flex;align-items:center;gap:8px}
+.sec-b h3:first-child{margin-top:0}
+
+/* step list */
+.steps{counter-reset:step;list-style:none;margin:6px 0}
+.steps li{counter-increment:step;position:relative;padding:0 0 14px 42px;margin-bottom:0}
+.steps li:last-child{padding-bottom:0}
+.steps li::before{content:counter(step);position:absolute;left:0;top:-2px;width:28px;height:28px;border-radius:50%;background:var(--ice);color:var(--navy);font-family:"Bai Jamjuree";font-weight:700;font-size:13px;display:grid;place-items:center}
+.steps li:not(:last-child)::after{content:"";position:absolute;left:13.5px;top:28px;bottom:6px;width:1.5px;background:var(--line)}
+.steps li b{color:var(--navy-2)}
+
+/* status pills demo */
+.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:12.5px;font-weight:600;white-space:nowrap}
+.pill .dot{width:9px;height:9px;border-radius:50%;flex:none}
+.pill.ok{background:rgba(14,138,95,.12);color:var(--green);border:1px solid rgba(14,138,95,.3)}.pill.ok .dot{background:var(--green)}
+.pill.warn{background:rgba(230,81,0,.12);color:var(--amber);border:1px solid rgba(230,81,0,.35)}.pill.warn .dot{background:var(--amber)}
+.pill.wait{background:var(--surface-2);color:var(--muted);border:1px solid var(--line)}.pill.wait .dot{background:var(--muted)}
+.pill.red{background:rgba(214,40,40,.1);color:var(--red);border:1px solid rgba(214,40,40,.3)}.pill.red .dot{background:var(--red)}
+
+/* tri buttons demo */
+.tridemo{display:inline-flex;gap:7px;vertical-align:middle}
+.tridemo .tb{padding:8px 16px;border-radius:9px;font-weight:600;font-size:13px;border:1.5px solid var(--line)}
+.tb.pass{background:var(--green);border-color:var(--green);color:#fff}
+.tb.fail{background:var(--red);border-color:var(--red);color:#fff}
+.tb.na{background:var(--ink);border-color:var(--ink);color:#fff}
+.tb.present{background:var(--green);border-color:var(--green);color:#fff}
+.tb.damaged{background:var(--amber);border-color:var(--amber);color:#fff}
+.tb.missing{background:var(--red);border-color:var(--red);color:#fff}
+.tb.off{background:var(--surface);color:var(--muted)}
+
+/* callout */
+.note{border-radius:11px;padding:13px 16px;margin:14px 0;font-size:13.5px;display:flex;gap:11px;align-items:flex-start}
+.note .ic{flex:none;font-size:17px;line-height:1.3}
+.note.tip{background:rgba(14,138,95,.08);border:1px solid rgba(14,138,95,.25)}
+.note.warn{background:rgba(230,81,0,.09);border:1px solid rgba(230,81,0,.3)}
+.note.danger{background:rgba(214,40,40,.07);border:1px solid rgba(214,40,40,.25)}
+.note.info{background:var(--surface-2);border:1px solid var(--line)}
+.note b{color:var(--navy-2)}
+
+/* requirement chips */
+.reqlist{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.reqchip{display:inline-flex;align-items:center;gap:7px;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:8px 13px;font-size:13px;font-weight:500}
+.reqchip .star{color:var(--red);font-weight:700}
+
+/* table */
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13.5px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--surface-2);font-family:"Bai Jamjuree";font-weight:600;color:var(--navy);font-size:13px}
+td .code{font-family:"IBM Plex Mono";font-weight:600;font-size:12px;color:#fff;background:var(--muted);padding:2px 7px;border-radius:6px;display:inline-block}
+td .code.brass{background:var(--amber)}
+
+/* FAQ */
+.faq{border:1px solid var(--line);border-radius:11px;margin-bottom:10px;overflow:hidden;background:var(--surface)}
+.faq summary{padding:14px 16px;font-weight:600;font-size:14px;color:var(--navy);cursor:pointer;list-style:none;display:flex;align-items:center;gap:10px;background:var(--surface-2)}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::before{content:"+";font-family:"Bai Jamjuree";font-weight:700;font-size:18px;color:var(--navy-2);width:20px;flex:none}
+.faq[open] summary::before{content:"–"}
+.faq .ans{padding:14px 16px 16px 46px;font-size:13.5px;color:var(--ink)}
+.faq .ans p+p{margin-top:8px}
+
+kbd{font-family:"IBM Plex Mono";font-size:12px;background:var(--ink);color:#fff;padding:2px 7px;border-radius:6px;font-weight:600}
+.divider{height:1px;background:var(--line);margin:18px 0}
+.footer{text-align:center;font-size:11px;color:var(--muted);padding:24px 16px 0;line-height:1.7}
+.footer b{color:var(--navy)}
+.backtop{display:inline-block;margin-top:8px;font-size:12px;color:var(--navy-2);text-decoration:none;font-weight:600}
+
+@media(max-width:640px){
+  .toc ol{grid-template-columns:1fr}
+  .hero h1{font-size:22px}
+  .sec-b{padding:18px}
+  .faq .ans{padding-left:16px}
+}
+@media print{
+  body{background:#fff;font-size:12px}
+  .topbar,.toc .backtop,.hero::after{display:none}
+  .hero,.sec,.toc{box-shadow:none;border:1px solid #ccc;break-inside:avoid}
+  .sec{break-inside:avoid}
+  .topbar{position:static}
+}
+</style>
+</head>
+<body>
+<div class="hazard"></div>
+<div class="topbar">
+  <div class="logo">
+    <svg viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="7" fill="#1E2761"/><path d="M16 6c-3 4-5 6-5 9.5A5 5 0 0 0 16 20a5 5 0 0 0 5-4.5C21 12 19 10 16 6z" fill="#D62828"/><path d="M16 11c-1.4 2-2.3 2.8-2.3 4.3A2.3 2.3 0 0 0 16 17.5a2.3 2.3 0 0 0 2.3-2.2C18.3 13.8 17.4 13 16 11z" fill="#E65100"/><rect x="9" y="23" width="14" height="2.4" rx="1.2" fill="#CADCFC"/></svg>
+    <div><b>FHS Inspection</b><span>SECURITY &amp; COMPLIANCE</span></div>
+  </div>
+  <div class="right">
+    <a href="index.html">เปิดแอปตรวจ →</a>
+    <a href="#" onclick="window.print();return false;">🖨 พิมพ์</a>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kicker">คู่มือการใช้งานสำหรับผู้ตรวจ</div>
+    <h1>ระบบตรวจสอบสถานีหัวดับเพลิง</h1>
+    <p>คู่มือนี้อธิบายขั้นตอนการตรวจสถานีหัวดับเพลิง (Fire Hose Station) ตั้งแต่เข้าสู่ระบบ สแกนสถานี กรอกผลตรวจ ถ่ายรูป เซ็นรับรอง จนถึงบันทึกผล — สำหรับเจ้าหน้าที่ผู้ตรวจภาคสนาม</p>
+    <span class="ver">BevChain Thailand · Fire Hose Station Inspection v1.0</span>
+  </div>
+
+  <!-- TOC -->
+  <nav class="toc">
+    <h2>📑 สารบัญ</h2>
+    <ol>
+      <li><a href="#s1">ภาพรวมและสิ่งที่ต้องเตรียม</a></li>
+      <li><a href="#s2">ติดตั้งแอปลงมือถือ (PWA)</a></li>
+      <li><a href="#s3">เข้าสู่ระบบ</a></li>
+      <li><a href="#s4">เริ่มการตรวจ — สแกนสถานี</a></li>
+      <li><a href="#s5">ตรวจสอบ GPS</a></li>
+      <li><a href="#s6">กรอกรายการตรวจ (Checklist B)</a></li>
+      <li><a href="#s7">ตรวจนับอุปกรณ์</a></li>
+      <li><a href="#s8">แรงดัน &amp; หมายเลขซีล</a></li>
+      <li><a href="#s9">ถ่ายรูปหลักฐาน</a></li>
+      <li><a href="#s10">หมายเหตุ &amp; สรุปผล</a></li>
+      <li><a href="#s11">ลายเซ็นผู้ตรวจ</a></li>
+      <li><a href="#s12">บันทึกผลการตรวจ</a></li>
+      <li><a href="#s13">การทำงานออฟไลน์</a></li>
+      <li><a href="#s14">ปัญหาที่พบบ่อย (FAQ)</a></li>
+    </ol>
+  </nav>
+
+  <!-- 1 -->
+  <section class="sec" id="s1">
+    <div class="sec-h"><div class="n">1</div><h2>ภาพรวมและสิ่งที่ต้องเตรียม</h2></div>
+    <div class="sec-b">
+      <p>ระบบนี้ใช้บันทึกผลการตรวจสถานีหัวดับเพลิงแบบดิจิทัล แทนการจดกระดาษ ข้อมูลทุกอย่าง (ผลตรวจ รูปถ่าย พิกัด GPS ลายเซ็น) จะถูกส่งเข้าศูนย์กลางทันที และทีมส่วนกลางจะเห็นรายงานบน Dashboard</p>
+      <h3>สิ่งที่ต้องเตรียม</h3>
+      <div class="reqlist">
+        <span class="reqchip">📱 สมาร์ทโฟน (Android / iPhone)</span>
+        <span class="reqchip">📷 กล้องถ่ายรูป + สแกน QR</span>
+        <span class="reqchip">📍 เปิด GPS / ตำแหน่งที่ตั้ง</span>
+        <span class="reqchip">🌐 อินเทอร์เน็ต (ตรวจออฟไลน์ได้ ค่อยซิงค์ทีหลัง)</span>
+        <span class="reqchip">🆔 รหัสพนักงาน + รหัสผ่าน</span>
+      </div>
+      <div class="note info"><span class="ic">ℹ️</span><div>หากยังไม่มี <b>รหัสพนักงาน/รหัสผ่าน</b> ติดต่อหัวหน้าทีมหรือผู้ดูแลระบบ (Admin) เพื่อสร้างบัญชีให้ก่อน</div></div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section class="sec" id="s2">
+    <div class="sec-h"><div class="n">2</div><h2>ติดตั้งแอปลงมือถือ (PWA)</h2><span class="tag">ทำครั้งเดียว</span></div>
+    <div class="sec-b">
+      <p>แนะนำให้ติดตั้งเป็นแอปบนหน้าจอหลัก จะเปิดเร็วและใช้งานออฟไลน์ได้ดีกว่าเปิดผ่านเบราว์เซอร์</p>
+      <h3>📱 Android (Chrome)</h3>
+      <ol class="steps">
+        <li>เปิดลิงก์แอปตรวจในเบราว์เซอร์ <b>Chrome</b></li>
+        <li>กดเมนู <kbd>⋮</kbd> มุมขวาบน → เลือก <b>“ติดตั้งแอป”</b> หรือ <b>“เพิ่มลงในหน้าจอหลัก”</b></li>
+        <li>ยืนยัน — ไอคอน <b>FHS ตรวจสถานี</b> จะปรากฏบนหน้าจอ</li>
+      </ol>
+      <h3>🍎 iPhone / iPad (Safari)</h3>
+      <ol class="steps">
+        <li>เปิดลิงก์แอปตรวจในเบราว์เซอร์ <b>Safari</b></li>
+        <li>กดปุ่ม <b>แชร์</b> <kbd>↑</kbd> ด้านล่าง → เลือก <b>“เพิ่มไปยังหน้าจอโฮม”</b></li>
+        <li>กด <b>“เพิ่ม”</b> มุมขวาบน</li>
+      </ol>
+      <div class="note tip"><span class="ic">✅</span><div>ครั้งแรกที่เปิด แอปจะขอสิทธิ์ <b>กล้อง</b> และ <b>ตำแหน่งที่ตั้ง (GPS)</b> — กด <b>“อนุญาต”</b> ทั้งสองอย่าง ไม่งั้นจะสแกน QR และบันทึกพิกัดไม่ได้</div></div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section class="sec" id="s3">
+    <div class="sec-h"><div class="n">3</div><h2>เข้าสู่ระบบ</h2></div>
+    <div class="sec-b">
+      <ol class="steps">
+        <li>กรอก <b>รหัสพนักงาน</b> (เช่น <span class="mono">EMP-1023</span>) — ระบบจะแปลงเป็นตัวพิมพ์ใหญ่ให้อัตโนมัติ</li>
+        <li>กรอก <b>รหัสผ่าน</b></li>
+        <li>กด <b>“เข้าสู่ระบบ”</b></li>
+      </ol>
+      <div class="note warn"><span class="ic">🔒</span><div><b>ระวังการกรอกรหัสผ่านผิด:</b> หากกรอกผิดเกิน <b>5 ครั้ง</b> ระบบจะ <b>ล็อกบัญชี 15 นาที</b> เพื่อความปลอดภัย ต้องรอครบเวลาจึงลองใหม่ได้ ระบบจะแจ้งจำนวนครั้งที่เหลือทุกครั้งที่กรอกผิด</div></div>
+      <div class="note info"><span class="ic">ℹ️</span><div>เมื่อเข้าสู่ระบบสำเร็จแล้ว ระบบจะ <b>จำการเข้าสู่ระบบไว้</b> ในเครื่อง — ตรวจสถานีถัดไปได้เลยโดยไม่ต้องล็อกอินซ้ำ จนกว่าจะกด “ออกจากระบบ” หรือปิดแอป</div></div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section class="sec" id="s4">
+    <div class="sec-h"><div class="n">4</div><h2>เริ่มการตรวจ — สแกนสถานี</h2></div>
+    <div class="sec-b">
+      <p>มี <b>3 วิธี</b> ในการระบุสถานีที่จะตรวจ เลือกวิธีใดก็ได้:</p>
+      <h3>① สแกน QR Code <span class="tag" style="margin-left:6px">แนะนำ</span></h3>
+      <ol class="steps">
+        <li>กดปุ่ม <b>“สแกน QR Code”</b></li>
+        <li>เล็งกล้องไปที่ <b>ป้าย QR</b> ที่ติดบนตู้/สถานี</li>
+        <li>ระบบจะเปิดสถานีนั้นให้อัตโนมัติเมื่ออ่านสำเร็จ</li>
+      </ol>
+      <h3>② แตะป้าย NFC</h3>
+      <p>หากสถานีมีป้าย NFC และเครื่องเป็น <b>Android + Chrome</b> จะมีปุ่ม <b>“แตะป้าย NFC”</b> ปรากฏ — กดแล้วนำหลังเครื่องไปแตะป้าย</p>
+      <div class="note info"><span class="ic">ℹ️</span><div>ปุ่ม NFC จะแสดงเฉพาะบน <b>Chrome บน Android</b> เท่านั้น iPhone ไม่รองรับฟีเจอร์นี้ ให้ใช้สแกน QR แทน</div></div>
+      <h3>③ พิมพ์รหัสสถานีเอง</h3>
+      <p>ถ้า QR เสียหายหรือสแกนไม่ได้ ให้พิมพ์รหัสสถานี (เช่น <span class="mono">FHC-EX-01</span>) ในช่องด้านล่าง แล้วกด <b>“ไป”</b></p>
+      <div class="note warn"><span class="ic">⚠️</span><div>ถ้าระบบขึ้นว่า <b>“ไม่พบสถานีในระบบ”</b> แปลว่ารหัสผิดหรือสถานียังไม่ได้ลงทะเบียน — ตรวจสอบรหัสอีกครั้ง หรือแจ้ง Admin</div></div>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section class="sec" id="s5">
+    <div class="sec-h"><div class="n">5</div><h2>ตรวจสอบ GPS</h2></div>
+    <div class="sec-b">
+      <p>เมื่อเข้าหน้าตรวจ ระบบจะระบุตำแหน่งของคุณเทียบกับพิกัดสถานีโดยอัตโนมัติ แถบสถานะ GPS จะแสดงผลเป็นสี:</p>
+      <table>
+        <tr><th style="width:auto">สถานะ</th><th>ความหมาย</th></tr>
+        <tr><td><span class="pill wait"><span class="dot"></span>กำลังระบุตำแหน่ง…</span></td><td>กำลังหาพิกัด รอสักครู่</td></tr>
+        <tr><td><span class="pill ok"><span class="dot"></span>อยู่ที่สถานี · 25 ม.</span></td><td>คุณอยู่ในระยะ <b>60 เมตร</b> จากสถานี — ถูกต้อง</td></tr>
+        <tr><td><span class="pill warn"><span class="dot"></span>⚠ ห่างจากสถานี · 180 ม.</span></td><td>คุณอยู่ห่างจากสถานีเกิน 60 เมตร — ตรวจสอบว่ามาถูกจุดหรือไม่</td></tr>
+        <tr><td><span class="pill warn"><span class="dot"></span>⚠ ไม่สามารถเข้าถึง GPS</span></td><td>เครื่องปิด GPS หรือไม่อนุญาต — ตรวจต่อได้ แต่จะไม่มีพิกัดยืนยัน</td></tr>
+      </table>
+      <div class="note tip"><span class="ic">✅</span><div>ถ้าขึ้น <b>“ห่างจากสถานี”</b> ทั้งที่ยืนอยู่หน้าตู้จริง — เป็นเรื่องปกติได้หากสัญญาณ GPS อ่อน (ในอาคาร/ใต้หลังคาเหล็ก) ระบบยังให้ตรวจต่อได้ พิกัดจะถูกบันทึกไว้เพื่อให้ส่วนกลางตรวจสอบ</div></div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section class="sec" id="s6">
+    <div class="sec-h"><div class="n">6</div><h2>กรอกรายการตรวจ (Checklist B)</h2><span class="tag">บังคับครบทุกข้อ</span></div>
+    <div class="sec-b">
+      <p>แต่ละรายการให้เลือก 1 ใน 3 สถานะ:</p>
+      <p style="margin:10px 0">
+        <span class="tridemo"><span class="tb pass">ผ่าน</span><span class="tb fail">ไม่ผ่าน</span><span class="tb na">N/A</span></span>
+      </p>
+      <table>
+        <tr><td><span class="tb pass" style="padding:5px 12px;border-radius:8px">ผ่าน</span></td><td>รายการนั้นอยู่ในสภาพปกติ ใช้งานได้</td></tr>
+        <tr><td><span class="tb fail" style="padding:5px 12px;border-radius:8px">ไม่ผ่าน</span></td><td>พบปัญหา/ชำรุด — ระบบจะ <b>เปิดช่องหมายเหตุ</b> ให้ระบุรายละเอียด</td></tr>
+        <tr><td><span class="tb na" style="padding:5px 12px;border-radius:8px">N/A</span></td><td>ไม่มีรายการนี้ที่สถานี (ไม่เกี่ยวข้อง)</td></tr>
+      </table>
+      <div class="note warn"><span class="ic">📝</span><div>เมื่อเลือก <b>“ไม่ผ่าน”</b> กรุณา <b>พิมพ์หมายเหตุ</b> อธิบายปัญหาเสมอ เพื่อให้ทีมซ่อมบำรุงเข้าใจและแก้ไขได้ตรงจุด</div></div>
+      <h3>รายการที่ต้องตรวจ</h3>
+      <table>
+        <tr><th style="width:60px">รหัส</th><th>รายการ</th></tr>
+        <tr><td><span class="code">B1</span></td><td>ตู้/สถานีเข้าถึงได้ ไม่มีของวางบัง</td></tr>
+        <tr><td><span class="code">B2</span></td><td>กระจก/ประตูตู้สมบูรณ์ (กรณี break-glass)</td></tr>
+        <tr><td><span class="code">B3</span></td><td>สายดับเพลิงครบ ไม่ชำรุด/ไม่ขึ้นรา/ไม่รั่ว</td></tr>
+        <tr><td><span class="code brass">B4</span></td><td>หัวฉีดทองเหลืองอยู่ครบ <span style="color:var(--amber);font-weight:600">(อุปกรณ์ทองเหลือง — มูลค่าสูง ระวังการสูญหาย)</span></td></tr>
+        <tr><td><span class="code">B5</span></td><td>วาล์ว/landing valve ใช้งานได้ ไม่เป็นสนิม ไม่รั่ว</td></tr>
+        <tr><td><span class="code">B6</span></td><td>ข้อต่อ/coupling สมบูรณ์</td></tr>
+        <tr><td><span class="code">B7</span></td><td>ป้าย/สัญลักษณ์มองเห็นชัด</td></tr>
+        <tr><td><span class="code">B8</span></td><td>ไฟส่องสว่างบริเวณเพียงพอ</td></tr>
+        <tr><td><span class="code">B11</span></td><td>ป้ายวันตรวจล่าสุด / tag อัปเดต</td></tr>
+        <tr><td><span class="code">B12</span></td><td>ถังดับเพลิงข้างเคียง (ถ้ามี) แรงดัน+วันหมดอายุปกติ</td></tr>
+        <tr><td><span class="code">B13</span></td><td>ขวาน/อุปกรณ์เสริมในตู้ครบ</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section class="sec" id="s7">
+    <div class="sec-h"><div class="n">7</div><h2>ตรวจนับอุปกรณ์</h2><span class="tag">บังคับครบทุกชิ้น</span></div>
+    <div class="sec-b">
+      <p>สถานีจะแสดงรายการอุปกรณ์ที่ลงทะเบียนไว้ (เช่น หัวฉีด สายดับเพลิง ขวาน) ให้ตรวจนับ <b>ทีละชิ้น</b> โดยกดสถานะ:</p>
+      <p style="margin:10px 0">
+        <span class="tridemo">
+          <span class="tb present">✓ อยู่ครบ</span>
+          <span class="tb damaged">⚠ ชำรุด</span>
+          <span class="tb missing">✕ หาย</span>
+        </span>
+      </p>
+      <table>
+        <tr><td><span class="tb present" style="padding:5px 12px;border-radius:8px">อยู่ครบ</span></td><td>อุปกรณ์อยู่ในตู้ สภาพดี</td></tr>
+        <tr><td><span class="tb damaged" style="padding:5px 12px;border-radius:8px">ชำรุด</span></td><td>อยู่แต่เสียหาย ใช้งานไม่ได้</td></tr>
+        <tr><td><span class="tb missing" style="padding:5px 12px;border-radius:8px">หาย</span></td><td>ไม่พบอุปกรณ์ — <b>ระบบจะเปิดเคสสอบสวน CCTV อัตโนมัติ</b></td></tr>
+      </table>
+      <div class="note danger"><span class="ic">🎥</span><div>หากระบุว่ามีอุปกรณ์ <b>“หาย”</b> ระบบจะสร้าง <b>เคสสอบสวน CCTV</b> ให้อัตโนมัติเมื่อบันทึกผล โดยอ้างอิงช่วงเวลา “เห็นครั้งล่าสุด” ถึง “ตอนนี้” และกล้องที่ครอบคลุมสถานี — ทีมส่วนกลางจะตรวจสอบย้อนหลัง</div></div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section class="sec" id="s8">
+    <div class="sec-h"><div class="n">8</div><h2>แรงดัน &amp; หมายเลขซีล</h2><span class="tag">ถ้ามี</span></div>
+    <div class="sec-b">
+      <ol class="steps">
+        <li><b>แรงดันเกจ (bar):</b> อ่านค่าจากเกจแล้วกรอกตัวเลข เช่น <span class="mono">7.0</span></li>
+        <li><b>หมายเลขซีล:</b> กรอกเลขซีลที่ติดอยู่ เช่น <span class="mono">SEAL-00123</span></li>
+      </ol>
+      <div class="note warn"><span class="ic">⚠️</span><div>ค่าแรงดันปกติอยู่ในช่วง <b>4.5 – 12 bar</b> หากกรอกค่านอกช่วงนี้ ระบบจะ <b>เตือนสีส้ม</b> ให้ตรวจสอบอีกครั้งว่าอ่านค่าถูกต้อง (ยังบันทึกได้ แต่ควรเช็กให้แน่ใจ)</div></div>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section class="sec" id="s9">
+    <div class="sec-h"><div class="n">9</div><h2>ถ่ายรูปหลักฐาน</h2><span class="tag">บังคับ ≥ 1 รูป</span></div>
+    <div class="sec-b">
+      <ol class="steps">
+        <li>กดกรอบ <b>“เพิ่มรูป”</b></li>
+        <li>ถ่ายรูปสภาพ <b>ตู้ / สาย / หัวฉีด</b> (เลือกหลายรูปได้)</li>
+        <li>รอระบบอัปโหลดจนรูปขึ้นในตาราง — กดปุ่ม <b>✕</b> มุมรูปเพื่อลบรูปที่ไม่ต้องการ</li>
+      </ol>
+      <div class="note tip"><span class="ic">🏷</span><div>ทุกรูปจะถูก <b>ประทับวันเวลา + รหัสสถานีอัตโนมัติ</b> ไว้มุมล่างของภาพ และย่อขนาดให้อัปโหลดเร็ว — ไม่ต้องเขียนกำกับเอง</div></div>
+      <div class="note danger"><span class="ic">📷</span><div>ต้องแนบรูป <b>อย่างน้อย 1 รูป</b> มิฉะนั้นจะบันทึกผลไม่ได้</div></div>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section class="sec" id="s10">
+    <div class="sec-h"><div class="n">10</div><h2>หมายเหตุ &amp; สรุปผล</h2></div>
+    <div class="sec-b">
+      <p><b>ช่องหมายเหตุรวม:</b> ใช้บันทึกข้อสังเกตเพิ่มเติม หรือสิ่งที่ต้องแก้ไข (ไม่บังคับ)</p>
+      <p><b>กล่องสรุปผล</b> จะคำนวณผลให้อัตโนมัติตามที่กรอก:</p>
+      <table>
+        <tr><td><span class="pill ok"><span class="dot"></span>ผ่าน ✓</span></td><td>ทุกรายการผ่าน และอุปกรณ์อยู่ครบทุกชิ้น</td></tr>
+        <tr><td><span class="pill red"><span class="dot"></span>ไม่ผ่าน / ต้องแก้ไข</span></td><td>มีอย่างน้อย 1 รายการ <b>“ไม่ผ่าน”</b> หรืออุปกรณ์ <b>ชำรุด/หาย</b></td></tr>
+      </table>
+      <div class="note info"><span class="ic">ℹ️</span><div>คุณ <b>ไม่ต้องเลือกผลเอง</b> — ระบบสรุปจากรายการตรวจและการนับอุปกรณ์โดยอัตโนมัติ</div></div>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section class="sec" id="s11">
+    <div class="sec-h"><div class="n">11</div><h2>ลายเซ็นผู้ตรวจ</h2><span class="tag">บังคับ</span></div>
+    <div class="sec-b">
+      <ol class="steps">
+        <li>เซ็นชื่อด้วยนิ้วในกรอบลายเซ็น เพื่อรับรองว่าตรวจตามจริง</li>
+        <li>หากเซ็นผิด กด <b>“ล้างลายเซ็น”</b> แล้วเซ็นใหม่</li>
+      </ol>
+      <div class="note danger"><span class="ic">✍️</span><div>ต้องเซ็นลายเซ็น มิฉะนั้นจะบันทึกผลไม่ได้ — ลายเซ็นเป็นหลักฐานการรับรองผลการตรวจ</div></div>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section class="sec" id="s12">
+    <div class="sec-h"><div class="n">12</div><h2>บันทึกผลการตรวจ</h2></div>
+    <div class="sec-b">
+      <p>กดปุ่ม <b>“บันทึกผลการตรวจ”</b> ด้านล่างสุด ระบบจะตรวจความครบถ้วนก่อนบันทึก หากยังไม่ครบจะแจ้งเตือนสีแดง ต้องแก้ให้ครบทั้งหมดนี้:</p>
+      <div class="reqlist">
+        <span class="reqchip"><span class="star">✶</span> รายการตรวจครบทุกข้อ (B)</span>
+        <span class="reqchip"><span class="star">✶</span> ตรวจนับอุปกรณ์ครบทุกชิ้น</span>
+        <span class="reqchip"><span class="star">✶</span> รูปหลักฐาน ≥ 1 รูป</span>
+        <span class="reqchip"><span class="star">✶</span> ลายเซ็นผู้ตรวจ</span>
+      </div>
+      <div class="note warn"><span class="ic">⚠️</span><div>ถ้าผลออกมา <b>“ไม่ผ่าน”</b> หรือมีอุปกรณ์ <b>“หาย”</b> ระบบจะ <b>ถามยืนยัน</b> อีกครั้งก่อนบันทึก (พร้อมแจ้งว่าจะเปิดเคส CCTV) — อ่านข้อความแล้วกด <b>ตกลง</b> เพื่อยืนยัน</div></div>
+      <h3>เมื่อบันทึกสำเร็จ</h3>
+      <ul class="steps">
+        <li>จะขึ้นหน้า <b>“บันทึกการตรวจสำเร็จ”</b> พร้อม <b>เลขอ้างอิง</b> และสรุปผล</li>
+        <li>กด <b>“ตรวจสถานีถัดไป”</b> เพื่อไปสแกนสถานีใหม่ (ไม่ต้องล็อกอินซ้ำ)</li>
+        <li>หรือกด <b>“ออกจากระบบ”</b> เมื่อตรวจเสร็จทั้งหมด</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 13 -->
+  <section class="sec" id="s13">
+    <div class="sec-h"><div class="n">13</div><h2>การทำงานออฟไลน์</h2></div>
+    <div class="sec-b">
+      <p>แอปออกแบบมาให้ <b>ตรวจได้แม้ไม่มีสัญญาณ</b> เช่น ในคลังสินค้าหรือพื้นที่อับสัญญาณ</p>
+      <div class="note tip"><span class="ic">📶</span><div>หากบันทึกผลตอนไม่มีเน็ต ข้อมูลจะถูก <b>เก็บคิวไว้ในเครื่อง</b> และ <b>ซิงค์ขึ้นระบบอัตโนมัติ</b> ทันทีที่กลับมามีอินเทอร์เน็ต — ไม่ต้องกรอกซ้ำ</div></div>
+      <div class="note warn"><span class="ic">⚠️</span><div><b>ข้อควรระวัง:</b> รูปถ่ายต้องใช้เน็ตในการอัปโหลด หากออฟไลน์อยู่ การเพิ่มรูปอาจไม่สำเร็จ — แนะนำให้กลับมาในจุดที่มีสัญญาณก่อนแนบรูปและกดบันทึก เพื่อให้ข้อมูลครบสมบูรณ์</div></div>
+    </div>
+  </section>
+
+  <!-- 14 -->
+  <section class="sec" id="s14">
+    <div class="sec-h"><div class="n">14</div><h2>ปัญหาที่พบบ่อย (FAQ)</h2></div>
+    <div class="sec-b">
+      <details class="faq"><summary>สแกน QR ไม่ได้ / กล้องไม่เปิด</summary><div class="ans">
+        <p>1. ตรวจสอบว่า <b>อนุญาตสิทธิ์กล้อง</b> ให้แอปแล้ว (ตั้งค่า → เว็บไซต์/แอป → กล้อง → อนุญาต)</p>
+        <p>2. ถ้ายังไม่ได้ ให้ <b>พิมพ์รหัสสถานีเอง</b> ในช่องด้านล่างปุ่มสแกน แล้วกด “ไป”</p>
+        <p>3. ทำความสะอาดเลนส์กล้อง และให้แสงสว่างเพียงพอ</p>
+      </div></details>
+      <details class="faq"><summary>บัญชีถูกล็อก เข้าระบบไม่ได้</summary><div class="ans">
+        <p>กรอกรหัสผ่านผิดเกิน 5 ครั้ง บัญชีจะถูกล็อก <b>15 นาที</b> โปรดรอครบเวลาแล้วลองใหม่ หากจำรหัสไม่ได้ ติดต่อ Admin เพื่อรีเซ็ตรหัสผ่าน</p>
+      </div></details>
+      <details class="faq"><summary>GPS ขึ้น “ห่างจากสถานี” ทั้งที่อยู่หน้าตู้</summary><div class="ans">
+        <p>เกิดจากสัญญาณ GPS อ่อน (อยู่ในอาคาร/ใต้หลังคาเหล็ก) หรือสถานียังไม่ได้ตั้งพิกัดอ้างอิง ระบบ <b>ยังให้ตรวจต่อได้ตามปกติ</b> พิกัดจริงจะถูกบันทึกไว้ให้ส่วนกลางตรวจสอบ ลองออกไปที่โล่งสักครู่อาจช่วยให้แม่นขึ้น</p>
+      </div></details>
+      <details class="faq"><summary>กดบันทึกแล้วขึ้นเตือนสีแดง บันทึกไม่ได้</summary><div class="ans">
+        <p>แปลว่ายังกรอกไม่ครบ ระบบจะบอกว่าขาดอะไร เลื่อนอ่านข้อความเตือน แล้วเติมให้ครบ: รายการตรวจทุกข้อ, นับอุปกรณ์ทุกชิ้น, รูป ≥ 1 รูป, และลายเซ็น</p>
+      </div></details>
+      <details class="faq"><summary>รูปอัปโหลดไม่สำเร็จ</summary><div class="ans">
+        <p>มักเกิดจากสัญญาณเน็ตอ่อน ลองลบรูปที่ขึ้น “อัปไม่สำเร็จ” แล้วถ่าย/เพิ่มใหม่ในจุดที่สัญญาณดีขึ้น</p>
+      </div></details>
+      <details class="faq"><summary>เลือกสถานะผิด แก้ได้ไหม</summary><div class="ans">
+        <p>ได้ ก่อนกดบันทึก สามารถกดสถานะใหม่ทับได้ตลอด (เลือก “ผ่าน/ไม่ผ่าน/N/A” หรือ “อยู่ครบ/ชำรุด/หาย” ใหม่) ระบบจะใช้ค่าล่าสุดที่เลือก</p>
+      </div></details>
+      <details class="faq"><summary>ตรวจเสร็จแล้วข้อมูลไปไหน</summary><div class="ans">
+        <p>ส่งเข้าศูนย์กลางทันที ทีมส่วนกลางดูได้ที่ <b>Dashboard</b> และจะมี <b>รายงานสรุปประจำสัปดาห์</b> ส่งอีเมลให้ผู้บริหารอัตโนมัติ</p>
+      </div></details>
+    </div>
+  </section>
+
+  <div class="footer">
+    <b>BevChain Thailand · Security &amp; Compliance Dept.</b><br>
+    Fire Hose Station Inspection System v1.0 · คู่มือผู้ตรวจ<br>
+    หากพบปัญหาการใช้งานที่ไม่ได้อยู่ในคู่มือนี้ ติดต่อผู้ดูแลระบบ (Admin)
+    <br><a class="backtop" href="#">↑ กลับขึ้นบนสุด</a>
+  </div>
+
+</div>
+</body>
+</html>
