@@ -244,7 +244,6 @@ const FIREBASE_CONFIG = {
 };
 const CLOUDINARY_CONFIG = { cloudName: "diiqvxqqd", uploadPreset: "fhs_inspection" };
 const GPS_WARN_METERS = 60;          // เตือนถ้าห่างจากสถานีเกินระยะนี้ (A5)
-const PRESSURE_MIN = 4.5, PRESSURE_MAX = 12; // ช่วงแรงดันปกติ (bar) เตือนถ้าผิด (I7)
 const MAX_LOGIN_FAILS = 5, LOCK_MINUTES = 15; // brute-force lockout (I1)
 /* ==================================================== */
 
@@ -403,14 +402,6 @@ function enterInspection(){
     </div>
 
     <div class="card">
-      <div class="card-h"><div class="ix">B9</div><h3>แรงดัน & ซีล</h3></div>
-      <div class="card-b">
-        <div class="field"><label>แรงดันเกจ (bar)</label><input type="number" id="pressure" step="0.1" inputmode="decimal" placeholder="เช่น 7.0"><div id="pressureWarn"></div></div>
-        <div class="field" style="margin-bottom:0"><label>หมายเลขซีล (B10)</label><input type="text" id="sealNo" class="mono" placeholder="SEAL-00123"></div>
-      </div>
-    </div>
-
-    <div class="card">
       <div class="card-h"><div class="ix">C</div><h3>รูปหลักฐาน</h3><span class="sub" id="photoCount">0 รูป</span></div>
       <div class="card-b">
         <p class="hint" style="margin-top:0;margin-bottom:8px">ถ่ายรูปสภาพตู้/สาย/หัวฉีด — รูปจะติดวันเวลา+รหัสสถานีอัตโนมัติ <b>(บังคับอย่างน้อย 1 รูป)</b></p>
@@ -458,12 +449,6 @@ function enterInspection(){
     document.querySelectorAll(`[data-eq="${id}"]`).forEach(x=>x.removeAttribute('data-on'));
     b.setAttribute('data-on',v); eqState[id]=v; updateResult();
   }));
-  // pressure warn (I7)
-  $('pressure').addEventListener('input',e=>{
-    const v=parseFloat(e.target.value); const w=$('pressureWarn');
-    if(e.target.value!==''&&(v<PRESSURE_MIN||v>PRESSURE_MAX)) w.innerHTML=`<div class="alert warn" style="margin-top:8px;margin-bottom:0">⚠ ค่าแรงดัน ${v} bar อยู่นอกช่วงปกติ (${PRESSURE_MIN}–${PRESSURE_MAX}) โปรดตรวจสอบ</div>`;
-    else w.innerHTML='';
-  });
   $('photoInput').addEventListener('change', handlePhotos);
   $('btnSubmit').addEventListener('click', submitInspection);
   $('btnCancel').addEventListener('click', ()=>location.href=location.pathname);
@@ -606,8 +591,7 @@ async function submitInspection(){
       inspectorId:CURRENT_USER.id, inspectorName:CURRENT_USER.name,
       serverTimestamp:serverTimestamp(), clientTime:new Date().toISOString(),
       gps:{lat:gps.lat,lng:gps.lng}, gpsDistanceM:gps.distance,
-      checklist, pressureValue: $('pressure').value!==''?parseFloat($('pressure').value):null,
-      sealNumber: $('sealNo').value.trim(), photos, signatureUrl, result, equipmentSnapshot, missingItems,
+      checklist, photos, signatureUrl, result, equipmentSnapshot, missingItems,
       notes: $('notes').value.trim(), createdAt:serverTimestamp()
     };
     // update station: lastSeen for present items (D2), status of all items, lastInspection
