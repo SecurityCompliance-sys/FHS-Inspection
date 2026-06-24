@@ -596,7 +596,14 @@ $('seedLink').onclick=seedAdmin;
 $('logout').onclick=()=>{sessionStorage.removeItem('fhs_admin');location.reload();};
 
 /* boot */
-(function(){ let s=null; try{ s=JSON.parse(sessionStorage.getItem('fhs_admin')); }catch(e){} if(s){ ADMIN=s; bootApp(); } })();
+(async function(){
+  let s=null; try{ s=JSON.parse(sessionStorage.getItem('fhs_admin')); }catch(e){}
+  if(!s||!s.id) return;
+  try{ const snap=await getDoc(doc(db,'users',s.id)); const u=snap.exists()?snap.data():null;
+    if(u && u.role==='admin' && u.active!==false){ ADMIN={id:s.id,name:u.name||s.id,role:'admin'}; bootApp(); }
+    // ไม่ใช่ admin → ไม่ให้เข้าหลังบ้าน (แสดงหน้า login ตามเดิม) — กัน viewer เดินมาจาก dashboard
+  }catch(e){ if(s.role==='admin'){ ADMIN=s; bootApp(); } } // ออฟไลน์: ยังต้องเป็น admin ใน session
+})();
 </script>
 </body>
 </html>

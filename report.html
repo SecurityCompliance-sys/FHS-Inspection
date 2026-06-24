@@ -180,7 +180,8 @@ async function gateLogin(){
   finally{btn.disabled=false;btn.textContent='เข้าสู่ระบบ';}
 }
 async function boot(){
-  $('gate').style.display='none'; $('adminName').textContent=ADMIN.name;
+  $('gate').style.display='none'; $('adminName').textContent=ADMIN.name+(ADMIN.role!=='admin'?' · viewer (อ่านอย่างเดียว)':'');
+  if(ADMIN.role!=='admin'){ $('btnSend').disabled=true; $('btnSend').title='เฉพาะ admin'; }
   if(EMAILJS.publicKey&&!EMAILJS.publicKey.startsWith('YOUR')) emailjs.init({publicKey:EMAILJS.publicKey});
   const [st,ins,cs]=await Promise.all([getDocs(collection(db,'stations')),getDocs(collection(db,'inspections')),getDocs(collection(db,'cases'))]);
   STATIONS=st.docs.map(d=>({id:d.id,...d.data()}));
@@ -332,6 +333,7 @@ function buildEmailHtml(off, site){
 
 async function sendEmail(){
   const a=$('sendAlert'); a.innerHTML='';
+  if(ADMIN.role!=='admin'){ a.innerHTML='<div class="alert err">เฉพาะผู้ใช้สิทธิ์ admin เท่านั้นที่ส่งอีเมลได้</div>'; return; }
   if(!EMAILJS.serviceId||EMAILJS.serviceId.startsWith('YOUR')){ a.innerHTML='<div class="alert err">ยังไม่ได้ตั้งค่า EmailJS (publicKey/serviceId/templateId) ที่หัวไฟล์ report.html</div>'; return; }
   const off=parseInt($('period').value);
   // recipients: each site that has data + _all
@@ -361,7 +363,14 @@ $('btnSend').onclick=sendEmail;
 $('gBtn').onclick=gateLogin;
 $('gPw').addEventListener('keydown',e=>{if(e.key==='Enter')gateLogin();});
 $('logout').onclick=()=>{sessionStorage.removeItem('fhs_admin');location.reload();};
-(function(){ let s=null; try{ s=JSON.parse(sessionStorage.getItem('fhs_admin')); }catch(e){} if(s){ ADMIN=s; boot(); } })();
+(async function(){
+  let s=null; try{ s=JSON.parse(sessionStorage.getItem('fhs_admin')); }catch(e){}
+  if(!s||!s.id) return;
+  try{ const snap=await getDoc(doc(db,'users',s.id)); const u=snap.exists()?snap.data():null;
+    if(u && ['admin','viewer'].includes(u.role) && u.active!==false){ ADMIN={id:s.id,name:u.name||s.id,role:u.role}; boot(); }
+    else { sessionStorage.removeItem('fhs_admin'); }
+  }catch(e){ if(s&&['admin','viewer'].includes(s.role)){ ADMIN=s; boot(); } }
+})();
 </script>
 </body>
 </html>

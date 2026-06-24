@@ -715,7 +715,14 @@ $('gBtn').onclick=gateLogin;
 $('gPw').addEventListener('keydown',e=>{if(e.key==='Enter')gateLogin();});
 $('logout').onclick=()=>{sessionStorage.removeItem('fhs_admin');location.reload();};
 
-(function(){ let s=null; try{ s=JSON.parse(sessionStorage.getItem('fhs_admin')); }catch(e){} if(s){ ADMIN=s; boot(); } })();
+(async function(){
+  let s=null; try{ s=JSON.parse(sessionStorage.getItem('fhs_admin')); }catch(e){}
+  if(!s||!s.id) return;
+  try{ const snap=await getDoc(doc(db,'users',s.id)); const u=snap.exists()?snap.data():null;
+    if(u && ['admin','viewer'].includes(u.role) && u.active!==false){ ADMIN={id:s.id,name:u.name||s.id,role:u.role}; boot(); }
+    else { sessionStorage.removeItem('fhs_admin'); } // role ไม่ผ่าน → ล้าง session
+  }catch(e){ if(s&&['admin','viewer'].includes(s.role)){ ADMIN=s; boot(); } }
+})();
 </script>
 </body>
 </html>
