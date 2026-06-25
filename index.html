@@ -109,6 +109,14 @@ textarea{resize:vertical;min-height:74px}
 .tog[data-on="fail"]{background:var(--red);border-color:var(--red);color:#fff}
 .tog[data-on="na"]{background:var(--ink);border-color:var(--ink);color:#fff}
 .tog[data-on="shift"]{background:var(--navy);border-color:var(--navy);color:#fff}
+.ex-btn{margin-left:8px;font:inherit;font-family:"Bai Jamjuree";font-size:11px;font-weight:600;color:var(--navy-2);background:rgba(30,39,97,.08);border:1px solid var(--line);border-radius:14px;padding:2px 9px;cursor:pointer;white-space:nowrap;vertical-align:middle}
+.ex-btn:active{transform:scale(.95)}
+.ex-modal{position:fixed;inset:0;background:rgba(15,26,46,.82);display:none;align-items:center;justify-content:center;z-index:60;padding:18px}
+.ex-modal.on{display:flex}
+.ex-box{background:#fff;border-radius:14px;max-width:440px;width:100%;overflow:hidden;position:relative;box-shadow:var(--shadow)}
+.ex-box img{width:100%;display:block;max-height:68vh;object-fit:contain;background:#0F1A2E;min-height:120px}
+.ex-cap{padding:12px 14px;font-size:13px;font-weight:600;color:var(--ink)}
+.ex-close{position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:50%;background:rgba(15,26,46,.65);color:#fff;border:none;cursor:pointer;font-size:15px;z-index:1}
 .cl-note{margin-top:8px;display:none}
 .cl-note.show{display:block}
 .cl-note input{padding:9px 12px;font-size:13px;border-radius:9px}
@@ -229,6 +237,8 @@ textarea{resize:vertical;min-height:74px}
   <div class="footer">BevChain Thailand · Security &amp; Compliance Dept.<br>Fire Hose Station Inspection System v1.0<br><a href="manual-inspector.html" style="color:var(--muted);text-decoration:underline">📖 คู่มือผู้ตรวจ</a> · <a href="dashboard.html" style="color:var(--muted);text-decoration:underline">เข้าระบบหลังบ้าน (Dashboard / Admin)</a></div>
 </div>
 
+<div class="ex-modal" id="exModal"><div class="ex-box"><button class="ex-close" id="exClose">✕</button><img id="exImg" alt="ตัวอย่างอุปกรณ์"><div class="ex-cap" id="exCap"></div></div></div>
+
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
 import { getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, collection, serverTimestamp, enableIndexedDbPersistence, Timestamp }
@@ -276,6 +286,7 @@ const photos = [];       // {url,label}
 let submitting = false;
 let gps = {lat:null,lng:null,distance:null,ok:false};
 let currentShift = 'day';
+let REF_IMAGES = {};
 
 /* ---------- helpers ---------- */
 const $ = id => document.getElementById(id);
@@ -375,7 +386,7 @@ function enterInspection(){
 
   const clRows = CHECKLIST.map(c=>`
     <div class="cl-item">
-      <div class="cl-top"><span class="cl-code ${c.brass?'brass':''}">${c.code}</span><span class="cl-label">${esc(c.label)}</span></div>
+      <div class="cl-top"><span class="cl-code ${c.brass?'brass':''}">${c.code}</span><span class="cl-label">${esc(c.label)}${REF_IMAGES[c.code]?` <button type="button" class="ex-btn" data-ex="${c.code}">📷 ดูตัวอย่าง</button>`:''}</span></div>
       <div class="cl-buttons">
         <button class="tog" data-cl="${c.code}" data-v="pass">ผ่าน</button>
         <button class="tog" data-cl="${c.code}" data-v="fail">ไม่ผ่าน</button>
@@ -458,6 +469,8 @@ function enterInspection(){
     $('note-'+code).classList.toggle('show', v==='fail');
     updateResult();
   }));
+  // wire reference-image buttons (📷 ดูตัวอย่าง)
+  $('clBody').querySelectorAll('[data-ex]').forEach(b=>b.addEventListener('click',()=>openExample(b.dataset.ex)));
   // wire equipment toggles
   $('eqBody').querySelectorAll('[data-eq]').forEach(b=>b.addEventListener('click',()=>{
     const id=b.dataset.eq, v=b.dataset.v;
@@ -699,6 +712,8 @@ function onScan(text){
 }
 function savedUser(){ try{ return JSON.parse(sessionStorage.getItem('fhs_user')); }catch(e){ return null; } }
 function backToScan(msg){ show('scrScan'); $('scanArea').style.display='none'; $('btnStartScan').style.display='flex'; alert(msg); }
+async function loadRefImages(){ try{ const snap=await getDoc(doc(db,'settings','referenceImages')); REF_IMAGES = snap.exists()?(snap.data()||{}):{}; }catch(e){ REF_IMAGES={}; } }
+function openExample(code){ const url=REF_IMAGES[code]; if(!url) return; const cap = code==='B6'?'ตัวอย่าง: ข้อต่อ/coupling (หัวต่อสายดับเพลิง)':code==='B5'?'ตัวอย่าง: landing valve (วาล์วเปิด-ปิดน้ำสำหรับต่อสาย)':'ตัวอย่างอุปกรณ์'; $('exImg').src=url; $('exCap').textContent=cap; $('exModal').classList.add('on'); }
 async function goToStation(sid){
   if(!sid) return;
   show('scrLoading');
@@ -707,6 +722,7 @@ async function goToStation(sid){
   catch(e){ backToScan('โหลดข้อมูลสถานีไม่สำเร็จ: '+e.message); return; }
   if(!st){ backToScan('ไม่พบสถานี '+sid+' ในระบบ'); return; }
   CURRENT_STATION=st;
+  await loadRefImages();
   // already logged in?
   const saved=savedUser();
   if(saved){ CURRENT_USER=saved; renderWho(); enterInspection(); }
@@ -721,6 +737,8 @@ $('btnLogin').addEventListener('click',doLogin);
 $('loginPw').addEventListener('keydown',e=>{ if(e.key==='Enter')doLogin(); });
 $('btnScanNext').addEventListener('click',()=>location.href=location.pathname);
 $('btnLogout').addEventListener('click',logout);
+$('exClose').addEventListener('click',()=>$('exModal').classList.remove('on'));
+$('exModal').addEventListener('click',e=>{ if(e.target===$('exModal')) $('exModal').classList.remove('on'); });
 
 /* ===== NFC (J2) — Chrome Android เท่านั้น ===== */
 if('NDEFReader' in window){
