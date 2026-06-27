@@ -1,5 +1,5 @@
 /* FHS Inspection — Service Worker (Phase 3, J4 PWA/offline) */
-const CACHE = "fhs-v3";
+const CACHE = "fhs-v4";
 const CORE = [
   "index.html",
   "dashboard.html",
@@ -7,6 +7,7 @@ const CORE = [
   "report.html",
   "manual-inspector.html",
   "manifest.json",
+  "favicon.svg",
   "icon-192.png",
   "icon-512.png",
   "icon-maskable-512.png",
