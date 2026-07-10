@@ -139,12 +139,12 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--navy-2);
   <div class="box">
     <div style="text-align:center;margin-bottom:16px"><svg width="48" height="48" viewBox="0 0 64 64" fill="none"><path d="M32 6l22 8v16c0 14-9 23-22 28C19 53 10 44 10 30V14l22-8z" fill="#1E2761"/><circle cx="32" cy="27" r="6" fill="#CADCFC"/><path d="M22 42c0-5.5 4.5-9 10-9s10 3.5 10 9" fill="#CADCFC"/></svg></div>
     <h1>Admin · FHS</h1>
-    <p>เฉพาะผู้ดูแลระบบ</p>
+    <p data-i18n="gate_sub">เฉพาะผู้ดูแลระบบ</p>
     <div id="gateAlert"></div>
-    <div class="field"><label>รหัสพนักงาน</label><input type="text" id="gId" class="mono" style="text-transform:uppercase" placeholder="EMP-1001"></div>
-    <div class="field"><label>รหัสผ่าน</label><input type="password" id="gPw" placeholder="••••••••"></div>
-    <button class="btn btn-primary" style="width:100%" id="gBtn">เข้าสู่ระบบ</button>
-    <p class="hint" style="text-align:center;margin-top:14px">ยังไม่มีผู้ใช้? <a id="seedLink" style="color:var(--navy-2);cursor:pointer;font-weight:600">สร้าง admin คนแรก</a></p>
+    <div class="field"><label data-i18n="f_empid">รหัสพนักงาน</label><input type="text" id="gId" class="mono" style="text-transform:uppercase" placeholder="EMP-1001"></div>
+    <div class="field"><label data-i18n="f_pw">รหัสผ่าน</label><input type="password" id="gPw" placeholder="••••••••"></div>
+    <button class="btn btn-primary" style="width:100%" id="gBtn" data-i18n="signin">เข้าสู่ระบบ</button>
+    <p class="hint" style="text-align:center;margin-top:14px"><span data-i18n="gate_nouser">ยังไม่มีผู้ใช้?</span> <a id="seedLink" data-i18n="gate_seed" style="color:var(--navy-2);cursor:pointer;font-weight:600">สร้าง admin คนแรก</a></p>
   </div>
 </div>
 
@@ -153,81 +153,81 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--navy-2);
     <svg viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="7" fill="#1E2761"/><path d="M16 6c-3 4-5 6-5 9.5A5 5 0 0 0 16 20a5 5 0 0 0 5-4.5C21 12 19 10 16 6z" fill="#D62828"/><rect x="9" y="23" width="14" height="2.4" rx="1.2" fill="#CADCFC"/></svg>
     <div><b>FHS Admin</b><span>SECURITY &amp; COMPLIANCE</span></div>
   </div>
-  <nav class="appsw"><a href="index.html">ตรวจ</a><a href="dashboard.html">Dashboard</a><a href="report.html">รายงาน</a><a href="admin.html" class="cur">Admin</a></nav>
-  <div class="right"><span id="adminName"></span><a id="logout">ออกระบบ</a></div>
+  <nav class="appsw"><a href="index.html" data-i18n="nav_inspect">ตรวจ</a><a href="dashboard.html">Dashboard</a><a href="report.html" data-i18n="nav_report">รายงาน</a><a href="admin.html" class="cur">Admin</a></nav>
+  <div class="right"><a id="langBtn" style="border:1px solid rgba(255,255,255,.3);border-radius:7px;padding:4px 9px;font-size:11px;font-weight:700">EN</a><span id="adminName"></span><a id="logout" data-i18n="signout">ออกระบบ</a></div>
 </div>
 
 <div class="wrap">
   <div class="tabs">
-    <button class="tab on" data-tab="stations">🏭 สถานี</button>
-    <button class="tab" data-tab="users">👤 ผู้ใช้</button>
-    <button class="tab" data-tab="cameras">🎥 กล้อง CCTV</button>
-    <button class="tab" data-tab="qr">⬛ QR &amp; พิมพ์</button>
-    <button class="tab" data-tab="data">🧹 ข้อมูล</button>
+    <button class="tab on" data-tab="stations" data-i18n="tab_stations">🏭 สถานี</button>
+    <button class="tab" data-tab="users" data-i18n="tab_users">👤 ผู้ใช้</button>
+    <button class="tab" data-tab="cameras" data-i18n="tab_cameras">🎥 กล้อง CCTV</button>
+    <button class="tab" data-tab="qr" data-i18n="tab_qr">⬛ QR &amp; พิมพ์</button>
+    <button class="tab" data-tab="data" data-i18n="tab_data">🧹 ข้อมูล</button>
   </div>
 
   <!-- STATIONS -->
   <div class="page on" id="page-stations">
-    <div class="page-head"><h2>สถานีหัวดับเพลิง</h2><button class="btn btn-primary" id="addStation">+ เพิ่มสถานี</button></div>
-    <div class="card" id="stationList"><div class="empty">กำลังโหลด…</div></div>
+    <div class="page-head"><h2 data-i18n="h_stations">สถานีหัวดับเพลิง</h2><button class="btn btn-primary" id="addStation" data-i18n="add_station">+ เพิ่มสถานี</button></div>
+    <div class="card" id="stationList"><div class="empty" data-i18n="loading">กำลังโหลด…</div></div>
   </div>
 
   <!-- USERS -->
   <div class="page" id="page-users">
-    <div class="page-head"><h2>ผู้ใช้งาน</h2><button class="btn btn-primary" id="addUser">+ เพิ่มผู้ใช้</button></div>
-    <div class="card" id="userList"><div class="empty">กำลังโหลด…</div></div>
+    <div class="page-head"><h2 data-i18n="h_users">ผู้ใช้งาน</h2><button class="btn btn-primary" id="addUser" data-i18n="add_user">+ เพิ่มผู้ใช้</button></div>
+    <div class="card" id="userList"><div class="empty" data-i18n="loading">กำลังโหลด…</div></div>
   </div>
 
   <!-- CAMERAS -->
   <div class="page" id="page-cameras">
-    <div class="page-head"><h2>กล้อง CCTV</h2><button class="btn btn-primary" id="addCamera">+ เพิ่มกล้อง</button></div>
-    <div class="card" id="cameraList"><div class="empty">กำลังโหลด…</div></div>
+    <div class="page-head"><h2 data-i18n="h_cameras">กล้อง CCTV</h2><button class="btn btn-primary" id="addCamera" data-i18n="add_camera">+ เพิ่มกล้อง</button></div>
+    <div class="card" id="cameraList"><div class="empty" data-i18n="loading">กำลังโหลด…</div></div>
   </div>
 
   <!-- QR -->
   <div class="page" id="page-qr">
-    <div class="page-head"><h2>QR Code สถานี</h2>
-      <button class="btn btn-ghost btn-sm" id="selectAll">เลือกทั้งหมด</button>
-      <button class="btn btn-primary btn-sm" id="printSel">🖨 พิมพ์ที่เลือก</button>
+    <div class="page-head"><h2 data-i18n="h_qr">QR Code สถานี</h2>
+      <button class="btn btn-ghost btn-sm" id="selectAll" data-i18n="select_all">เลือกทั้งหมด</button>
+      <button class="btn btn-primary btn-sm" id="printSel" data-i18n="print_sel">🖨 พิมพ์ที่เลือก</button>
     </div>
-    <div class="alert info">QR แต่ละอันลิงก์ไปยังแอปตรวจพร้อมรหัสสถานี — สแกนด้วยกล้องมือถือเปิดฟอร์มได้เลย ฉลากพิมพ์ 2 ดวง/หน้า A4</div>
-    <div class="field" style="max-width:520px"><label>URL แอปตรวจ (ปลายทางของ QR)</label><input type="text" id="inspectUrl" class="mono"></div>
-    <div class="qr-grid" id="qrGrid"><div class="empty">ยังไม่มีสถานี</div></div>
+    <div class="alert info" data-i18n="qr_info">QR แต่ละอันลิงก์ไปยังแอปตรวจพร้อมรหัสสถานี — สแกนด้วยกล้องมือถือเปิดฟอร์มได้เลย ฉลากพิมพ์ 2 ดวง/หน้า A4</div>
+    <div class="field" style="max-width:520px"><label data-i18n="qr_url">URL แอปตรวจ (ปลายทางของ QR)</label><input type="text" id="inspectUrl" class="mono"></div>
+    <div class="qr-grid" id="qrGrid"><div class="empty" data-i18n="empty_stations_short">ยังไม่มีสถานี</div></div>
   </div>
 
   <!-- DATA / CLEANUP -->
   <div class="page" id="page-data">
-    <div class="page-head"><h2>ข้อมูล &amp; รูปตัวอย่าง</h2></div>
+    <div class="page-head"><h2 data-i18n="h_data">ข้อมูล &amp; รูปตัวอย่าง</h2></div>
     <div class="card" style="padding:18px;max-width:560px;margin-bottom:18px">
-      <h3 style="font-family:'Bai Jamjuree';font-weight:700;font-size:16px;color:var(--navy);margin-bottom:4px">รูปตัวอย่างอุปกรณ์</h3>
-      <p class="hint" style="margin-bottom:14px">ตั้งรูปช่วยผู้ตรวจที่ไม่รู้จักอุปกรณ์ — จะมีปุ่ม “📷 ดูตัวอย่าง” ท้ายข้อนั้นในแอปตรวจ (อัปโหลดรูป หรือวาง URL)</p>
-      <div class="field"><label>ข้อต่อ/coupling (ข้อ B6)</label>
-        <div style="display:flex;gap:8px"><input type="text" id="riB6" placeholder="วาง URL รูป หรือกดอัปโหลด" style="flex:1">
-          <label class="btn btn-ghost btn-sm" style="flex:none;cursor:pointer">⬆ อัปโหลด<input type="file" accept="image/*" id="riB6file" hidden></label></div>
+      <h3 style="font-family:'Bai Jamjuree';font-weight:700;font-size:16px;color:var(--navy);margin-bottom:4px" data-i18n="ref_h">รูปตัวอย่างอุปกรณ์</h3>
+      <p class="hint" style="margin-bottom:14px" data-i18n="ref_hint">ตั้งรูปช่วยผู้ตรวจที่ไม่รู้จักอุปกรณ์ — จะมีปุ่ม “📷 ดูตัวอย่าง” ท้ายข้อนั้นในแอปตรวจ (อัปโหลดรูป หรือวาง URL)</p>
+      <div class="field"><label data-i18n="ref_coupling">ข้อต่อ/coupling (ข้อ B6)</label>
+        <div style="display:flex;gap:8px"><input type="text" id="riB6" data-i18n-ph="ph_imgurl" placeholder="วาง URL รูป หรือกดอัปโหลด" style="flex:1">
+          <label class="btn btn-ghost btn-sm" style="flex:none;cursor:pointer"><span data-i18n="upload">⬆ อัปโหลด</span><input type="file" accept="image/*" id="riB6file" hidden></label></div>
         <div id="riB6prev" style="margin-top:8px"></div></div>
-      <div class="field"><label>landing valve (ข้อ B5)</label>
-        <div style="display:flex;gap:8px"><input type="text" id="riB5" placeholder="วาง URL รูป หรือกดอัปโหลด" style="flex:1">
-          <label class="btn btn-ghost btn-sm" style="flex:none;cursor:pointer">⬆ อัปโหลด<input type="file" accept="image/*" id="riB5file" hidden></label></div>
+      <div class="field"><label data-i18n="ref_valve">landing valve (ข้อ B5)</label>
+        <div style="display:flex;gap:8px"><input type="text" id="riB5" data-i18n-ph="ph_imgurl" placeholder="วาง URL รูป หรือกดอัปโหลด" style="flex:1">
+          <label class="btn btn-ghost btn-sm" style="flex:none;cursor:pointer"><span data-i18n="upload">⬆ อัปโหลด</span><input type="file" accept="image/*" id="riB5file" hidden></label></div>
         <div id="riB5prev" style="margin-top:8px"></div></div>
       <div id="riAlert"></div>
-      <button class="btn btn-primary" id="riSave">บันทึกรูปตัวอย่าง</button>
+      <button class="btn btn-primary" id="riSave" data-i18n="ref_save">บันทึกรูปตัวอย่าง</button>
     </div>
-    <div class="alert err" style="margin-bottom:14px">⚠️ <b>Danger Zone</b> — การลบเป็นการลบถาวร กู้คืนไม่ได้ ใช้เฉพาะเมื่อแน่ใจ (เช่น ล้างข้อมูลทดสอบ)</div>
+    <div class="alert err" style="margin-bottom:14px" data-i18n-html="danger">⚠️ <b>Danger Zone</b> — การลบเป็นการลบถาวร กู้คืนไม่ได้ ใช้เฉพาะเมื่อแน่ใจ (เช่น ล้างข้อมูลทดสอบ)</div>
     <div class="card" style="padding:18px;max-width:560px">
       <div class="two">
-        <div class="field"><label>ตั้งแต่วันที่</label><input type="date" id="clrFrom"></div>
-        <div class="field"><label>ถึงวันที่ (รวมทั้งวัน)</label><input type="date" id="clrTo"></div>
+        <div class="field"><label data-i18n="from_date">ตั้งแต่วันที่</label><input type="date" id="clrFrom"></div>
+        <div class="field"><label data-i18n="to_date">ถึงวันที่ (รวมทั้งวัน)</label><input type="date" id="clrTo"></div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
-        <button class="btn btn-ghost btn-sm" id="clrLastWeek">สัปดาห์ที่แล้ว</button>
-        <button class="btn btn-ghost btn-sm" id="clrThisWeek">สัปดาห์นี้</button>
-        <button class="btn btn-ghost btn-sm" id="clrAll">ทั้งหมด</button>
+        <button class="btn btn-ghost btn-sm" id="clrLastWeek" data-i18n="last_week">สัปดาห์ที่แล้ว</button>
+        <button class="btn btn-ghost btn-sm" id="clrThisWeek" data-i18n="this_week">สัปดาห์นี้</button>
+        <button class="btn btn-ghost btn-sm" id="clrAll" data-i18n="all">ทั้งหมด</button>
       </div>
-      <label class="chk" style="display:flex;gap:8px;align-items:center;margin-bottom:12px"><input type="checkbox" id="clrCases" checked> ลบเคส CCTV ในช่วงเดียวกันด้วย</label>
+      <label class="chk" style="display:flex;gap:8px;align-items:center;margin-bottom:12px"><input type="checkbox" id="clrCases" checked> <span data-i18n="clr_cases">ลบเคส CCTV ในช่วงเดียวกันด้วย</span></label>
       <div id="clrPreview" class="hint" style="margin:10px 0;font-size:14px"></div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn btn-ghost" id="clrPreviewBtn">🔍 ตรวจสอบจำนวนที่จะลบ</button>
-        <button class="btn" id="clrDelBtn" style="display:none;background:var(--red);color:#fff">🗑 ลบข้อมูลในช่วงนี้</button>
+        <button class="btn btn-ghost" id="clrPreviewBtn" data-i18n="clr_preview_btn">🔍 ตรวจสอบจำนวนที่จะลบ</button>
+        <button class="btn" id="clrDelBtn" style="display:none;background:var(--red);color:#fff" data-i18n="clr_del_btn">🗑 ลบข้อมูลในช่วงนี้</button>
       </div>
     </div>
   </div>
@@ -239,24 +239,24 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--navy-2);
   <div class="modal-b">
     <div id="smAlert"></div>
     <div class="two">
-      <div class="field"><label>รหัสสถานี <span style="color:var(--red)">*</span></label><input type="text" id="smId" class="mono" style="text-transform:uppercase" placeholder="FHC-EX-01"></div>
-      <div class="field"><label>ไซต์ <span style="color:var(--red)">*</span></label><input type="text" id="smSite" placeholder="LLKDC" list="siteList"><datalist id="siteList"><option>LLKDC</option><option>NDC</option><option>Wangnoi</option></datalist></div>
+      <div class="field"><label><span data-i18n="f_stationid">รหัสสถานี</span> <span style="color:var(--red)">*</span></label><input type="text" id="smId" class="mono" style="text-transform:uppercase" placeholder="FHC-EX-01"></div>
+      <div class="field"><label><span data-i18n="f_site">ไซต์</span> <span style="color:var(--red)">*</span></label><input type="text" id="smSite" placeholder="LLKDC" list="siteList"><datalist id="siteList"><option>LLKDC</option><option>NDC</option><option>Wangnoi</option></datalist></div>
     </div>
-    <div class="field"><label>ชื่อสถานี</label><input type="text" id="smName" placeholder="สถานีดับเพลิง โซน A"></div>
-    <div class="field"><label>ตำแหน่ง/จุดติดตั้ง</label><input type="text" id="smLoc" placeholder="โซน A ใกล้ประตู 3"></div>
+    <div class="field"><label data-i18n="f_stationname">ชื่อสถานี</label><input type="text" id="smName" data-i18n-ph="ph_stationname" placeholder="สถานีดับเพลิง โซน A"></div>
+    <div class="field"><label data-i18n="f_location">ตำแหน่ง/จุดติดตั้ง</label><input type="text" id="smLoc" data-i18n-ph="ph_location" placeholder="โซน A ใกล้ประตู 3"></div>
     <div class="two">
       <div class="field"><label>พิกัด Latitude</label><input type="number" id="smLat" step="any" placeholder="14.1234"></div>
       <div class="field"><label>พิกัด Longitude</label><input type="number" id="smLng" step="any" placeholder="100.5678"></div>
     </div>
-    <button class="btn btn-ghost btn-sm" id="smGps" style="margin-bottom:14px">📍 ใช้ตำแหน่งปัจจุบัน</button>
-    <div class="field"><label>กล้อง CCTV ที่ครอบคลุม</label><select id="smCams" multiple size="3" style="height:auto"></select><p class="hint">กด Ctrl/Cmd ค้างเพื่อเลือกหลายตัว</p></div>
-    <div class="field"><label>ผู้รับผิดชอบ</label><select id="smAssignee"><option value="">— ไม่ระบุ —</option></select></div>
-    <div class="alert info" style="margin-bottom:14px">ความถี่การตรวจ: <b>2 ครั้ง/วัน</b> — กะกลางวัน (07:00–19:00) และกะกลางคืน (19:00–07:00) ทุกสถานี</div>
-    <label style="margin-top:6px">อุปกรณ์ในสถานี (รายชิ้น)</label>
+    <button class="btn btn-ghost btn-sm" id="smGps" style="margin-bottom:14px" data-i18n="sm_gps">📍 ใช้ตำแหน่งปัจจุบัน</button>
+    <div class="field"><label data-i18n="f_cams">กล้อง CCTV ที่ครอบคลุม</label><select id="smCams" multiple size="3" style="height:auto"></select><p class="hint" data-i18n="hint_multi">กด Ctrl/Cmd ค้างเพื่อเลือกหลายตัว</p></div>
+    <div class="field"><label data-i18n="f_assignee">ผู้รับผิดชอบ</label><select id="smAssignee"><option value="" data-i18n="none_opt">— ไม่ระบุ —</option></select></div>
+    <div class="alert info" style="margin-bottom:14px" data-i18n-html="freq_info">ความถี่การตรวจ: <b>2 ครั้ง/วัน</b> — กะกลางวัน (07:00–19:00) และกะกลางคืน (19:00–07:00) ทุกสถานี</div>
+    <label style="margin-top:6px" data-i18n="f_equip">อุปกรณ์ในสถานี (รายชิ้น)</label>
     <div id="smEquip"></div>
-    <button class="btn btn-ghost btn-sm" id="smAddEq" style="margin-top:4px">+ เพิ่มอุปกรณ์</button>
+    <button class="btn btn-ghost btn-sm" id="smAddEq" style="margin-top:4px" data-i18n="sm_addeq">+ เพิ่มอุปกรณ์</button>
   </div>
-  <div class="modal-f"><button class="btn btn-ghost" data-close>ยกเลิก</button><button class="btn btn-primary" id="smSave">บันทึก</button></div>
+  <div class="modal-f"><button class="btn btn-ghost" data-close data-i18n="cancel">ยกเลิก</button><button class="btn btn-primary" id="smSave" data-i18n="save">บันทึก</button></div>
 </div></div>
 
 <!-- USER MODAL -->
@@ -265,16 +265,16 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--navy-2);
   <div class="modal-b">
     <div id="umAlert"></div>
     <div class="two">
-      <div class="field"><label>รหัสพนักงาน <span style="color:var(--red)">*</span></label><input type="text" id="umId" class="mono" style="text-transform:uppercase" placeholder="EMP-1023"></div>
-      <div class="field"><label>ชื่อ <span style="color:var(--red)">*</span></label><input type="text" id="umName" placeholder="MADARA"></div>
+      <div class="field"><label><span data-i18n="f_empid">รหัสพนักงาน</span> <span style="color:var(--red)">*</span></label><input type="text" id="umId" class="mono" style="text-transform:uppercase" placeholder="EMP-1023"></div>
+      <div class="field"><label><span data-i18n="f_name">ชื่อ</span> <span style="color:var(--red)">*</span></label><input type="text" id="umName" placeholder="MADARA"></div>
     </div>
     <div class="two">
-      <div class="field"><label>บทบาท</label><select id="umRole"><option value="inspector">Inspector (ตรวจ)</option><option value="admin">Admin (ดูแลระบบ)</option><option value="viewer">Viewer (ดูอย่างเดียว)</option></select></div>
-      <div class="field"><label>ไซต์</label><input type="text" id="umSite" placeholder="LLKDC" list="siteList"></div>
+      <div class="field"><label data-i18n="f_role">บทบาท</label><select id="umRole"><option value="inspector" data-i18n="role_inspector">Inspector (ตรวจ)</option><option value="admin" data-i18n="role_admin">Admin (ดูแลระบบ)</option><option value="viewer" data-i18n="role_viewer">Viewer (ดูอย่างเดียว)</option></select></div>
+      <div class="field"><label data-i18n="f_site">ไซต์</label><input type="text" id="umSite" placeholder="LLKDC" list="siteList"></div>
     </div>
-    <div class="field" style="margin-bottom:0"><label>รหัสผ่าน <span style="color:var(--red)">*</span></label><input type="text" id="umPw" placeholder="ตั้งรหัสผ่าน"><p class="hint" id="umPwHint">เว้นว่างไว้หากไม่ต้องการเปลี่ยนรหัส (โหมดแก้ไข)</p></div>
+    <div class="field" style="margin-bottom:0"><label><span data-i18n="f_pw">รหัสผ่าน</span> <span style="color:var(--red)">*</span></label><input type="text" id="umPw" data-i18n-ph="ph_setpw" placeholder="ตั้งรหัสผ่าน"><p class="hint" id="umPwHint" data-i18n="umpw_hint">เว้นว่างไว้หากไม่ต้องการเปลี่ยนรหัส (โหมดแก้ไข)</p></div>
   </div>
-  <div class="modal-f"><button class="btn btn-ghost" data-close>ยกเลิก</button><button class="btn btn-primary" id="umSave">บันทึก</button></div>
+  <div class="modal-f"><button class="btn btn-ghost" data-close data-i18n="cancel">ยกเลิก</button><button class="btn btn-primary" id="umSave" data-i18n="save">บันทึก</button></div>
 </div></div>
 
 <!-- CAMERA MODAL -->
@@ -282,11 +282,11 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--navy-2);
   <div class="modal-h"><h3 id="cmTitle">เพิ่มกล้อง</h3><button class="x" data-close>✕</button></div>
   <div class="modal-b">
     <div id="cmAlert"></div>
-    <div class="field"><label>รหัสกล้อง <span style="color:var(--red)">*</span></label><input type="text" id="cmId" class="mono" style="text-transform:uppercase" placeholder="CAM-12"></div>
-    <div class="field"><label>ชื่อ/ตำแหน่งกล้อง</label><input type="text" id="cmName" placeholder="กล้องโซน A ทางเดิน"></div>
-    <div class="field" style="margin-bottom:0"><label>จุดติดตั้ง</label><input type="text" id="cmLoc" placeholder="เพดานโซน A"></div>
+    <div class="field"><label><span data-i18n="f_camid">รหัสกล้อง</span> <span style="color:var(--red)">*</span></label><input type="text" id="cmId" class="mono" style="text-transform:uppercase" placeholder="CAM-12"></div>
+    <div class="field"><label data-i18n="f_camname">ชื่อ/ตำแหน่งกล้อง</label><input type="text" id="cmName" data-i18n-ph="ph_camname" placeholder="กล้องโซน A ทางเดิน"></div>
+    <div class="field" style="margin-bottom:0"><label data-i18n="f_mount">จุดติดตั้ง</label><input type="text" id="cmLoc" data-i18n-ph="ph_mount" placeholder="เพดานโซน A"></div>
   </div>
-  <div class="modal-f"><button class="btn btn-ghost" data-close>ยกเลิก</button><button class="btn btn-primary" id="cmSave">บันทึก</button></div>
+  <div class="modal-f"><button class="btn btn-ghost" data-close data-i18n="cancel">ยกเลิก</button><button class="btn btn-primary" id="cmSave" data-i18n="save">บันทึก</button></div>
 </div></div>
 
 <div class="print-area"><div class="label-sheet" id="labelSheet"></div></div>
@@ -315,33 +315,112 @@ function randSalt(){return [...crypto.getRandomValues(new Uint8Array(16))].map(b
 const tsDate=ts=>ts?(ts.toDate?ts.toDate():new Date(ts)):null;
 const inspTime=i=>tsDate(i.createdAt)||(i.clientTime?new Date(i.clientTime):null);
 
+/* ===== i18n (TH / EN) ===== */
+let LANG = localStorage.getItem('fhs_lang') || 'th';
+const I18N = {
+ th:{
+  gate_sub:'เฉพาะผู้ดูแลระบบ', f_empid:'รหัสพนักงาน', f_pw:'รหัสผ่าน', signin:'เข้าสู่ระบบ',
+  gate_nouser:'ยังไม่มีผู้ใช้?', gate_seed:'สร้าง admin คนแรก', nav_inspect:'ตรวจ', nav_report:'รายงาน', signout:'ออกระบบ',
+  tab_stations:'🏭 สถานี', tab_users:'👤 ผู้ใช้', tab_cameras:'🎥 กล้อง CCTV', tab_qr:'⬛ QR & พิมพ์', tab_data:'🧹 ข้อมูล',
+  h_stations:'สถานีหัวดับเพลิง', add_station:'+ เพิ่มสถานี', h_users:'ผู้ใช้งาน', add_user:'+ เพิ่มผู้ใช้',
+  h_cameras:'กล้อง CCTV', add_camera:'+ เพิ่มกล้อง', h_qr:'QR Code สถานี', select_all:'เลือกทั้งหมด', print_sel:'🖨 พิมพ์ที่เลือก',
+  qr_info:'QR แต่ละอันลิงก์ไปยังแอปตรวจพร้อมรหัสสถานี — สแกนด้วยกล้องมือถือเปิดฟอร์มได้เลย ฉลากพิมพ์ 2 ดวง/หน้า A4',
+  qr_url:'URL แอปตรวจ (ปลายทางของ QR)', loading:'กำลังโหลด…', h_data:'ข้อมูล & รูปตัวอย่าง', ref_h:'รูปตัวอย่างอุปกรณ์',
+  ref_hint:'ตั้งรูปช่วยผู้ตรวจที่ไม่รู้จักอุปกรณ์ — จะมีปุ่ม “📷 ดูตัวอย่าง” ท้ายข้อนั้นในแอปตรวจ (อัปโหลดรูป หรือวาง URL)',
+  ref_coupling:'ข้อต่อ/coupling (ข้อ B6)', ref_valve:'landing valve (ข้อ B5)', upload:'⬆ อัปโหลด', ph_imgurl:'วาง URL รูป หรือกดอัปโหลด', ref_save:'บันทึกรูปตัวอย่าง',
+  danger:'⚠️ <b>Danger Zone</b> — การลบเป็นการลบถาวร กู้คืนไม่ได้ ใช้เฉพาะเมื่อแน่ใจ (เช่น ล้างข้อมูลทดสอบ)',
+  from_date:'ตั้งแต่วันที่', to_date:'ถึงวันที่ (รวมทั้งวัน)', last_week:'สัปดาห์ที่แล้ว', this_week:'สัปดาห์นี้', all:'ทั้งหมด',
+  clr_cases:'ลบเคส CCTV ในช่วงเดียวกันด้วย', clr_preview_btn:'🔍 ตรวจสอบจำนวนที่จะลบ', clr_del_btn:'🗑 ลบข้อมูลในช่วงนี้',
+  f_stationid:'รหัสสถานี', f_site:'ไซต์', f_stationname:'ชื่อสถานี', f_location:'ตำแหน่ง/จุดติดตั้ง',
+  ph_stationname:'สถานีดับเพลิง โซน A', ph_location:'โซน A ใกล้ประตู 3', sm_gps:'📍 ใช้ตำแหน่งปัจจุบัน',
+  f_cams:'กล้อง CCTV ที่ครอบคลุม', hint_multi:'กด Ctrl/Cmd ค้างเพื่อเลือกหลายตัว', f_assignee:'ผู้รับผิดชอบ',
+  freq_info:'ความถี่การตรวจ: <b>2 ครั้ง/วัน</b> — กะกลางวัน (07:00–19:00) และกะกลางคืน (19:00–07:00) ทุกสถานี',
+  f_equip:'อุปกรณ์ในสถานี (รายชิ้น)', sm_addeq:'+ เพิ่มอุปกรณ์', cancel:'ยกเลิก', save:'บันทึก',
+  f_name:'ชื่อ', f_role:'บทบาท', role_inspector:'Inspector (ตรวจ)', role_admin:'Admin (ดูแลระบบ)', role_viewer:'Viewer (ดูอย่างเดียว)',
+  ph_setpw:'ตั้งรหัสผ่าน', umpw_hint:'เว้นว่างไว้หากไม่ต้องการเปลี่ยนรหัส (โหมดแก้ไข)',
+  f_camid:'รหัสกล้อง', f_camname:'ชื่อ/ตำแหน่งกล้อง', f_mount:'จุดติดตั้ง', ph_camname:'กล้องโซน A ทางเดิน', ph_mount:'เพดานโซน A', none_opt:'— ไม่ระบุ —',
+  title_add_station:'เพิ่มสถานี', title_edit_station:'แก้ไขสถานี', title_add_user:'เพิ่มผู้ใช้', title_edit_user:'แก้ไขผู้ใช้', title_add_camera:'เพิ่มกล้อง', title_edit_camera:'แก้ไขกล้อง',
+  edit:'แก้ไข', del:'ลบ', empty_stations:'ยังไม่มีสถานี — กด “เพิ่มสถานี”', empty_users:'ยังไม่มีผู้ใช้',
+  empty_cameras:'ยังไม่มีกล้อง — เพิ่มกล้องเพื่อผูกกับสถานีสำหรับสอบสวน CCTV', empty_stations_short:'ยังไม่มีสถานี',
+  suspended:'ระงับ', brass:'ทองเหลือง', ph_eqname:'ชื่ออุปกรณ์', ph_eqtype:'ประเภท', print_pick:'เลือกพิมพ์',
+  alert_fillall:'กรอกข้อมูลให้ครบ', err_nouser:'ไม่พบผู้ใช้', err_notadmin:'บัญชีนี้ไม่มีสิทธิ์ Admin', err_wrongpw:'รหัสผ่านไม่ถูกต้อง',
+  err_station_req:'กรอกรหัสสถานีและไซต์', err_station_dup:'มีรหัสสถานีนี้แล้ว', err_user_req:'กรอกรหัสและชื่อ', err_pw_req:'ตั้งรหัสผ่าน', err_id_dup:'มีรหัสนี้แล้ว', err_cam_req:'กรอกรหัสกล้อง',
+  del_self:'ลบบัญชีตัวเองไม่ได้', upload_fail:'อัปโหลดรูปไม่สำเร็จ', uploading:'กำลังอัปโหลด…', pick_one:'เลือกอย่างน้อย 1 สถานี', scan_hint:'📱 สแกนเพื่อบันทึกการตรวจ',
+  gps_unsupported:'ไม่รองรับ GPS', gps_locating:'📍 กำลังระบุ…', gps_saved:'📍 บันทึกพิกัดแล้ว', gps_fail:'เข้าถึง GPS ไม่ได้',
+  no_insp_data:'ไม่มีข้อมูลการตรวจ', no_data_range:'ไม่มีข้อมูลในช่วงที่เลือก', cancel_del:'ยกเลิกการลบ', del_fail:'ลบไม่สำเร็จ: ', ref_saved:'บันทึกรูปตัวอย่างแล้ว ✓',
+  brass_default:'หัวฉีดทองเหลือง', nozzle:'หัวฉีด', hose:'สายดับเพลิง', hose_type:'สาย'
+ },
+ en:{
+  gate_sub:'Administrators only', f_empid:'Employee ID', f_pw:'Password', signin:'Sign in',
+  gate_nouser:'No users yet?', gate_seed:'Create first admin', nav_inspect:'Inspect', nav_report:'Report', signout:'Sign out',
+  tab_stations:'🏭 Stations', tab_users:'👤 Users', tab_cameras:'🎥 CCTV', tab_qr:'⬛ QR & Print', tab_data:'🧹 Data',
+  h_stations:'Fire Hose Stations', add_station:'+ Add station', h_users:'Users', add_user:'+ Add user',
+  h_cameras:'CCTV Cameras', add_camera:'+ Add camera', h_qr:'Station QR Codes', select_all:'Select all', print_sel:'🖨 Print selected',
+  qr_info:'Each QR links to the inspection app with its station code — scan with a phone camera to open the form. Labels print 2 per A4 page.',
+  qr_url:'Inspection app URL (QR target)', loading:'Loading…', h_data:'Data & Reference Images', ref_h:'Equipment reference images',
+  ref_hint:'Set images to help inspectors who don’t recognise the equipment — a “📷 Example” button appears at that item in the inspection app (upload or paste a URL).',
+  ref_coupling:'Coupling (item B6)', ref_valve:'Landing valve (item B5)', upload:'⬆ Upload', ph_imgurl:'Paste image URL or upload', ref_save:'Save reference images',
+  danger:'⚠️ <b>Danger Zone</b> — deletion is permanent and cannot be undone. Use only when sure (e.g. clearing test data).',
+  from_date:'From date', to_date:'To date (inclusive)', last_week:'Last week', this_week:'This week', all:'All',
+  clr_cases:'Also delete CCTV cases in the same range', clr_preview_btn:'🔍 Preview count', clr_del_btn:'🗑 Delete this range',
+  f_stationid:'Station ID', f_site:'Site', f_stationname:'Station name', f_location:'Location / mounting point',
+  ph_stationname:'Fire station, Zone A', ph_location:'Zone A, near Gate 3', sm_gps:'📍 Use current location',
+  f_cams:'Covering CCTV cameras', hint_multi:'Hold Ctrl/Cmd to select multiple', f_assignee:'Assignee',
+  freq_info:'Inspection frequency: <b>2×/day</b> — day shift (07:00–19:00) and night shift (19:00–07:00), all stations.',
+  f_equip:'Equipment (per item)', sm_addeq:'+ Add equipment', cancel:'Cancel', save:'Save',
+  f_name:'Name', f_role:'Role', role_inspector:'Inspector', role_admin:'Admin', role_viewer:'Viewer (read-only)',
+  ph_setpw:'Set password', umpw_hint:'Leave blank to keep the current password (edit mode).',
+  f_camid:'Camera ID', f_camname:'Camera name / position', f_mount:'Mounting point', ph_camname:'Zone A camera, walkway', ph_mount:'Zone A ceiling', none_opt:'— None —',
+  title_add_station:'Add station', title_edit_station:'Edit station', title_add_user:'Add user', title_edit_user:'Edit user', title_add_camera:'Add camera', title_edit_camera:'Edit camera',
+  edit:'Edit', del:'Delete', empty_stations:'No stations yet — tap “Add station”', empty_users:'No users yet',
+  empty_cameras:'No cameras yet — add one to link stations for CCTV investigation', empty_stations_short:'No stations yet',
+  suspended:'Suspended', brass:'Brass', ph_eqname:'Equipment name', ph_eqtype:'Type', print_pick:'Print',
+  alert_fillall:'Please fill in all fields', err_nouser:'User not found', err_notadmin:'This account is not an admin', err_wrongpw:'Incorrect password',
+  err_station_req:'Enter station ID and site', err_station_dup:'This station ID already exists', err_user_req:'Enter ID and name', err_pw_req:'Set a password', err_id_dup:'This ID already exists', err_cam_req:'Enter a camera ID',
+  del_self:'You can’t delete your own account', upload_fail:'Image upload failed', uploading:'Uploading…', pick_one:'Select at least 1 station', scan_hint:'📱 Scan to record inspection',
+  gps_unsupported:'GPS not supported', gps_locating:'📍 Locating…', gps_saved:'📍 Coordinates saved', gps_fail:'Can’t access GPS',
+  no_insp_data:'No inspection data', no_data_range:'No data in the selected range', cancel_del:'Deletion cancelled', del_fail:'Delete failed: ', ref_saved:'Reference images saved ✓',
+  brass_default:'Brass nozzle', nozzle:'Nozzle', hose:'Fire hose', hose_type:'Hose'
+ }
+};
+const t=k=>(I18N[LANG]&&I18N[LANG][k])??I18N.th[k]??k;
+function applyLang(){
+  document.documentElement.lang=LANG;
+  document.querySelectorAll('[data-i18n]').forEach(el=>el.textContent=t(el.dataset.i18n));
+  document.querySelectorAll('[data-i18n-ph]').forEach(el=>el.setAttribute('placeholder',t(el.dataset.i18nPh)));
+  document.querySelectorAll('[data-i18n-html]').forEach(el=>el.innerHTML=t(el.dataset.i18nHtml));
+  const lb=$('langBtn'); if(lb) lb.textContent=LANG==='th'?'EN':'ไทย';
+  if(ADMIN){ renderStations(); renderUsers(); renderCameras(); renderQR(); }
+}
+function toggleLang(){ LANG=LANG==='th'?'en':'th'; localStorage.setItem('fhs_lang',LANG); applyLang(); }
+
 let STATIONS=[], USERS=[], CAMERAS=[], INSPECTIONS=[], CASES=[], ADMIN=null, editStationId=null, editUserId=null, editCameraId=null;
 
 /* ===== LOGIN GATE ===== */
 async function gateLogin(){
   const id=$('gId').value.trim().toUpperCase(), pw=$('gPw').value, a=$('gateAlert'); a.innerHTML='';
-  if(!id||!pw){a.innerHTML='<div class="alert err">กรอกข้อมูลให้ครบ</div>';return;}
+  if(!id||!pw){a.innerHTML=`<div class="alert err">${t('alert_fillall')}</div>`;return;}
   const btn=$('gBtn');btn.disabled=true;btn.innerHTML='<div class="spinner"></div>';
   try{
     const snap=await getDoc(doc(db,'users',id));
-    if(!snap.exists())throw new Error('ไม่พบผู้ใช้');
+    if(!snap.exists())throw new Error(t('err_nouser'));
     const u=snap.data();
-    if(u.role!=='admin')throw new Error('บัญชีนี้ไม่มีสิทธิ์ Admin');
-    if((await sha256((u.salt||'')+pw))!==u.passwordHash)throw new Error('รหัสผ่านไม่ถูกต้อง');
+    if(u.role!=='admin')throw new Error(t('err_notadmin'));
+    if((await sha256((u.salt||'')+pw))!==u.passwordHash)throw new Error(t('err_wrongpw'));
     ADMIN={id,name:u.name||id,role:u.role}; sessionStorage.setItem('fhs_admin',JSON.stringify(ADMIN));
     bootApp();
   }catch(e){a.innerHTML=`<div class="alert err">${esc(e.message)}</div>`;}
-  finally{btn.disabled=false;btn.textContent='เข้าสู่ระบบ';}
+  finally{btn.disabled=false;btn.textContent=t('signin');}
 }
 async function seedAdmin(){
   const exist=await getDocs(collection(db,'users'));
-  if(!exist.empty){alert('มีผู้ใช้ในระบบแล้ว ไม่สามารถสร้าง admin เริ่มต้นได้ — โปรด login');return;}
-  const id=prompt('รหัสพนักงาน admin (เช่น EMP-1001):'); if(!id)return;
-  const name=prompt('ชื่อ:')||id;
-  const pw=prompt('ตั้งรหัสผ่าน:'); if(!pw)return;
+  if(!exist.empty){alert(LANG==='en'?'Users already exist — cannot create the first admin, please log in':'มีผู้ใช้ในระบบแล้ว ไม่สามารถสร้าง admin เริ่มต้นได้ — โปรด login');return;}
+  const id=prompt(LANG==='en'?'Admin employee ID (e.g. EMP-1001):':'รหัสพนักงาน admin (เช่น EMP-1001):'); if(!id)return;
+  const name=prompt(LANG==='en'?'Name:':'ชื่อ:')||id;
+  const pw=prompt(LANG==='en'?'Set password:':'ตั้งรหัสผ่าน:'); if(!pw)return;
   const salt=randSalt();
   await setDoc(doc(db,'users',id.trim().toUpperCase()),{userId:id.trim().toUpperCase(),name,passwordHash:await sha256(salt+pw),salt,role:'admin',site:'',active:true,failedAttempts:0,lockedUntil:null,createdAt:serverTimestamp()});
-  alert('สร้าง admin สำเร็จ! เข้าสู่ระบบได้เลย');
+  alert(LANG==='en'?'Admin created! You can now sign in.':'สร้าง admin สำเร็จ! เข้าสู่ระบบได้เลย');
 }
 function bootApp(){
   $('gate').style.display='none';
@@ -360,17 +439,18 @@ async function loadCameras(){ const s=await getDocs(collection(db,'cctvCameras')
 /* ===== RENDER STATIONS ===== */
 function renderStations(){
   const el=$('stationList');
-  if(!STATIONS.length){el.innerHTML='<div class="empty">ยังไม่มีสถานี — กด “เพิ่มสถานี”</div>';return;}
+  if(!STATIONS.length){el.innerHTML=`<div class="empty">${t('empty_stations')}</div>`;return;}
   el.innerHTML=STATIONS.sort((a,b)=>a.id.localeCompare(b.id)).map(s=>{
     const eqN=(s.equipment||[]).length, brass=(s.equipment||[]).filter(e=>e.isBrass).length;
+    const eqTxt=LANG==='en'?`${eqN} items${brass?` (${brass} brass)`:''}`:`อุปกรณ์ ${eqN} ชิ้น${brass?` (ทองเหลือง ${brass})`:''}`;
     return `<div class="row">
       <div class="av fire"><svg width="20" height="20" viewBox="0 0 24 24" fill="#D62828"><path d="M12 2C9 6 7 8 7 11.5A5 5 0 0 0 12 16a5 5 0 0 0 5-4.5C17 8 15 6 12 2z"/></svg></div>
       <div class="main"><b>${esc(s.id)} <span class="badge navy">${esc(s.site||'-')}</span></b>
-        <div class="meta">${esc(s.name||'')} ${s.location?'· '+esc(s.location):''} · อุปกรณ์ ${eqN} ชิ้น${brass?` (ทองเหลือง ${brass})`:''} ${(s.cctvCameras||[]).length?'· 🎥 '+s.cctvCameras.map(esc).join(','):''}</div>
+        <div class="meta">${esc(s.name||'')} ${s.location?'· '+esc(s.location):''} · ${eqTxt} ${(s.cctvCameras||[]).length?'· 🎥 '+s.cctvCameras.map(esc).join(','):''}</div>
       </div>
       <div class="actions">
-        <button class="icbtn" data-edit-station="${esc(s.id)}" title="แก้ไข"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4z"/></svg></button>
-        <button class="icbtn danger" data-del-station="${esc(s.id)}" title="ลบ"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>
+        <button class="icbtn" data-edit-station="${esc(s.id)}" title="${t('edit')}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4z"/></svg></button>
+        <button class="icbtn danger" data-del-station="${esc(s.id)}" title="${t('del')}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>
       </div></div>`;
   }).join('');
   el.querySelectorAll('[data-edit-station]').forEach(b=>b.onclick=()=>openStation(b.dataset.editStation));
@@ -380,11 +460,11 @@ function renderStations(){
 /* ===== STATION MODAL ===== */
 function openStation(id){
   editStationId=id||null;
-  $('smTitle').textContent=id?'แก้ไขสถานี':'เพิ่มสถานี'; $('smAlert').innerHTML='';
+  $('smTitle').textContent=id?t('title_edit_station'):t('title_add_station'); $('smAlert').innerHTML='';
   // camera options
   $('smCams').innerHTML=CAMERAS.map(c=>`<option value="${esc(c.id)}">${esc(c.id)} — ${esc(c.name||'')}</option>`).join('');
   // assignee options (inspectors + admins)
-  $('smAssignee').innerHTML='<option value="">— ไม่ระบุ —</option>'+USERS.filter(u=>['inspector','admin'].includes(u.role)).map(u=>`<option value="${esc(u.id)}">${esc(u.name||u.id)} (${esc(u.id)})</option>`).join('');
+  $('smAssignee').innerHTML=`<option value="">${t('none_opt')}</option>`+USERS.filter(u=>['inspector','admin'].includes(u.role)).map(u=>`<option value="${esc(u.id)}">${esc(u.name||u.id)} (${esc(u.id)})</option>`).join('');
   const s=id?STATIONS.find(x=>x.id===id):null;
   $('smId').value=s?s.id:''; $('smId').disabled=!!id;
   $('smSite').value=s?.site||''; $('smName').value=s?.name||''; $('smLoc').value=s?.location||'';
@@ -392,23 +472,23 @@ function openStation(id){
   $('smAssignee').value=s?.assignedTo||'';
   [...$('smCams').options].forEach(o=>o.selected=(s?.cctvCameras||[]).includes(o.value));
   $('smEquip').innerHTML=''; (s?.equipment||[]).forEach(addEqRow);
-  if(!s||!(s.equipment||[]).length){ addEqRow({name:'หัวฉีดทองเหลือง',type:'หัวฉีด',isBrass:true}); addEqRow({name:'สายดับเพลิง',type:'สาย'}); }
+  if(!s||!(s.equipment||[]).length){ addEqRow({name:t('brass_default'),type:t('nozzle'),isBrass:true}); addEqRow({name:t('hose'),type:t('hose_type')}); }
   $('stationModal').classList.add('on');
 }
 function addEqRow(e={}){
   const div=document.createElement('div'); div.className='eq-edit';
-  div.innerHTML=`<input type="text" class="eqn" placeholder="ชื่ออุปกรณ์" value="${esc(e.name||'')}" style="flex:2">
-    <input type="text" class="eqt" placeholder="ประเภท" value="${esc(e.type||'')}" style="flex:1">
-    <label class="chk"><input type="checkbox" class="eqb" ${e.isBrass?'checked':''}>ทองเหลือง</label>
-    <button class="icbtn danger" style="flex:none" title="ลบ"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg></button>`;
+  div.innerHTML=`<input type="text" class="eqn" placeholder="${t('ph_eqname')}" value="${esc(e.name||'')}" style="flex:2">
+    <input type="text" class="eqt" placeholder="${t('ph_eqtype')}" value="${esc(e.type||'')}" style="flex:1">
+    <label class="chk"><input type="checkbox" class="eqb" ${e.isBrass?'checked':''}>${t('brass')}</label>
+    <button class="icbtn danger" style="flex:none" title="${t('del')}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg></button>`;
   div.dataset.eqid=e.id||('eq-'+Math.random().toString(36).slice(2,8));
   div.querySelector('.icbtn').onclick=()=>div.remove();
   $('smEquip').appendChild(div);
 }
 async function saveStation(){
   const id=$('smId').value.trim().toUpperCase(), site=$('smSite').value.trim(), a=$('smAlert');
-  if(!id||!site){a.innerHTML='<div class="alert err">กรอกรหัสสถานีและไซต์</div>';return;}
-  if(!editStationId && STATIONS.some(s=>s.id===id)){a.innerHTML='<div class="alert err">มีรหัสสถานีนี้แล้ว</div>';return;}
+  if(!id||!site){a.innerHTML=`<div class="alert err">${t('err_station_req')}</div>`;return;}
+  if(!editStationId && STATIONS.some(s=>s.id===id)){a.innerHTML=`<div class="alert err">${t('err_station_dup')}</div>`;return;}
   const equipment=[...$('smEquip').querySelectorAll('.eq-edit')].map(r=>{
     const name=r.querySelector('.eqn').value.trim(); if(!name)return null;
     const old=editStationId?(STATIONS.find(s=>s.id===editStationId)?.equipment||[]).find(e=>e.id===r.dataset.eqid):null;
@@ -428,9 +508,9 @@ async function saveStation(){
     else await setDoc(doc(db,'stations',id),{...data,createdAt:serverTimestamp()});
     $('stationModal').classList.remove('on'); await loadStations();
   }catch(e){a.innerHTML=`<div class="alert err">${esc(e.message)}</div>`;}
-  finally{btn.disabled=false;btn.textContent='บันทึก';}
+  finally{btn.disabled=false;btn.textContent=t('save');}
 }
-async function delStation(id){ if(!confirm(`ลบสถานี ${id}?\n(ประวัติการตรวจที่บันทึกไว้จะยังคงอยู่)`))return; await deleteDoc(doc(db,'stations',id)); await loadStations(); }
+async function delStation(id){ if(!confirm(LANG==='en'?`Delete station ${id}?\n(Saved inspection history will remain)`:`ลบสถานี ${id}?\n(ประวัติการตรวจที่บันทึกไว้จะยังคงอยู่)`))return; await deleteDoc(doc(db,'stations',id)); await loadStations(); }
 
 /* ===== DATA CLEANUP (ล้างข้อมูลการตรวจ) ===== */
 const pad2=n=>String(n).padStart(2,'0');
@@ -443,47 +523,47 @@ function clrMatches(){ const {start,end}=clrRange(); const inR=d=>d&&(!start||d>
   return {ins,cs}; }
 function previewClr(){
   const {start,end}=clrRange();
-  if(!start&&!end){ $('clrPreview').innerHTML='<span style="color:var(--red)">เลือกช่วงวันที่ก่อน (หรือกดปุ่มลัด)</span>'; $('clrDelBtn').style.display='none'; return; }
+  if(!start&&!end){ $('clrPreview').innerHTML=`<span style="color:var(--red)">${LANG==='en'?'Pick a date range first (or use a shortcut)':'เลือกช่วงวันที่ก่อน (หรือกดปุ่มลัด)'}</span>`; $('clrDelBtn').style.display='none'; return; }
   const {ins,cs}=clrMatches();
-  $('clrPreview').innerHTML=`พบ <b>${ins.length}</b> การตรวจ${$('clrCases').checked?` และ <b>${cs.length}</b> เคส CCTV`:''} ในช่วงที่เลือก`;
+  $('clrPreview').innerHTML=LANG==='en'?`Found <b>${ins.length}</b> inspections${$('clrCases').checked?` and <b>${cs.length}</b> CCTV cases`:''} in range`:`พบ <b>${ins.length}</b> การตรวจ${$('clrCases').checked?` และ <b>${cs.length}</b> เคส CCTV`:''} ในช่วงที่เลือก`;
   $('clrDelBtn').style.display=(ins.length||cs.length)?'inline-flex':'none';
 }
 function setClrRange(start,end){ $('clrFrom').value=toDateInput(start); $('clrTo').value=toDateInput(end); previewClr(); }
 async function doClr(){
   const {ins,cs}=clrMatches();
-  if(!ins.length&&!cs.length){alert('ไม่มีข้อมูลในช่วงที่เลือก');return;}
-  if(!confirm(`ยืนยันลบถาวร ${ins.length} การตรวจ${cs.length?` + ${cs.length} เคส`:''}?\nกู้คืนไม่ได้`))return;
-  if(prompt('พิมพ์ DELETE เพื่อยืนยันการลบถาวร')!=='DELETE'){alert('ยกเลิกการลบ');return;}
-  const btn=$('clrDelBtn');btn.disabled=true;btn.innerHTML='<div class="spinner"></div>กำลังลบ…';
+  if(!ins.length&&!cs.length){alert(t('no_data_range'));return;}
+  if(!confirm(LANG==='en'?`Permanently delete ${ins.length} inspections${cs.length?` + ${cs.length} cases`:''}?\nCannot be undone`:`ยืนยันลบถาวร ${ins.length} การตรวจ${cs.length?` + ${cs.length} เคส`:''}?\nกู้คืนไม่ได้`))return;
+  if(prompt(LANG==='en'?'Type DELETE to confirm permanent deletion':'พิมพ์ DELETE เพื่อยืนยันการลบถาวร')!=='DELETE'){alert(t('cancel_del'));return;}
+  const btn=$('clrDelBtn');btn.disabled=true;btn.innerHTML=`<div class="spinner"></div>${LANG==='en'?'Deleting…':'กำลังลบ…'}`;
   let n=0;
   try{
     for(const i of ins){ await deleteDoc(doc(db,'inspections',i.id)); n++; }
     for(const c of cs){ await deleteDoc(doc(db,'cases',c.id)); n++; }
     await loadInsCases();
-    $('clrPreview').innerHTML=`<b style="color:var(--green)">ลบแล้ว ${n} รายการ ✓</b>`;
+    $('clrPreview').innerHTML=`<b style="color:var(--green)">${LANG==='en'?`Deleted ${n} items ✓`:`ลบแล้ว ${n} รายการ ✓`}</b>`;
     $('clrDelBtn').style.display='none';
-  }catch(e){ alert('ลบไม่สำเร็จ: '+e.message); }
-  finally{ btn.disabled=false; btn.innerHTML='🗑 ลบข้อมูลในช่วงนี้'; }
+  }catch(e){ alert(t('del_fail')+e.message); }
+  finally{ btn.disabled=false; btn.innerHTML=t('clr_del_btn'); }
 }
 
 /* ===== USERS ===== */
 function renderUsers(){
   const el=$('userList');
-  if(!USERS.length){el.innerHTML='<div class="empty">ยังไม่มีผู้ใช้</div>';return;}
+  if(!USERS.length){el.innerHTML=`<div class="empty">${t('empty_users')}</div>`;return;}
   const rc={admin:'red',inspector:'navy',viewer:'amber'};
   el.innerHTML=USERS.sort((a,b)=>a.id.localeCompare(b.id)).map(u=>`<div class="row">
     <div class="av">${esc((u.name||u.id).slice(0,2).toUpperCase())}</div>
-    <div class="main"><b>${esc(u.name||u.id)} ${u.active===false?'<span class="badge red">ระงับ</span>':''}</b>
+    <div class="main"><b>${esc(u.name||u.id)} ${u.active===false?`<span class="badge red">${t('suspended')}</span>`:''}</b>
       <div class="meta"><span class="mono">${esc(u.id)}</span> · <span class="badge ${rc[u.role]||'navy'}">${esc(u.role||'inspector')}</span> · ${esc(u.site||'-')}</div></div>
     <div class="actions">
-      <button class="icbtn" data-edit-user="${esc(u.id)}" title="แก้ไข"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4z"/></svg></button>
-      <button class="icbtn danger" data-del-user="${esc(u.id)}" title="ลบ"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>
+      <button class="icbtn" data-edit-user="${esc(u.id)}" title="${t('edit')}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4z"/></svg></button>
+      <button class="icbtn danger" data-del-user="${esc(u.id)}" title="${t('del')}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>
     </div></div>`).join('');
   el.querySelectorAll('[data-edit-user]').forEach(b=>b.onclick=()=>openUser(b.dataset.editUser));
   el.querySelectorAll('[data-del-user]').forEach(b=>b.onclick=()=>delUser(b.dataset.delUser));
 }
 function openUser(id){
-  editUserId=id||null; $('umTitle').textContent=id?'แก้ไขผู้ใช้':'เพิ่มผู้ใช้'; $('umAlert').innerHTML='';
+  editUserId=id||null; $('umTitle').textContent=id?t('title_edit_user'):t('title_add_user'); $('umAlert').innerHTML='';
   const u=id?USERS.find(x=>x.id===id):null;
   $('umId').value=u?u.id:''; $('umId').disabled=!!id;
   $('umName').value=u?.name||''; $('umRole').value=u?.role||'inspector'; $('umSite').value=u?.site||''; $('umPw').value='';
@@ -492,9 +572,9 @@ function openUser(id){
 }
 async function saveUser(){
   const id=$('umId').value.trim().toUpperCase(), name=$('umName').value.trim(), pw=$('umPw').value, a=$('umAlert');
-  if(!id||!name){a.innerHTML='<div class="alert err">กรอกรหัสและชื่อ</div>';return;}
-  if(!editUserId && !pw){a.innerHTML='<div class="alert err">ตั้งรหัสผ่าน</div>';return;}
-  if(!editUserId && USERS.some(u=>u.id===id)){a.innerHTML='<div class="alert err">มีรหัสนี้แล้ว</div>';return;}
+  if(!id||!name){a.innerHTML=`<div class="alert err">${t('err_user_req')}</div>`;return;}
+  if(!editUserId && !pw){a.innerHTML=`<div class="alert err">${t('err_pw_req')}</div>`;return;}
+  if(!editUserId && USERS.some(u=>u.id===id)){a.innerHTML=`<div class="alert err">${t('err_id_dup')}</div>`;return;}
   const btn=$('umSave');btn.disabled=true;btn.innerHTML='<div class="spinner"></div>';
   try{
     const base={userId:id,name,role:$('umRole').value,site:$('umSite').value.trim(),active:true};
@@ -503,37 +583,38 @@ async function saveUser(){
     else await setDoc(doc(db,'users',id),{...base,createdAt:serverTimestamp()});
     $('userModal').classList.remove('on'); await loadUsers();
   }catch(e){a.innerHTML=`<div class="alert err">${esc(e.message)}</div>`;}
-  finally{btn.disabled=false;btn.textContent='บันทึก';}
+  finally{btn.disabled=false;btn.textContent=t('save');}
 }
-async function delUser(id){ if(id===ADMIN.id){alert('ลบบัญชีตัวเองไม่ได้');return;} if(!confirm(`ลบผู้ใช้ ${id}?`))return; await deleteDoc(doc(db,'users',id)); await loadUsers(); }
+async function delUser(id){ if(id===ADMIN.id){alert(t('del_self'));return;} if(!confirm(LANG==='en'?`Delete user ${id}?`:`ลบผู้ใช้ ${id}?`))return; await deleteDoc(doc(db,'users',id)); await loadUsers(); }
 
 /* ===== CAMERAS ===== */
 function renderCameras(){
   const el=$('cameraList');
-  if(!CAMERAS.length){el.innerHTML='<div class="empty">ยังไม่มีกล้อง — เพิ่มกล้องเพื่อผูกกับสถานีสำหรับสอบสวน CCTV</div>';return;}
+  if(!CAMERAS.length){el.innerHTML=`<div class="empty">${t('empty_cameras')}</div>`;return;}
   el.innerHTML=CAMERAS.sort((a,b)=>a.id.localeCompare(b.id)).map(c=>{
     const cover=STATIONS.filter(s=>(s.cctvCameras||[]).includes(c.id)).length;
+    const coverTxt=LANG==='en'?`covers ${cover} stations`:`ครอบคลุม ${cover} สถานี`;
     return `<div class="row">
       <div class="av"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#15234A" stroke-width="2"><path d="m23 7-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></div>
-      <div class="main"><b>${esc(c.id)}</b><div class="meta">${esc(c.name||'')} ${c.location?'· '+esc(c.location):''} · ครอบคลุม ${cover} สถานี</div></div>
+      <div class="main"><b>${esc(c.id)}</b><div class="meta">${esc(c.name||'')} ${c.location?'· '+esc(c.location):''} · ${coverTxt}</div></div>
       <div class="actions">
-        <button class="icbtn" data-edit-camera="${esc(c.id)}" title="แก้ไข"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4z"/></svg></button>
-        <button class="icbtn danger" data-del-camera="${esc(c.id)}" title="ลบ"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>
+        <button class="icbtn" data-edit-camera="${esc(c.id)}" title="${t('edit')}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4z"/></svg></button>
+        <button class="icbtn danger" data-del-camera="${esc(c.id)}" title="${t('del')}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>
       </div></div>`;
   }).join('');
   el.querySelectorAll('[data-edit-camera]').forEach(b=>b.onclick=()=>openCamera(b.dataset.editCamera));
   el.querySelectorAll('[data-del-camera]').forEach(b=>b.onclick=()=>delCamera(b.dataset.delCamera));
 }
 function openCamera(id){
-  editCameraId=id||null; $('cmTitle').textContent=id?'แก้ไขกล้อง':'เพิ่มกล้อง'; $('cmAlert').innerHTML='';
+  editCameraId=id||null; $('cmTitle').textContent=id?t('title_edit_camera'):t('title_add_camera'); $('cmAlert').innerHTML='';
   const c=id?CAMERAS.find(x=>x.id===id):null;
   $('cmId').value=c?c.id:''; $('cmId').disabled=!!id; $('cmName').value=c?.name||''; $('cmLoc').value=c?.location||'';
   $('cameraModal').classList.add('on');
 }
 async function saveCamera(){
   const id=$('cmId').value.trim().toUpperCase(), a=$('cmAlert');
-  if(!id){a.innerHTML='<div class="alert err">กรอกรหัสกล้อง</div>';return;}
-  if(!editCameraId && CAMERAS.some(c=>c.id===id)){a.innerHTML='<div class="alert err">มีรหัสนี้แล้ว</div>';return;}
+  if(!id){a.innerHTML=`<div class="alert err">${t('err_cam_req')}</div>`;return;}
+  if(!editCameraId && CAMERAS.some(c=>c.id===id)){a.innerHTML=`<div class="alert err">${t('err_id_dup')}</div>`;return;}
   const btn=$('cmSave');btn.disabled=true;btn.innerHTML='<div class="spinner"></div>';
   try{
     const data={cameraId:id,name:$('cmName').value.trim(),location:$('cmLoc').value.trim()};
@@ -541,28 +622,28 @@ async function saveCamera(){
     else await setDoc(doc(db,'cctvCameras',id),{...data,createdAt:serverTimestamp()});
     $('cameraModal').classList.remove('on'); await loadCameras();
   }catch(e){a.innerHTML=`<div class="alert err">${esc(e.message)}</div>`;}
-  finally{btn.disabled=false;btn.textContent='บันทึก';}
+  finally{btn.disabled=false;btn.textContent=t('save');}
 }
-async function delCamera(id){ if(!confirm(`ลบกล้อง ${id}?`))return; await deleteDoc(doc(db,'cctvCameras',id)); await loadCameras(); }
+async function delCamera(id){ if(!confirm(LANG==='en'?`Delete camera ${id}?`:`ลบกล้อง ${id}?`))return; await deleteDoc(doc(db,'cctvCameras',id)); await loadCameras(); }
 
 /* ===== REFERENCE IMAGES (รูปตัวอย่างอุปกรณ์) ===== */
 const CLOUDINARY_CONFIG = { cloudName: "diiqvxqqd", uploadPreset: "fhs_inspection" };
 async function uploadCloudinary(blob){ const fd=new FormData(); fd.append('file',blob); fd.append('upload_preset',CLOUDINARY_CONFIG.uploadPreset); const r=await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/image/upload`,{method:'POST',body:fd}); if(!r.ok)throw new Error('cloudinary'); const d=await r.json(); return d.secure_url; }
-function riPrev(code){ const u=$('ri'+code).value.trim(); $('ri'+code+'prev').innerHTML=(u&&!u.startsWith('กำลัง'))?`<img src="${esc(u)}" style="max-width:150px;border:1px solid var(--line);border-radius:8px">`:''; }
+function riPrev(code){ const u=$('ri'+code).value.trim(); $('ri'+code+'prev').innerHTML=(u&&u!==t('uploading'))?`<img src="${esc(u)}" style="max-width:150px;border:1px solid var(--line);border-radius:8px">`:''; }
 async function loadRefImages(){ try{ const snap=await getDoc(doc(db,'settings','referenceImages')); const d=snap.exists()?snap.data():{}; $('riB6').value=d.B6||''; $('riB5').value=d.B5||''; riPrev('B6'); riPrev('B5'); }catch(e){} }
-async function riUpload(code,file){ if(!file)return; const inp=$('ri'+code); const old=inp.value; inp.value='กำลังอัปโหลด…'; inp.disabled=true;
-  try{ const url=await uploadCloudinary(file); inp.value=url; riPrev(code); }catch(e){ inp.value=old; alert('อัปโหลดรูปไม่สำเร็จ'); } finally{ inp.disabled=false; } }
+async function riUpload(code,file){ if(!file)return; const inp=$('ri'+code); const old=inp.value; inp.value=t('uploading'); inp.disabled=true;
+  try{ const url=await uploadCloudinary(file); inp.value=url; riPrev(code); }catch(e){ inp.value=old; alert(t('upload_fail')); } finally{ inp.disabled=false; } }
 async function saveRefImages(){ const a=$('riAlert'); a.innerHTML=''; const btn=$('riSave'); btn.disabled=true; btn.innerHTML='<div class="spinner"></div>';
   try{ await setDoc(doc(db,'settings','referenceImages'),{B6:$('riB6').value.trim(),B5:$('riB5').value.trim()},{merge:true});
-    a.innerHTML='<div class="alert" style="background:rgba(14,138,95,.1);color:#0E8A5F;border:1px solid rgba(14,138,95,.25);margin-bottom:10px">บันทึกรูปตัวอย่างแล้ว ✓</div>';
-  }catch(e){ a.innerHTML=`<div class="alert err" style="margin-bottom:10px">บันทึกไม่สำเร็จ: ${esc(e.message)} — ตรวจ Firestore Rules ให้อนุญาต collection settings</div>`; }
-  finally{ btn.disabled=false; btn.textContent='บันทึกรูปตัวอย่าง'; } }
+    a.innerHTML=`<div class="alert" style="background:rgba(14,138,95,.1);color:#0E8A5F;border:1px solid rgba(14,138,95,.25);margin-bottom:10px">${t('ref_saved')}</div>`;
+  }catch(e){ a.innerHTML=`<div class="alert err" style="margin-bottom:10px">${LANG==='en'?'Save failed':'บันทึกไม่สำเร็จ'}: ${esc(e.message)} — ${LANG==='en'?'allow the settings collection in Firestore Rules':'ตรวจ Firestore Rules ให้อนุญาต collection settings'}</div>`; }
+  finally{ btn.disabled=false; btn.textContent=t('ref_save'); } }
 
 /* ===== QR ===== */
 function qrUrl(sid){ const base=$('inspectUrl').value.trim(); return `${base}${base.includes('?')?'&':'?'}station=${encodeURIComponent(sid)}`; }
 function renderQR(){
   const grid=$('qrGrid');
-  if(!STATIONS.length){grid.innerHTML='<div class="empty">ยังไม่มีสถานี</div>';return;}
+  if(!STATIONS.length){grid.innerHTML=`<div class="empty">${t('empty_stations_short')}</div>`;return;}
   grid.innerHTML='';
   STATIONS.sort((a,b)=>a.id.localeCompare(b.id)).forEach(s=>{
     const card=document.createElement('div'); card.className='qr-card';
@@ -572,14 +653,14 @@ function renderQR(){
     const nm=document.createElement('div'); nm.className='qnm'; nm.textContent=`${s.site||''} ${s.name?'· '+s.name:''}`; card.appendChild(nm);
     const lbl=document.createElement('label'); lbl.className='sel';
     const cb=document.createElement('input'); cb.type='checkbox'; cb.dataset.qr=s.id; cb.checked=true;
-    lbl.appendChild(cb); lbl.appendChild(document.createTextNode('เลือกพิมพ์')); card.appendChild(lbl);
+    lbl.appendChild(cb); lbl.appendChild(document.createTextNode(t('print_pick'))); card.appendChild(lbl);
     grid.appendChild(card);
     new QRCode(box,{text:qrUrl(s.id),width:150,height:150,correctLevel:QRCode.CorrectLevel.M});
   });
 }
 function printSelected(){
   const ids=[...document.querySelectorAll('[data-qr]:checked')].map(c=>c.dataset.qr);
-  if(!ids.length){alert('เลือกอย่างน้อย 1 สถานี');return;}
+  if(!ids.length){alert(t('pick_one'));return;}
   const sheet=$('labelSheet'); sheet.innerHTML='';
   ids.forEach(sid=>{
     const s=STATIONS.find(x=>x.id===sid);
@@ -590,7 +671,7 @@ function printSelected(){
     const qd=document.createElement('div'); qd.className='qimg';
     setTimeout(()=>{ const i=tmp.querySelector('img'); qd.appendChild(i?i.cloneNode():tmp.querySelector('canvas')); },150);
     lab.appendChild(qd);
-    lab.insertAdjacentHTML('beforeend',`<div class="lid">${esc(sid)}</div><div class="lnm">${esc(s.name||'')} ${s.location?'· '+esc(s.location):''}</div><div class="scan">📱 สแกนเพื่อบันทึกการตรวจ</div>`);
+    lab.insertAdjacentHTML('beforeend',`<div class="lid">${esc(sid)}</div><div class="lnm">${esc(s.name||'')} ${s.location?'· '+esc(s.location):''}</div><div class="scan">${t('scan_hint')}</div>`);
     sheet.appendChild(lab);
   });
   setTimeout(()=>window.print(),400);
@@ -610,7 +691,7 @@ $('smAddEq').onclick=()=>addEqRow();
 $('smSave').onclick=saveStation;
 $('umSave').onclick=saveUser;
 $('cmSave').onclick=saveCamera;
-$('smGps').onclick=()=>{ if(!navigator.geolocation){alert('ไม่รองรับ GPS');return;} $('smGps').textContent='📍 กำลังระบุ…'; navigator.geolocation.getCurrentPosition(p=>{$('smLat').value=p.coords.latitude.toFixed(6);$('smLng').value=p.coords.longitude.toFixed(6);$('smGps').textContent='📍 บันทึกพิกัดแล้ว';},()=>{$('smGps').textContent='📍 ใช้ตำแหน่งปัจจุบัน';alert('เข้าถึง GPS ไม่ได้');}); };
+$('smGps').onclick=()=>{ if(!navigator.geolocation){alert(t('gps_unsupported'));return;} $('smGps').textContent=t('gps_locating'); navigator.geolocation.getCurrentPosition(p=>{$('smLat').value=p.coords.latitude.toFixed(6);$('smLng').value=p.coords.longitude.toFixed(6);$('smGps').textContent=t('gps_saved');},()=>{$('smGps').textContent=t('sm_gps');alert(t('gps_fail'));}); };
 $('selectAll').onclick=()=>{ const cbs=[...document.querySelectorAll('[data-qr]')]; const all=cbs.every(c=>c.checked); cbs.forEach(c=>c.checked=!all); };
 $('printSel').onclick=printSelected;
 $('clrPreviewBtn').onclick=previewClr;
@@ -618,7 +699,7 @@ $('clrDelBtn').onclick=doClr;
 $('clrCases').onchange=()=>{ if($('clrFrom').value||$('clrTo').value)previewClr(); };
 $('clrLastWeek').onclick=()=>{ const m=mondayOf(new Date()); const start=new Date(m); start.setDate(start.getDate()-7); const end=new Date(m); end.setDate(end.getDate()-1); setClrRange(start,end); };
 $('clrThisWeek').onclick=()=>{ setClrRange(mondayOf(new Date()),new Date()); };
-$('clrAll').onclick=()=>{ const times=INSPECTIONS.map(inspTime).filter(Boolean).sort((a,b)=>a-b); if(!times.length){$('clrPreview').innerHTML='ไม่มีข้อมูลการตรวจ';return;} setClrRange(times[0],new Date()); };
+$('clrAll').onclick=()=>{ const times=INSPECTIONS.map(inspTime).filter(Boolean).sort((a,b)=>a-b); if(!times.length){$('clrPreview').innerHTML=t('no_insp_data');return;} setClrRange(times[0],new Date()); };
 $('inspectUrl').onchange=renderQR;
 $('riSave').onclick=saveRefImages;
 $('riB6file').onchange=e=>riUpload('B6',e.target.files[0]);
@@ -628,6 +709,8 @@ $('gBtn').onclick=gateLogin;
 $('gPw').addEventListener('keydown',e=>{if(e.key==='Enter')gateLogin();});
 $('seedLink').onclick=seedAdmin;
 $('logout').onclick=()=>{sessionStorage.removeItem('fhs_admin');location.reload();};
+$('langBtn').onclick=toggleLang;
+applyLang();
 
 /* boot */
 (async function(){
