@@ -543,15 +543,14 @@ function renderCases(){
   if(f==='open')list=list.filter(c=>c.status==='investigating');
   else if(f!=='all')list=list.filter(c=>c.status===f);
   const el=$('caseList');
-  if(!list.length){ el.innerHTML='<div class="empty">ไม่มีเคสในหมวดนี้ ✓</div>'; return; }
+  if(!list.length){ el.innerHTML=`<div class="empty">${t('no_case_cat')}</div>`; return; }
   const sc={investigating:'amber',found:'green',replaced:'navy',closed:'gray'};
-  const sl={investigating:'กำลังสอบสวน',found:'พบแล้ว',replaced:'เปลี่ยนใหม่',closed:'ปิดเคส'};
   el.innerHTML=list.map(c=>{
     const rep=tsDate(c.reportedMissingAt); const stale=c.status==='investigating'&&daysAgo(rep)>STALE_CASE_DAYS;
     return `<div class="row" data-case="${esc(c.id)}" style="cursor:pointer">
       <div class="av" style="background:rgba(214,40,40,.1);color:#D62828"><svg width="18" height="18" viewBox="0 0 24 24" fill="#D62828"><path d="M12 2C9 6 7 8 7 11.5A5 5 0 0 0 12 16a5 5 0 0 0 5-4.5C17 8 15 6 12 2z"/></svg></div>
-      <div class="main"><b>${esc(c.itemName||'อุปกรณ์')} <span class="badge ${sc[c.status]||'gray'}">${sl[c.status]||c.status}</span>${stale?' <span class="badge red">ค้าง '+daysAgo(rep)+' วัน</span>':''}</b>
-        <div class="meta"><span class="mono">${esc(c.stationId)}</span> · แจ้ง ${fmt(rep)} · โดย ${esc(c.reportedBy||'—')} · 🎥 ${(c.cctvCameras||[]).length} กล้อง</div></div>
+      <div class="main"><b>${esc(c.itemName||t('item'))} <span class="badge ${sc[c.status]||'gray'}">${caseStatusLabel(c.status)}</span>${stale?` <span class="badge red">${t('stale_d')} ${daysAgo(rep)} ${t('days')}</span>`:''}</b>
+        <div class="meta"><span class="mono">${esc(c.stationId)}</span> · ${t('reported')} ${fmt(rep)} · ${t('by')} ${esc(c.reportedBy||'—')} · 🎥 ${(c.cctvCameras||[]).length} ${t('cameras')}</div></div>
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64708A" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></div>`;
   }).join('');
   el.querySelectorAll('[data-case]').forEach(r=>r.onclick=()=>openCase(r.dataset.case));
@@ -572,32 +571,31 @@ function openCase(id){
   if(winStart&&winEnd){ const h=Math.round((winEnd-winStart)/3600000); durTxt=h<48?`${h} ชม.`:`${Math.round(h/24)} วัน`; }
   const cams=(c.cctvCameras||[]).map(cid=>{ const cam=CAMERAS.find(x=>x.id===cid); return {id:cid,name:cam?.name||'',loc:cam?.location||''}; });
   const tl=stationTimeline(c.stationId,c.itemId);
-  const sl={investigating:'กำลังสอบสวน',found:'พบแล้ว',replaced:'เปลี่ยนใหม่',closed:'ปิดเคส'};
 
   $('caseBody').innerHTML=`
-    <div class="inv-head"><div class="t">${esc(c.itemName||'อุปกรณ์')} หาย</div><div class="s">${esc(c.stationName||'')} · ${esc(c.stationId)} · เคส ${esc(c.id.slice(0,8).toUpperCase())}</div></div>
+    <div class="inv-head"><div class="t">${esc(c.itemName||t('item'))} ${L('missing','หาย')}</div><div class="s">${esc(c.stationName||'')} · ${esc(c.stationId)} · ${L('case','เคส')} ${esc(c.id.slice(0,8).toUpperCase())}</div></div>
     <div class="kv">
-      <div class="k">สถานะปัจจุบัน</div><div class="v">${sl[c.status]||c.status}</div>
-      <div class="k">เห็นครั้งสุดท้าย</div><div class="v">${seen?fmt(seen):'ไม่มีข้อมูล'} ${c.lastSeenBy?'· โดย '+esc(c.lastSeenBy):''}</div>
-      <div class="k">แจ้งหาย</div><div class="v">${fmt(rep)} · โดย ${esc(c.reportedBy||'—')}</div>
+      <div class="k">${L('Current status','สถานะปัจจุบัน')}</div><div class="v">${caseStatusLabel(c.status)}</div>
+      <div class="k">${L('Last seen','เห็นครั้งสุดท้าย')}</div><div class="v">${seen?fmt(seen):L('no data','ไม่มีข้อมูล')} ${c.lastSeenBy?'· '+L('by','โดย')+' '+esc(c.lastSeenBy):''}</div>
+      <div class="k">${L('Reported missing','แจ้งหาย')}</div><div class="v">${fmt(rep)} · ${L('by','โดย')} ${esc(c.reportedBy||'—')}</div>
     </div>
     <div class="win">
-      <div class="wt">🎥 ช่วงเวลาที่ต้องตรวจ CCTV (D3)</div>
-      <div style="font-size:14px;font-weight:600">${winStart?fmt(winStart):'(ไม่ทราบจุดเริ่ม — ตรวจย้อนจากการตรวจก่อนหน้า)'} &nbsp;→&nbsp; ${fmt(winEnd)}</div>
-      <div class="hint" style="margin-top:4px">ช่วงเวลาโดยประมาณ: <b>${durTxt}</b> — อุปกรณ์หายไประหว่างนี้</div>
+      <div class="wt">🎥 ${L('CCTV time window to review (D3)','ช่วงเวลาที่ต้องตรวจ CCTV (D3)')}</div>
+      <div style="font-size:14px;font-weight:600">${winStart?fmt(winStart):L('(start unknown — check back from previous inspection)','(ไม่ทราบจุดเริ่ม — ตรวจย้อนจากการตรวจก่อนหน้า)')} &nbsp;→&nbsp; ${fmt(winEnd)}</div>
+      <div class="hint" style="margin-top:4px">${L('Approx. window','ช่วงเวลาโดยประมาณ')}: <b>${durTxt}</b> — ${L('item went missing during this period','อุปกรณ์หายไประหว่างนี้')}</div>
     </div>
-    <div style="margin-bottom:6px"><label>กล้องที่ต้องเปิดดู (D4)</label></div>
-    <div class="cam-list" style="margin-bottom:16px">${cams.length?cams.map(cm=>`<span class="cam-pill" title="${esc(cm.name)} ${esc(cm.loc)}">🎥 ${esc(cm.id)}</span>`).join(''):'<span class="hint">สถานีนี้ยังไม่ได้ผูกกล้องใน Admin</span>'}</div>
-    <div style="margin-bottom:6px"><label>ไทม์ไลน์สถานี (D6) — สถานะอุปกรณ์ย้อนหลัง</label></div>
-    <div class="timeline">${tl.length?tl.map(t=>`<div class="tl-item ${t.status==='missing'?'miss':t.status==='present'?'ok':''}"><div class="tt">${t.status==='present'?'✓ พบอุปกรณ์':t.status==='missing'?'✕ ไม่พบ':'— ไม่ระบุ'}</div><div class="td">${fmt(t.date)} · ${esc(t.by||'')}</div></div>`).join(''):'<div class="hint">ไม่มีประวัติ</div>'}</div>
-    <div style="margin-bottom:6px"><label>อัปเดตสถานะเคส (D7)</label></div>
+    <div style="margin-bottom:6px"><label>${L('Cameras to review (D4)','กล้องที่ต้องเปิดดู (D4)')}</label></div>
+    <div class="cam-list" style="margin-bottom:16px">${cams.length?cams.map(cm=>`<span class="cam-pill" title="${esc(cm.name)} ${esc(cm.loc)}">🎥 ${esc(cm.id)}</span>`).join(''):`<span class="hint">${L('This station has no cameras linked in Admin','สถานีนี้ยังไม่ได้ผูกกล้องใน Admin')}</span>`}</div>
+    <div style="margin-bottom:6px"><label>${L('Station timeline (D6) — item status history','ไทม์ไลน์สถานี (D6) — สถานะอุปกรณ์ย้อนหลัง')}</label></div>
+    <div class="timeline">${tl.length?tl.map(x=>`<div class="tl-item ${x.status==='missing'?'miss':x.status==='present'?'ok':''}"><div class="tt">${x.status==='present'?L('✓ present','✓ พบอุปกรณ์'):x.status==='missing'?L('✕ not found','✕ ไม่พบ'):L('— n/a','— ไม่ระบุ')}</div><div class="td">${fmt(x.date)} · ${esc(x.by||'')}</div></div>`).join(''):`<div class="hint">${L('No history','ไม่มีประวัติ')}</div>`}</div>
+    <div style="margin-bottom:6px"><label>${L('Update case status (D7)','อัปเดตสถานะเคส (D7)')}</label></div>
     <div class="life">
-      ${['investigating','found','replaced','closed'].map(s=>`<button data-s="${s}" class="${c.status===s?'on':''}">${sl[s]}</button>`).join('')}
+      ${['investigating','found','replaced','closed'].map(s=>`<button data-s="${s}" class="${c.status===s?'on':''}">${caseStatusLabel(s)}</button>`).join('')}
     </div>
-    <div style="margin-bottom:12px"><textarea id="caseNote" placeholder="บันทึกผลการสอบสวน / หมายเหตุ…" style="width:100%;min-height:70px">${esc(c.notes||'')}</textarea></div>
+    <div style="margin-bottom:12px"><textarea id="caseNote" placeholder="${L('Investigation notes…','บันทึกผลการสอบสวน / หมายเหตุ…')}" style="width:100%;min-height:70px">${esc(c.notes||'')}</textarea></div>
     <div style="display:flex;gap:10px">
-      <button class="btn btn-ghost btn-sm" id="printInv">🖨 พิมพ์ใบสอบสวน (D5)</button>
-      <button class="btn btn-primary btn-sm" id="saveCase" style="margin-left:auto" ${ADMIN.role!=='admin'?'disabled title="เฉพาะ admin"':''}>บันทึก</button>
+      <button class="btn btn-ghost btn-sm" id="printInv">🖨 ${L('Print sheet (D5)','พิมพ์ใบสอบสวน (D5)')}</button>
+      <button class="btn btn-primary btn-sm" id="saveCase" style="margin-left:auto" ${ADMIN.role!=='admin'?`disabled title="${t('admin_only')}"`:''}>${t('save')}</button>
     </div>`;
 
   let newStatus=c.status;
@@ -612,7 +610,7 @@ function openCase(id){
     try{
       await updateDoc(doc(db,'cases',c.id),{status:newStatus,notes:$('caseNote').value.trim(),updatedAt:serverTimestamp(),updatedBy:ADMIN.name});
       $('caseModal').classList.remove('on'); await loadAll();
-    }catch(e){ btn.disabled=false; btn.textContent='บันทึก'; alert('บันทึกไม่สำเร็จ: '+e.message); }
+    }catch(e){ btn.disabled=false; btn.textContent=t('save'); alert(t('save_fail')+e.message); }
   };
   $('caseModal').classList.add('on');
 }
@@ -650,11 +648,11 @@ function renderHistory(){
     return true;
   });
   const tb=$('histBody');
-  if(!list.length){ tb.innerHTML='<tr><td colspan="7"><div class="empty">ไม่พบรายการ</div></td></tr>'; return; }
+  if(!list.length){ tb.innerHTML=`<tr><td colspan="7"><div class="empty">${t('no_rows')}</div></td></tr>`; return; }
   tb.innerHTML=list.slice(0,200).map(i=>`<tr data-insp="${esc(i.id)}">
     <td style="white-space:nowrap">${fmt(tsDate(i.createdAt))}</td>
     <td class="mono">${esc(i.stationId)}</td><td>${esc(i.site||'')}</td><td>${esc(i.inspectorName||'')}</td>
-    <td class="tag-result ${i.result}">${i.result==='pass'?'ผ่าน':i.result==='needs_repair'?'ต้องแก้ไข':'ไม่ผ่าน'}</td>
+    <td class="tag-result ${i.result}">${esc(resultLabel(i.result))}</td>
     <td>${i.missingItems?.length?`<span class="badge red">${i.missingItems.length}</span>`:'—'}</td>
     <td>${i.photos?.length||0} 📷</td></tr>`).join('');
   tb.querySelectorAll('[data-insp]').forEach(r=>r.onclick=()=>openInsp(r.dataset.insp));
@@ -662,24 +660,24 @@ function renderHistory(){
 function openInsp(id){
   const i=INSPECTIONS.find(x=>x.id===id); if(!i)return;
   const cl=i.checklist||{};
-  const clHtml=Object.entries(cl).map(([code,v])=>`<div class="cl-line" style="align-items:flex-start"><span class="cc ${v.status}">${esc(code)}</span><span style="flex:1">${esc(CHECKLIST_LABELS[code]||'')}<b style="display:block;margin-top:2px;color:${v.status==='pass'?'var(--green)':v.status==='fail'?'var(--red)':'var(--muted)'}">${v.status==='pass'?'✓ ผ่าน':v.status==='fail'?'✕ ไม่ผ่าน':'N/A'}${v.note?' — '+esc(v.note):''}</b></span></div>`).join('');
-  const eq=(i.equipmentSnapshot||[]).map(e=>`<span class="badge ${e.status==='present'?'green':e.status==='missing'?'red':'amber'}">${esc(e.name)}: ${e.status==='present'?'ครบ':e.status==='missing'?'หาย':'ชำรุด'}</span>`).join(' ');
+  const clHtml=Object.entries(cl).map(([code,v])=>`<div class="cl-line" style="align-items:flex-start"><span class="cc ${v.status}">${esc(code)}</span><span style="flex:1">${esc(clLabel(code))}<b style="display:block;margin-top:2px;color:${v.status==='pass'?'var(--green)':v.status==='fail'?'var(--red)':'var(--muted)'}">${v.status==='pass'?t('c_pass'):v.status==='fail'?t('c_fail'):'N/A'}${v.note?' — '+esc(v.note):''}</b></span></div>`).join('');
+  const eq=(i.equipmentSnapshot||[]).map(e=>`<span class="badge ${e.status==='present'?'green':e.status==='missing'?'red':'amber'}">${esc(e.name)}: ${e.status==='present'?t('eq_present'):e.status==='missing'?t('eq_missing'):t('eq_damaged')}</span>`).join(' ');
   $('inspBody').innerHTML=`
     <div class="inv-head"><div class="t">${esc(i.stationId)}</div><div class="s">${esc(i.stationName||'')} · ${esc(i.site||'')}</div></div>
     <div class="kv">
-      <div class="k">ผู้ตรวจ</div><div class="v">${esc(i.inspectorName||'')}</div>
-      <div class="k">วันเวลา</div><div class="v">${fmt(tsDate(i.createdAt))}</div>
-      <div class="k">กะ</div><div class="v">${i.shift?shiftEmoji(i.shift)+' '+shiftLabel(i.shift):'—'}</div>
-      <div class="k">ผล</div><div class="v tag-result ${i.result}">${i.result==='pass'?'ผ่าน':i.result==='needs_repair'?'ต้องแก้ไข':'ไม่ผ่าน'}</div>
-      <div class="k">GPS</div><div class="v">${i.gpsDistanceM!=null?'ห่าง '+i.gpsDistanceM+' ม.':'—'}</div>
-      <div class="k">แรงดัน</div><div class="v">${i.pressureValue!=null?i.pressureValue+' bar':'—'}</div>
-      <div class="k">ซีล</div><div class="v mono">${esc(i.sealNumber||'—')}</div>
+      <div class="k">${t('k_inspector')}</div><div class="v">${esc(i.inspectorName||'')}</div>
+      <div class="k">${t('k_datetime')}</div><div class="v">${fmt(tsDate(i.createdAt))}</div>
+      <div class="k">${t('k_shift')}</div><div class="v">${i.shift?shiftEmoji(i.shift)+' '+shiftLabel(i.shift):'—'}</div>
+      <div class="k">${t('k_result')}</div><div class="v tag-result ${i.result}">${esc(resultLabel(i.result))}</div>
+      <div class="k">GPS</div><div class="v">${i.gpsDistanceM!=null?L('away ','ห่าง ')+i.gpsDistanceM+L(' m',' ม.'):'—'}</div>
+      <div class="k">${t('k_pressure')}</div><div class="v">${i.pressureValue!=null?i.pressureValue+' bar':'—'}</div>
+      <div class="k">${t('k_seal')}</div><div class="v mono">${esc(i.sealNumber||'—')}</div>
     </div>
-    ${eq?`<div style="margin-bottom:6px"><label>อุปกรณ์</label></div><div style="margin-bottom:16px;display:flex;flex-wrap:wrap;gap:6px">${eq}</div>`:''}
-    <div style="margin-bottom:6px"><label>รายการตรวจ</label></div><div style="margin-bottom:16px">${clHtml||'<span class="hint">—</span>'}</div>
-    ${i.notes?`<div style="margin-bottom:6px"><label>หมายเหตุ</label></div><div style="margin-bottom:16px;font-size:13.5px">${esc(i.notes)}</div>`:''}
-    ${i.photos?.length?`<div style="margin-bottom:6px"><label>รูปหลักฐาน (${i.photos.length})</label></div><div class="photos">${i.photos.map(p=>`<img src="${esc(p.url)}">`).join('')}</div>`:''}
-    ${i.signatureUrl?`<div style="margin-top:14px;margin-bottom:6px"><label>ลายเซ็นผู้ตรวจ</label></div><img src="${esc(i.signatureUrl)}" style="max-width:240px;border:1px solid var(--line);border-radius:9px;background:#fff;padding:6px">`:''}`;
+    ${eq?`<div style="margin-bottom:6px"><label>${t('k_equip')}</label></div><div style="margin-bottom:16px;display:flex;flex-wrap:wrap;gap:6px">${eq}</div>`:''}
+    <div style="margin-bottom:6px"><label>${t('k_checklist')}</label></div><div style="margin-bottom:16px">${clHtml||'<span class="hint">—</span>'}</div>
+    ${i.notes?`<div style="margin-bottom:6px"><label>${t('k_note')}</label></div><div style="margin-bottom:16px;font-size:13.5px">${esc(i.notes)}</div>`:''}
+    ${i.photos?.length?`<div style="margin-bottom:6px"><label>${t('k_photos')} (${i.photos.length})</label></div><div class="photos">${i.photos.map(p=>`<img src="${esc(p.url)}">`).join('')}</div>`:''}
+    ${i.signatureUrl?`<div style="margin-top:14px;margin-bottom:6px"><label>${t('k_sign')}</label></div><img src="${esc(i.signatureUrl)}" style="max-width:240px;border:1px solid var(--line);border-radius:9px;background:#fff;padding:6px">`:''}`;
   // เปิดรูปผ่าน listener ไม่ใช่ inline onclick — กัน JS-string injection จาก URL ในฐานข้อมูล
   $('inspBody').querySelectorAll('.photos img').forEach(im=>im.onclick=()=>window.open(im.src,'_blank'));
   $('inspModal').classList.add('on');
