@@ -702,11 +702,11 @@ function getAlerts(){
 function countAlerts(){ const a=getAlerts(); return a.missing.length+a.overdue.length+a.stale.length+a.seal.length; }
 function renderAlerts(){
   const a=getAlerts(); const el=$('alertsBody'); let html='';
-  if(!countAlerts()){ el.innerHTML='<div class="empty">ไม่มีการแจ้งเตือน ทุกอย่างปกติ ✓</div>'; return; }
-  if(a.missing.length){ html+=`<div class="alert-grp"><div class="gh">🎥 อุปกรณ์หาย — รอสอบสวน <span class="ct">${a.missing.length}</span></div><div class="panel">${a.missing.map(c=>`<div class="row" data-case="${esc(c.id)}" style="cursor:pointer"><div class="av" style="background:rgba(214,40,40,.1);color:#D62828">!</div><div class="main"><b>${esc(c.itemName)}</b><div class="meta">${esc(c.stationId)} · แจ้ง ${fmt(tsDate(c.reportedMissingAt))}</div></div><span class="badge amber">เปิดเคส CCTV</span></div>`).join('')}</div></div>`; }
-  if(a.overdue.length){ html+=`<div class="alert-grp"><div class="gh">⏰ พลาดกะที่ผ่านมา — ยังไม่ตรวจ <span class="ct">${a.overdue.length}</span></div><div class="panel">${a.overdue.map(o=>`<div class="row"><div class="av" style="background:rgba(230,81,0,.13);color:#E65100">${shiftEmoji(o.p.prev.shift)}</div><div class="main"><b>${esc(o.s.id)} <span class="badge navy">${esc(o.s.site||'')}</span></b><div class="meta">${esc(o.s.name||'')} · ยังไม่ตรวจกะ${shiftLabel(o.p.prev.shift)}ที่ผ่านมา</div></div><span class="badge amber">ตรวจด่วน</span></div>`).join('')}</div></div>`; }
-  if(a.stale.length){ html+=`<div class="alert-grp"><div class="gh">🐌 เคสค้างนาน (>${STALE_CASE_DAYS} วัน) <span class="ct">${a.stale.length}</span></div><div class="panel">${a.stale.map(c=>`<div class="row" data-case="${esc(c.id)}" style="cursor:pointer"><div class="av" style="background:rgba(214,40,40,.1);color:#D62828">${daysAgo(tsDate(c.reportedMissingAt))}</div><div class="main"><b>${esc(c.itemName)} @ ${esc(c.stationId)}</b><div class="meta">เปิดมาแล้ว ${daysAgo(tsDate(c.reportedMissingAt))} วัน ยังไม่ปิด</div></div><span class="badge red">เร่งติดตาม</span></div>`).join('')}</div></div>`; }
-  if(a.seal.length){ html+=`<div class="alert-grp"><div class="gh">🔒 ซีลเปลี่ยน/ไม่ตรงกับครั้งก่อน <span class="ct">${a.seal.length}</span></div><div class="panel">${a.seal.map(x=>`<div class="row"><div class="av" style="background:rgba(230,81,0,.13);color:#E65100">🔒</div><div class="main"><b>${esc(x.s.id)}</b><div class="meta">ซีลล่าสุด <span class="mono">${esc(x.now)}</span> · ก่อนหน้า <span class="mono">${esc(x.prev)}</span></div></div><span class="badge amber">ตรวจสอบ</span></div>`).join('')}</div></div>`; }
+  if(!countAlerts()){ el.innerHTML=`<div class="empty">${t('no_alerts')}</div>`; return; }
+  if(a.missing.length){ html+=`<div class="alert-grp"><div class="gh">${t('ag_missing')} <span class="ct">${a.missing.length}</span></div><div class="panel">${a.missing.map(c=>`<div class="row" data-case="${esc(c.id)}" style="cursor:pointer"><div class="av" style="background:rgba(214,40,40,.1);color:#D62828">!</div><div class="main"><b>${esc(c.itemName)}</b><div class="meta">${esc(c.stationId)} · ${t('reported')} ${fmt(tsDate(c.reportedMissingAt))}</div></div><span class="badge amber">${t('open_cctv')}</span></div>`).join('')}</div></div>`; }
+  if(a.overdue.length){ html+=`<div class="alert-grp"><div class="gh">${t('ag_over')} <span class="ct">${a.overdue.length}</span></div><div class="panel">${a.overdue.map(o=>`<div class="row"><div class="av" style="background:rgba(230,81,0,.13);color:#E65100">${shiftEmoji(o.p.prev.shift)}</div><div class="main"><b>${esc(o.s.id)} <span class="badge navy">${esc(o.s.site||'')}</span></b><div class="meta">${esc(o.s.name||'')} · ${t('not_done_shift')}${shiftLabel(o.p.prev.shift)}${t('last_shift')}</div></div><span class="badge amber">${t('inspect_now')}</span></div>`).join('')}</div></div>`; }
+  if(a.stale.length){ html+=`<div class="alert-grp"><div class="gh">${L(`🐌 Stale cases (>${STALE_CASE_DAYS} days)`,`🐌 เคสค้างนาน (>${STALE_CASE_DAYS} วัน)`)} <span class="ct">${a.stale.length}</span></div><div class="panel">${a.stale.map(c=>`<div class="row" data-case="${esc(c.id)}" style="cursor:pointer"><div class="av" style="background:rgba(214,40,40,.1);color:#D62828">${daysAgo(tsDate(c.reportedMissingAt))}</div><div class="main"><b>${esc(c.itemName)} @ ${esc(c.stationId)}</b><div class="meta">${t('open_for')} ${daysAgo(tsDate(c.reportedMissingAt))} ${t('days')} ${t('not_closed')}</div></div><span class="badge red">${t('chase')}</span></div>`).join('')}</div></div>`; }
+  if(a.seal.length){ html+=`<div class="alert-grp"><div class="gh">${t('ag_seal')} <span class="ct">${a.seal.length}</span></div><div class="panel">${a.seal.map(x=>`<div class="row"><div class="av" style="background:rgba(230,81,0,.13);color:#E65100">🔒</div><div class="main"><b>${esc(x.s.id)}</b><div class="meta">${t('seal_now')} <span class="mono">${esc(x.now)}</span> · ${t('seal_prev')} <span class="mono">${esc(x.prev)}</span></div></div><span class="badge amber">${t('check')}</span></div>`).join('')}</div></div>`; }
   el.innerHTML=html;
   el.querySelectorAll('[data-case]').forEach(r=>r.onclick=()=>openCase(r.dataset.case));
 }
@@ -751,13 +751,12 @@ function renderPlan(){
   const pendingCur=infos.filter(x=>x.p.status==='soon').length;
   const noAsg=STATIONS.filter(s=>!s.assignedTo).length;
   $('planStats').innerHTML=`
-    <div class="stat ${missed?'s-red':'s-green'}"><div class="bar"></div><div class="lab">พลาดกะก่อนหน้า</div><div class="val">${missed}</div><div class="sub">ยังไม่ตรวจกะที่ผ่านมา</div></div>
-    <div class="stat ${pendingCur?'s-amber':'s-green'}"><div class="bar"></div><div class="lab">รอตรวจกะปัจจุบัน (${shiftLabel(cur.shift)})</div><div class="val">${pendingCur}</div><div class="sub">ยังไม่ได้ตรวจกะนี้</div></div>
-    <div class="stat ${noAsg?'s-amber':'s-navy'}"><div class="bar"></div><div class="lab">ยังไม่มอบหมายผู้ตรวจ</div><div class="val">${noAsg}</div><div class="sub">กำหนดได้ใน Admin</div></div>`;
+    <div class="stat ${missed?'s-red':'s-green'}"><div class="bar"></div><div class="lab">${t('pl_missed')}</div><div class="val">${missed}</div><div class="sub">${t('pl_missed_sub')}</div></div>
+    <div class="stat ${pendingCur?'s-amber':'s-green'}"><div class="bar"></div><div class="lab">${t('pl_pending')} (${shiftLabel(cur.shift)})</div><div class="val">${pendingCur}</div><div class="sub">${t('pl_pending_sub')}</div></div>
+    <div class="stat ${noAsg?'s-amber':'s-navy'}"><div class="bar"></div><div class="lab">${t('pl_noassign')}</div><div class="val">${noAsg}</div><div class="sub">${t('pl_noassign_sub')}</div></div>`;
   const list=planList(); const tb=$('planBody');
-  if(!list.length){ tb.innerHTML='<tr><td colspan="7"><div class="empty">ไม่พบสถานีตามเงื่อนไข</div></td></tr>'; return; }
+  if(!list.length){ tb.innerHTML=`<tr><td colspan="7"><div class="empty">${t('no_plan')}</div></td></tr>`; return; }
   const bc={overdue:'red',soon:'amber',ontrack:'green',never:'gray'};
-  const bl={overdue:'พลาดกะก่อน',soon:'รอตรวจกะนี้',ontrack:'ครบกะนี้',never:'ยังไม่เคยตรวจ'};
   const today=todayWindows();
   tb.innerHTML=list.map(({s,p})=>{
     const dDone=coveredIn(s.id,today.day), nDone=coveredIn(s.id,today.night);
@@ -765,11 +764,11 @@ function renderPlan(){
     return `<tr>
     <td class="mono">${esc(s.id)}<div style="font-size:11px;color:var(--muted)">${esc(s.name||'')}</div></td>
     <td>${esc(s.site||'')}</td>
-    <td>${s.assignedToName?esc(s.assignedToName):'<span class="badge amber">ยังไม่มอบหมาย</span>'}</td>
+    <td>${s.assignedToName?esc(s.assignedToName):`<span class="badge amber">${t('unassigned')}</span>`}</td>
     <td style="white-space:nowrap">☀️ ${mk(dDone)} &nbsp; 🌙 ${mk(nDone)}</td>
     <td style="white-space:nowrap">${fmt(tsDate(s.lastInspectionAt))}</td>
-    <td>${p.doneCur?'<span class="badge green">ครบ</span>':'<span class="badge amber">รอตรวจ</span>'}</td>
-    <td><span class="badge ${bc[p.status]}">${bl[p.status]}</span></td>
+    <td>${p.doneCur?`<span class="badge green">${t('done')}</span>`:`<span class="badge amber">${t('pending')}</span>`}</td>
+    <td><span class="badge ${bc[p.status]}">${planStatusLabel(p.status)}</span></td>
   </tr>`;}).join('');
 }
 function exportPlan(){
@@ -799,6 +798,8 @@ $('exportPlan').onclick=exportPlan;
 $('gBtn').onclick=gateLogin;
 $('gPw').addEventListener('keydown',e=>{if(e.key==='Enter')gateLogin();});
 $('logout').onclick=()=>{sessionStorage.removeItem('fhs_admin');location.reload();};
+$('langBtn').onclick=toggleLang;
+applyLang();
 
 (async function(){
   let s=null; try{ s=JSON.parse(sessionStorage.getItem('fhs_admin')); }catch(e){}
