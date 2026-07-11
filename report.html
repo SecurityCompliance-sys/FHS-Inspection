@@ -115,30 +115,30 @@ td{padding:9px 11px;border-bottom:1px solid var(--line);vertical-align:middle}
 <div id="gate">
   <div class="box">
     <div style="text-align:center;margin-bottom:16px"><svg width="48" height="48" viewBox="0 0 64 64" fill="none"><path d="M32 6l22 8v16c0 14-9 23-22 28C19 53 10 44 10 30V14l22-8z" fill="#1E2761"/><path d="M22 24h20M22 31h20M22 38h13" stroke="#CADCFC" stroke-width="2.5" stroke-linecap="round"/></svg></div>
-    <h1>รายงานประจำสัปดาห์</h1><p>Security &amp; Compliance · FHS</p>
+    <h1 data-i18n="gate_h">รายงานประจำสัปดาห์</h1><p>Security &amp; Compliance · FHS</p>
     <div id="gateAlert"></div>
-    <div style="margin-bottom:14px"><label>รหัสพนักงาน</label><input type="text" id="gId" class="mono" style="text-transform:uppercase;width:100%" placeholder="EMP-1001"></div>
-    <div style="margin-bottom:18px"><label>รหัสผ่าน</label><input type="password" id="gPw" style="width:100%" placeholder="••••••••"></div>
-    <button class="btn btn-primary" style="width:100%" id="gBtn">เข้าสู่ระบบ</button>
+    <div style="margin-bottom:14px"><label data-i18n="f_empid">รหัสพนักงาน</label><input type="text" id="gId" class="mono" style="text-transform:uppercase;width:100%" placeholder="EMP-1001"></div>
+    <div style="margin-bottom:18px"><label data-i18n="f_pw">รหัสผ่าน</label><input type="password" id="gPw" style="width:100%" placeholder="••••••••"></div>
+    <button class="btn btn-primary" style="width:100%" id="gBtn" data-i18n="signin">เข้าสู่ระบบ</button>
   </div>
 </div>
 
 <div class="topbar">
   <div class="logo"><svg viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="7" fill="#1E2761"/><path d="M10 9h12M10 14h12M10 19h8" stroke="#CADCFC" stroke-width="2" stroke-linecap="round"/><circle cx="23" cy="22" r="4" fill="#D62828"/></svg>
     <div><b>Weekly Report</b><span>SECURITY &amp; COMPLIANCE</span></div></div>
-  <nav class="appsw"><a href="index.html">ตรวจ</a><a href="dashboard.html">Dashboard</a><a href="report.html" class="cur">รายงาน</a><a href="admin.html">Admin</a></nav>
-  <div class="right"><span id="adminName"></span><a id="logout">ออก</a></div>
+  <nav class="appsw"><a href="index.html" data-i18n="nav_inspect">ตรวจ</a><a href="dashboard.html">Dashboard</a><a href="report.html" class="cur" data-i18n="nav_report">รายงาน</a><a href="admin.html">Admin</a></nav>
+  <div class="right"><a id="langBtn" style="border:1px solid rgba(255,255,255,.3);border-radius:7px;padding:4px 9px;font-size:11px;font-weight:700">EN</a><span id="adminName"></span><a id="logout" data-i18n="signout">ออก</a></div>
 </div>
 
 <div class="wrap">
   <div class="toolbar">
-    <div><label>ช่วงเวลา</label><select id="period"><option value="0" selected>สัปดาห์นี้</option><option value="1">สัปดาห์ที่แล้ว</option><option value="2">2 สัปดาห์ก่อน</option></select></div>
+    <div><label data-i18n="tb_period">ช่วงเวลา</label><select id="period"><option value="0" selected data-i18n="p_this">สัปดาห์นี้</option><option value="1" data-i18n="p_last">สัปดาห์ที่แล้ว</option><option value="2" data-i18n="p_2ago">2 สัปดาห์ก่อน</option></select></div>
     <div class="grow"></div>
-    <button class="btn btn-ghost btn-sm" id="btnPrint">🖨 พิมพ์ / PDF</button>
-    <button class="btn btn-green btn-sm" id="btnSend">📧 ส่งอีเมล</button>
+    <button class="btn btn-ghost btn-sm" id="btnPrint" data-i18n="btn_print">🖨 พิมพ์ / PDF</button>
+    <button class="btn btn-green btn-sm" id="btnSend" data-i18n="btn_send">📧 ส่งอีเมล</button>
   </div>
   <div id="sendAlert"></div>
-  <div class="report" id="report"><div class="empty">กำลังโหลดข้อมูล…</div></div>
+  <div class="report" id="report"><div class="empty" data-i18n="loading">กำลังโหลดข้อมูล…</div></div>
 </div>
 
 <script type="module">
@@ -162,6 +162,28 @@ const REPORT_BASE_URL = location.href.replace(/report\.html.*$/,'dashboard.html'
 const app=initializeApp(FIREBASE_CONFIG); const db=getFirestore(app);
 const $=id=>document.getElementById(id);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); // escape quotes ด้วย เพราะใช้ใน attribute
+
+/* ===== i18n (TH / EN) — key ร่วม fhs_lang; เนื้อหาอีเมลคงเป็นไทย (ส่งถึงผู้รับไทย) ===== */
+let LANG = localStorage.getItem('fhs_lang') || 'th';
+const I18N = {
+ th:{ nav_inspect:'ตรวจ', nav_report:'รายงาน', signout:'ออก', f_empid:'รหัสพนักงาน', f_pw:'รหัสผ่าน', signin:'เข้าสู่ระบบ', gate_h:'รายงานประจำสัปดาห์',
+  tb_period:'ช่วงเวลา', p_this:'สัปดาห์นี้', p_last:'สัปดาห์ที่แล้ว', p_2ago:'2 สัปดาห์ก่อน', btn_print:'🖨 พิมพ์ / PDF', btn_send:'📧 ส่งอีเมล', loading:'กำลังโหลดข้อมูล…',
+  err_fill:'กรอกข้อมูลให้ครบ', err_nouser:'ไม่พบผู้ใช้', err_noaccess:'ไม่มีสิทธิ์เข้าถึง', err_wrongpw:'รหัสผ่านไม่ถูกต้อง',
+  send_adminonly:'เฉพาะผู้ใช้สิทธิ์ admin เท่านั้นที่ส่งอีเมลได้', send_norecip:'ไม่มีผู้รับที่ตั้งค่าไว้ใน SITE_RECIPIENTS', sending:'ส่ง…', send_ok:'ส่งสำเร็จ', send_fail:'ล้มเหลว', see_console:'ดู console', copies:'ฉบับ' },
+ en:{ nav_inspect:'Inspect', nav_report:'Report', signout:'Out', f_empid:'Employee ID', f_pw:'Password', signin:'Sign in', gate_h:'Weekly Report',
+  tb_period:'Period', p_this:'This week', p_last:'Last week', p_2ago:'2 weeks ago', btn_print:'🖨 Print / PDF', btn_send:'📧 Send email', loading:'Loading…',
+  err_fill:'Please fill in all fields', err_nouser:'User not found', err_noaccess:'No access', err_wrongpw:'Incorrect password',
+  send_adminonly:'Only admin users can send emails', send_norecip:'No recipients configured in SITE_RECIPIENTS', sending:'Sending…', send_ok:'Sent', send_fail:'failed', see_console:'see console', copies:'' }
+};
+const t=k=>(I18N[LANG]&&I18N[LANG][k])??I18N.th[k]??k;
+const L=(en,th)=>LANG==='en'?en:th;
+function applyLang(){
+  document.documentElement.lang=LANG;
+  document.querySelectorAll('[data-i18n]').forEach(el=>el.textContent=t(el.dataset.i18n));
+  const lb=$('langBtn'); if(lb) lb.textContent=LANG==='th'?'EN':'ไทย';
+  if(ADMIN) renderReport();
+}
+function toggleLang(){ LANG=LANG==='th'?'en':'th'; localStorage.setItem('fhs_lang',LANG); applyLang(); }
 async function sha256(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');}
 const tsDate=ts=>ts?(ts.toDate?ts.toDate():new Date(ts)):null;
 const fmtD=d=>d?d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'2-digit'}):'—';
@@ -172,19 +194,19 @@ let STATIONS=[],INSPECTIONS=[],CASES=[],ADMIN=null;
 
 async function gateLogin(){
   const id=$('gId').value.trim().toUpperCase(),pw=$('gPw').value,a=$('gateAlert');a.innerHTML='';
-  if(!id||!pw){a.innerHTML='<div class="alert err">กรอกข้อมูลให้ครบ</div>';return;}
+  if(!id||!pw){a.innerHTML=`<div class="alert err">${t('err_fill')}</div>`;return;}
   const btn=$('gBtn');btn.disabled=true;btn.innerHTML='<div class="spinner"></div>';
   try{
-    const snap=await getDoc(doc(db,'users',id)); if(!snap.exists())throw new Error('ไม่พบผู้ใช้');
-    const u=snap.data(); if(!['admin','viewer'].includes(u.role))throw new Error('ไม่มีสิทธิ์เข้าถึง');
-    if((await sha256((u.salt||'')+pw))!==u.passwordHash)throw new Error('รหัสผ่านไม่ถูกต้อง');
+    const snap=await getDoc(doc(db,'users',id)); if(!snap.exists())throw new Error(t('err_nouser'));
+    const u=snap.data(); if(!['admin','viewer'].includes(u.role))throw new Error(t('err_noaccess'));
+    if((await sha256((u.salt||'')+pw))!==u.passwordHash)throw new Error(t('err_wrongpw'));
     ADMIN={id,name:u.name||id,role:u.role}; sessionStorage.setItem('fhs_admin',JSON.stringify(ADMIN)); boot();
   }catch(e){a.innerHTML=`<div class="alert err">${esc(e.message)}</div>`;}
-  finally{btn.disabled=false;btn.textContent='เข้าสู่ระบบ';}
+  finally{btn.disabled=false;btn.textContent=t('signin');}
 }
 async function boot(){
-  $('gate').style.display='none'; $('adminName').textContent=ADMIN.name+(ADMIN.role!=='admin'?' · viewer (อ่านอย่างเดียว)':'');
-  if(ADMIN.role!=='admin'){ $('btnSend').disabled=true; $('btnSend').title='เฉพาะ admin'; }
+  $('gate').style.display='none'; $('adminName').textContent=ADMIN.name+(ADMIN.role!=='admin'?L(' · viewer (read-only)',' · viewer (อ่านอย่างเดียว)'):'');
+  if(ADMIN.role!=='admin'){ $('btnSend').disabled=true; $('btnSend').title=t('send_adminonly'); }
   if(EMAILJS.publicKey&&!EMAILJS.publicKey.startsWith('YOUR')) emailjs.init({publicKey:EMAILJS.publicKey});
   const [st,ins,cs]=await Promise.all([getDocs(collection(db,'stations')),getDocs(collection(db,'inspections')),getDocs(collection(db,'cases'))]);
   STATIONS=st.docs.map(d=>({id:d.id,...d.data()}));
@@ -220,7 +242,7 @@ function compute(off){
 function delta(now,was,inv=false){
   const d=now-was; const cls=d===0?'flat':((d>0)!==inv?'up':'down');
   const arrow=d>0?'▲':d<0?'▼':'—';
-  return `<div class="d ${cls}">${arrow} ${d>0?'+':''}${d} จากสัปดาห์ก่อน</div>`;
+  return `<div class="d ${cls}">${arrow} ${d>0?'+':''}${d} ${L('vs last week','จากสัปดาห์ก่อน')}</div>`;
 }
 
 function renderReport(){
@@ -229,70 +251,70 @@ function renderReport(){
   const periodTxt=`${fmtD(R.cur.start)} – ${fmtD(new Date(R.cur.end-1))}`;
 
   let html=`<div class="r-head">
-    <div class="et">รายงานตรวจสอบสถานีหัวดับเพลิง</div>
-    <div class="ep">BevChain Thailand · Security &amp; Compliance · ประจำสัปดาห์ ${periodTxt}</div>
-    <div class="badge-site">ทุกไซต์ · ${STATIONS.length} สถานี</div>
+    <div class="et">${L('Fire Hose Station Inspection Report','รายงานตรวจสอบสถานีหัวดับเพลิง')}</div>
+    <div class="ep">BevChain Thailand · Security &amp; Compliance · ${L('week','ประจำสัปดาห์')} ${periodTxt}</div>
+    <div class="badge-site">${L('All sites','ทุกไซต์')} · ${STATIONS.length} ${L('stations','สถานี')}</div>
   </div>`;
 
   // KPIs + week over week (E7)
-  html+=`<div class="sec"><h3>📊 ภาพรวม (เทียบสัปดาห์ก่อน)</h3><div class="kpis">
-    <div class="kpi navy"><div class="v">${R.c.count}</div><div class="l">การตรวจ</div>${delta(R.c.count,R.p.count)}</div>
-    <div class="kpi ${R.c.rate>=80?'green':R.c.rate>=50?'amber':'red'}"><div class="v">${R.c.rate}%</div><div class="l">อัตราผ่าน</div>${delta(R.c.rate,R.p.rate)}</div>
-    <div class="kpi ${R.c.fail?'red':'green'}"><div class="v">${R.c.fail}</div><div class="l">ไม่ผ่าน/ต้องแก้</div>${delta(R.c.fail,R.p.fail,true)}</div>
-    <div class="kpi ${R.c.issues?'red':'green'}"><div class="v">${R.c.issues}</div><div class="l">อุปกรณ์หาย</div>${delta(R.c.issues,R.p.issues,true)}</div>
+  html+=`<div class="sec"><h3>${L('📊 Overview (vs last week)','📊 ภาพรวม (เทียบสัปดาห์ก่อน)')}</h3><div class="kpis">
+    <div class="kpi navy"><div class="v">${R.c.count}</div><div class="l">${L('Inspections','การตรวจ')}</div>${delta(R.c.count,R.p.count)}</div>
+    <div class="kpi ${R.c.rate>=80?'green':R.c.rate>=50?'amber':'red'}"><div class="v">${R.c.rate}%</div><div class="l">${L('Pass rate','อัตราผ่าน')}</div>${delta(R.c.rate,R.p.rate)}</div>
+    <div class="kpi ${R.c.fail?'red':'green'}"><div class="v">${R.c.fail}</div><div class="l">${L('Fail/repair','ไม่ผ่าน/ต้องแก้')}</div>${delta(R.c.fail,R.p.fail,true)}</div>
+    <div class="kpi ${R.c.issues?'red':'green'}"><div class="v">${R.c.issues}</div><div class="l">${L('Items missing','อุปกรณ์หาย')}</div>${delta(R.c.issues,R.p.issues,true)}</div>
   </div></div>`;
 
-  // shift breakdown (กะกลางวัน/กลางคืน)
-  html+=`<div class="sec"><h3>🕐 แยกตามกะ (สัปดาห์นี้)</h3><div class="kpis" style="grid-template-columns:1fr 1fr">
-    <div class="kpi navy"><div class="v">☀️ ${R.c.dayCount}</div><div class="l">ตรวจกะกลางวัน</div>${delta(R.c.dayCount,R.p.dayCount)}</div>
-    <div class="kpi navy"><div class="v">🌙 ${R.c.nightCount}</div><div class="l">ตรวจกะกลางคืน</div>${delta(R.c.nightCount,R.p.nightCount)}</div>
+  // shift breakdown
+  html+=`<div class="sec"><h3>${L('🕐 By shift (this week)','🕐 แยกตามกะ (สัปดาห์นี้)')}</h3><div class="kpis" style="grid-template-columns:1fr 1fr">
+    <div class="kpi navy"><div class="v">☀️ ${R.c.dayCount}</div><div class="l">${L('Day-shift inspections','ตรวจกะกลางวัน')}</div>${delta(R.c.dayCount,R.p.dayCount)}</div>
+    <div class="kpi navy"><div class="v">🌙 ${R.c.nightCount}</div><div class="l">${L('Night-shift inspections','ตรวจกะกลางคืน')}</div>${delta(R.c.nightCount,R.p.nightCount)}</div>
   </div></div>`;
 
   // fail table with photos (E3)
-  html+=`<div class="sec"><h3>⚠️ รายการที่ไม่ผ่าน / ต้องแก้ไข</h3>`;
+  html+=`<div class="sec"><h3>${L('⚠️ Failed / needs repair','⚠️ รายการที่ไม่ผ่าน / ต้องแก้ไข')}</h3>`;
   if(R.failList.length){
-    html+=`<table><thead><tr><th>สถานี</th><th>ไซต์</th><th>ผู้ตรวจ</th><th>วันที่</th><th>ผล</th><th>ปัญหา</th><th>รูป</th></tr></thead><tbody>`;
+    html+=`<table><thead><tr><th>${L('Station','สถานี')}</th><th>${L('Site','ไซต์')}</th><th>${L('Inspector','ผู้ตรวจ')}</th><th>${L('Date','วันที่')}</th><th>${L('Result','ผล')}</th><th>${L('Issue','ปัญหา')}</th><th>${L('Photo','รูป')}</th></tr></thead><tbody>`;
     R.failList.forEach(i=>{
       const probs=[]; Object.entries(i.checklist||{}).forEach(([k,v])=>{if(v.status==='fail')probs.push(k);});
-      (i.missingItems||[]).forEach(m=>probs.push(m.name+'(หาย)'));
+      (i.missingItems||[]).forEach(m=>probs.push(m.name+L('(missing)','(หาย)')));
       html+=`<tr><td class="mono">${esc(i.stationId)}</td><td>${esc(i.site||'')}</td><td>${esc(i.inspectorName||'')}</td><td>${fmt(tsDate(i.createdAt))}</td>
-        <td class="tag ${i.result}">${i.result==='needs_repair'?'ต้องแก้ไข':'ไม่ผ่าน'}</td>
+        <td class="tag ${i.result}">${i.result==='needs_repair'?L('Needs repair','ต้องแก้ไข'):L('Fail','ไม่ผ่าน')}</td>
         <td style="font-size:12px">${esc(probs.join(', ')||'-')}</td>
         <td><div class="thumbs">${(i.photos||[]).slice(0,3).map(p=>`<img class="thumb" src="${esc(p.url)}">`).join('')||'—'}</div></td></tr>`;
     });
     html+=`</tbody></table>`;
-  } else html+=`<div class="ok-line">✓ ทุกสถานีที่ตรวจในสัปดาห์นี้ผ่านหมด</div>`;
+  } else html+=`<div class="ok-line">${L('✓ All stations inspected this week passed','✓ ทุกสถานีที่ตรวจในสัปดาห์นี้ผ่านหมด')}</div>`;
   html+=`</div>`;
 
   // missing items / new CCTV cases
   if(R.newCases.length){
-    html+=`<div class="sec"><h3>🎥 เคสของหายที่เปิดใหม่สัปดาห์นี้</h3>`;
-    R.newCases.forEach(c=>{ html+=`<div class="list-row"><span class="badge red">หาย</span><b>${esc(c.itemName)}</b><span class="hint" style="margin:0">@ ${esc(c.stationId)} · ${(c.cctvCameras||[]).length} กล้องต้องตรวจ</span></div>`; });
+    html+=`<div class="sec"><h3>${L('🎥 New loss cases this week','🎥 เคสของหายที่เปิดใหม่สัปดาห์นี้')}</h3>`;
+    R.newCases.forEach(c=>{ html+=`<div class="list-row"><span class="badge red">${L('missing','หาย')}</span><b>${esc(c.itemName)}</b><span class="hint" style="margin:0">@ ${esc(c.stationId)} · ${(c.cctvCameras||[]).length} ${L('cameras to review','กล้องต้องตรวจ')}</span></div>`; });
     html+=`</div>`;
   }
 
   // uninspected stations (E6)
-  html+=`<div class="sec"><h3>🔍 สถานีที่ยังไม่ได้ตรวจในสัปดาห์นี้</h3>`;
+  html+=`<div class="sec"><h3>${L('🔍 Stations not inspected this week','🔍 สถานีที่ยังไม่ได้ตรวจในสัปดาห์นี้')}</h3>`;
   if(R.uninspected.length){
-    html+=`<div class="alert info" style="margin-bottom:12px">${R.uninspected.length} สถานี ยังไม่มีการตรวจในช่วงนี้ — ควรติดตาม</div>`;
+    html+=`<div class="alert info" style="margin-bottom:12px">${L(`${R.uninspected.length} stations not inspected in this period — follow up`,`${R.uninspected.length} สถานี ยังไม่มีการตรวจในช่วงนี้ — ควรติดตาม`)}</div>`;
     html+=R.uninspected.map(s=>`<div class="list-row"><span class="badge amber">${esc(s.site||'-')}</span><b class="mono">${esc(s.id)}</b><span class="hint" style="margin:0">${esc(s.name||'')}</span></div>`).join('');
-  } else html+=`<div class="ok-line">✓ ตรวจครบทุกสถานีในสัปดาห์นี้</div>`;
+  } else html+=`<div class="ok-line">${L('✓ All stations inspected this week','✓ ตรวจครบทุกสถานีในสัปดาห์นี้')}</div>`;
   html+=`</div>`;
 
   // photo comparison week over week (C5)
-  html+=`<div class="sec"><h3>📸 เทียบรูปกับสัปดาห์ก่อน (week-over-week)</h3>`;
+  html+=`<div class="sec"><h3>${L('📸 Photo vs last week (week-over-week)','📸 เทียบรูปกับสัปดาห์ก่อน (week-over-week)')}</h3>`;
   if(R.cmp.length){
     html+=R.cmp.slice(0,8).map(x=>`<div class="cmp"><div class="ct"><span class="mono">${esc(x.s.id)}</span> ${esc(x.s.name||'')}</div>
       <div class="cmp-grid">
-        <div class="cmp-col"><div class="cl">สัปดาห์ก่อน · ${fmtD(R.prev.start)}</div>${x.prev?`<img src="${esc(x.prev)}">`:'<div class="no">ไม่มีรูป</div>'}</div>
-        <div class="cmp-col"><div class="cl">สัปดาห์นี้ · ${fmtD(R.cur.start)}</div>${x.now?`<img src="${esc(x.now)}">`:'<div class="no">ไม่มีรูป</div>'}</div>
+        <div class="cmp-col"><div class="cl">${L('Last week','สัปดาห์ก่อน')} · ${fmtD(R.prev.start)}</div>${x.prev?`<img src="${esc(x.prev)}">`:`<div class="no">${L('no photo','ไม่มีรูป')}</div>`}</div>
+        <div class="cmp-col"><div class="cl">${L('This week','สัปดาห์นี้')} · ${fmtD(R.cur.start)}</div>${x.now?`<img src="${esc(x.now)}">`:`<div class="no">${L('no photo','ไม่มีรูป')}</div>`}</div>
       </div></div>`).join('');
-    html+=`<p class="hint">ใช้เทียบสภาพตู้/สาย/หัวฉีด ดูการเปลี่ยนแปลงหรือสิ่งผิดปกติระหว่างสัปดาห์</p>`;
-  } else html+=`<div class="empty">ยังไม่มีสถานีที่ตรวจทั้งสองสัปดาห์เพื่อเทียบรูป</div>`;
+    html+=`<p class="hint">${L('Compare cabinet/hose/nozzle condition — spot changes or anomalies between weeks','ใช้เทียบสภาพตู้/สาย/หัวฉีด ดูการเปลี่ยนแปลงหรือสิ่งผิดปกติระหว่างสัปดาห์')}</p>`;
+  } else html+=`<div class="empty">${L('No stations inspected in both weeks to compare','ยังไม่มีสถานีที่ตรวจทั้งสองสัปดาห์เพื่อเทียบรูป')}</div>`;
   html+=`</div>`;
 
   html+=`<div class="sec" style="background:var(--surface-2);text-align:center;color:var(--muted);font-size:12px">
-    สร้างโดยระบบ FHS Inspection · ${esc(ADMIN.name)} · ${new Date().toLocaleString('th-TH')}</div>`;
+    ${L('Generated by FHS Inspection','สร้างโดยระบบ FHS Inspection')} · ${esc(ADMIN.name)} · ${new Date().toLocaleString(L('en-GB','th-TH'))}</div>`;
 
   $('report').innerHTML=html;
   // เปิดรูปผ่าน listener ไม่ใช่ inline onclick — กัน JS-string injection จาก URL ในฐานข้อมูล
@@ -336,16 +358,16 @@ function buildEmailHtml(off, site){
 
 async function sendEmail(){
   const a=$('sendAlert'); a.innerHTML='';
-  if(ADMIN.role!=='admin'){ a.innerHTML='<div class="alert err">เฉพาะผู้ใช้สิทธิ์ admin เท่านั้นที่ส่งอีเมลได้</div>'; return; }
-  if(!EMAILJS.serviceId||EMAILJS.serviceId.startsWith('YOUR')){ a.innerHTML='<div class="alert err">ยังไม่ได้ตั้งค่า EmailJS (publicKey/serviceId/templateId) ที่หัวไฟล์ report.html</div>'; return; }
+  if(ADMIN.role!=='admin'){ a.innerHTML=`<div class="alert err">${t('send_adminonly')}</div>`; return; }
+  if(!EMAILJS.serviceId||EMAILJS.serviceId.startsWith('YOUR')){ a.innerHTML=`<div class="alert err">${L('EmailJS not configured (publicKey/serviceId/templateId) at the top of report.html','ยังไม่ได้ตั้งค่า EmailJS (publicKey/serviceId/templateId) ที่หัวไฟล์ report.html')}</div>`; return; }
   const off=parseInt($('period').value);
   // recipients: each site that has data + _all
   const sitesWithData=[...new Set(INSPECTIONS.filter(i=>inRange(i,weekRange(off))).map(i=>i.site).filter(Boolean))];
   const jobs=[];
   sitesWithData.forEach(site=>{ if(SITE_RECIPIENTS[site]) jobs.push({to:SITE_RECIPIENTS[site],site}); });
   if(SITE_RECIPIENTS._all) jobs.push({to:SITE_RECIPIENTS._all,site:null});
-  if(!jobs.length){ a.innerHTML='<div class="alert err">ไม่มีผู้รับที่ตั้งค่าไว้ใน SITE_RECIPIENTS</div>'; return; }
-  const btn=$('btnSend'); btn.disabled=true; btn.innerHTML='<div class="spinner"></div>ส่ง…';
+  if(!jobs.length){ a.innerHTML=`<div class="alert err">${t('send_norecip')}</div>`; return; }
+  const btn=$('btnSend'); btn.disabled=true; btn.innerHTML=`<div class="spinner"></div>${t('sending')}`;
   let ok=0,err=0;
   for(const j of jobs){
     const {html,subject}=buildEmailHtml(off,j.site);
@@ -356,8 +378,8 @@ async function sendEmail(){
       catch(e){ err++; console.error(e); }
     }
   }
-  btn.disabled=false; btn.textContent='📧 ส่งอีเมล';
-  a.innerHTML=`<div class="alert ${err?'err':'ok'}">ส่งสำเร็จ ${ok} ฉบับ${err?` · ล้มเหลว ${err} (ดู console)`:''}</div>`;
+  btn.disabled=false; btn.textContent=t('btn_send');
+  a.innerHTML=`<div class="alert ${err?'err':'ok'}">${L(`Sent ${ok}${err?` · ${err} failed (see console)`:''}`,`ส่งสำเร็จ ${ok} ฉบับ${err?` · ล้มเหลว ${err} (ดู console)`:''}`)}</div>`;
 }
 
 $('period').onchange=renderReport;
@@ -366,6 +388,8 @@ $('btnSend').onclick=sendEmail;
 $('gBtn').onclick=gateLogin;
 $('gPw').addEventListener('keydown',e=>{if(e.key==='Enter')gateLogin();});
 $('logout').onclick=()=>{sessionStorage.removeItem('fhs_admin');location.reload();};
+$('langBtn').onclick=toggleLang;
+applyLang();
 (async function(){
   let s=null; try{ s=JSON.parse(sessionStorage.getItem('fhs_admin')); }catch(e){}
   if(!s||!s.id) return;
