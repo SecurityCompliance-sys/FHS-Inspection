@@ -423,16 +423,16 @@ const clLabel=code=>(LANG==='en'?CHECKLIST_LABELS_EN:CHECKLIST_LABELS)[code]||''
 /* ===== GATE ===== */
 async function gateLogin(){
   const id=$('gId').value.trim().toUpperCase(),pw=$('gPw').value,a=$('gateAlert');a.innerHTML='';
-  if(!id||!pw){a.innerHTML='<div class="alert err">กรอกข้อมูลให้ครบ</div>';return;}
+  if(!id||!pw){a.innerHTML=`<div class="alert err">${t('err_fill')}</div>`;return;}
   const btn=$('gBtn');btn.disabled=true;btn.innerHTML='<div class="spinner"></div>';
   try{
-    const snap=await getDoc(doc(db,'users',id)); if(!snap.exists())throw new Error('ไม่พบผู้ใช้');
+    const snap=await getDoc(doc(db,'users',id)); if(!snap.exists())throw new Error(t('err_nouser'));
     const u=snap.data();
-    if(!['admin','viewer'].includes(u.role))throw new Error('บัญชีนี้ไม่มีสิทธิ์เข้า Command Center');
-    if((await sha256((u.salt||'')+pw))!==u.passwordHash)throw new Error('รหัสผ่านไม่ถูกต้อง');
+    if(!['admin','viewer'].includes(u.role))throw new Error(t('err_nocc'));
+    if((await sha256((u.salt||'')+pw))!==u.passwordHash)throw new Error(t('err_wrongpw'));
     ADMIN={id,name:u.name||id,role:u.role}; sessionStorage.setItem('fhs_admin',JSON.stringify(ADMIN)); boot();
   }catch(e){a.innerHTML=`<div class="alert err">${esc(e.message)}</div>`;}
-  finally{btn.disabled=false;btn.textContent='เข้าสู่ระบบ';}
+  finally{btn.disabled=false;btn.textContent=t('signin');}
 }
 function boot(){ $('gate').style.display='none'; $('adminName').textContent=`${ADMIN.name} · ${ADMIN.role||'admin'}`; loadAll(); }
 
@@ -479,16 +479,16 @@ function renderDash(){
   const missed=STATIONS.filter(s=>planInfo(s).status==='overdue').length;
 
   $('statCards').innerHTML=`
-    <div class="stat s-navy"><div class="bar"></div><div class="lab">สถานีทั้งหมด</div><div class="val">${total}</div><div class="sub">${[...new Set(STATIONS.map(s=>s.site).filter(Boolean))].length} ไซต์ · ตรวจ 2 ครั้ง/วัน</div></div>
-    <div class="stat ${compliance>=80?'s-green':compliance>=50?'s-amber':'s-red'}"><div class="bar"></div><div class="lab">Compliance · กะ${shiftLabel(cur.shift)} ${shiftEmoji(cur.shift)}</div><div class="val">${compliance}%</div><div class="sub">ตรวจแล้วกะนี้ ${coveredCur}/${total}</div></div>
-    <div class="stat ${openCases?'s-red':'s-green'}"><div class="bar"></div><div class="lab">🎥 เคสของหายเปิดอยู่</div><div class="val">${openCases}</div><div class="sub">รอสอบสวน CCTV</div></div>
-    <div class="stat ${missed?'s-amber':'s-green'}"><div class="bar"></div><div class="lab">พลาดกะก่อนหน้า</div><div class="val">${missed}</div><div class="sub">ยังไม่ตรวจกะที่ผ่านมา</div></div>`;
+    <div class="stat s-navy"><div class="bar"></div><div class="lab">${t('st_all')}</div><div class="val">${total}</div><div class="sub">${[...new Set(STATIONS.map(s=>s.site).filter(Boolean))].length} ${t('st_sites')}</div></div>
+    <div class="stat ${compliance>=80?'s-green':compliance>=50?'s-amber':'s-red'}"><div class="bar"></div><div class="lab">${t('st_compliance')}${shiftLabel(cur.shift)} ${shiftEmoji(cur.shift)}</div><div class="val">${compliance}%</div><div class="sub">${t('st_donecur')} ${coveredCur}/${total}</div></div>
+    <div class="stat ${openCases?'s-red':'s-green'}"><div class="bar"></div><div class="lab">${t('st_opencase')}</div><div class="val">${openCases}</div><div class="sub">${t('st_wait_cctv')}</div></div>
+    <div class="stat ${missed?'s-amber':'s-green'}"><div class="bar"></div><div class="lab">${t('st_missed')}</div><div class="val">${missed}</div><div class="sub">${t('st_missed_sub')}</div></div>`;
 
   renderMap(); renderIssueChart(); renderRecent();
 }
 function renderMap(){
   const geo=STATIONS.filter(s=>s.gps&&s.gps.lat);
-  $('mapSub').textContent=`${geo.length}/${STATIONS.length} มีพิกัด`;
+  $('mapSub').textContent=`${geo.length}/${STATIONS.length} ${t('has_coord')}`;
   if(!map){ map=L.map('map',{scrollWheelZoom:false}).setView([13.7563,100.5018],11);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:19}).addTo(map); }
   markers.forEach(m=>map.removeLayer(m)); markers=[];
@@ -497,7 +497,7 @@ function renderMap(){
   geo.forEach(s=>{
     const col=STATUS_COLOR[stationStatus(s)];
     const m=L.circleMarker([s.gps.lat,s.gps.lng],{radius:9,fillColor:col,color:'#fff',weight:2,fillOpacity:.9}).addTo(map);
-    m.bindPopup(`<b>${esc(s.id)}</b><br>${esc(s.name||'')}<br>ตรวจล่าสุด: ${fmt(tsDate(s.lastInspectionAt))}<br>ผล: ${esc(s.lastResult||'ยังไม่ตรวจ')}`);
+    m.bindPopup(`<b>${esc(s.id)}</b><br>${esc(s.name||'')}<br>${t('map_last')}: ${fmt(tsDate(s.lastInspectionAt))}<br>${t('map_result')}: ${s.lastResult?esc(resultLabel(s.lastResult)):t('not_inspected')}`);
     markers.push(m); grp.push([s.gps.lat,s.gps.lng]);
   });
   if(grp.length) map.fitBounds(grp,{padding:[40,40],maxZoom:15});
@@ -509,7 +509,7 @@ function renderIssueChart(){
   INSPECTIONS.forEach(i=>{ const n=(i.missingItems?.length||0)+(i.result==='fail'?1:0); if(n)cnt[i.stationId]=(cnt[i.stationId]||0)+n; });
   CASES.forEach(c=>{ cnt[c.stationId]=(cnt[c.stationId]||0)+1; });
   const arr=Object.entries(cnt).sort((a,b)=>b[1]-a[1]).slice(0,8);
-  if(!arr.length){ $('issueChart').innerHTML='<div class="empty">ยังไม่มีปัญหาบันทึก ✓</div>'; return; }
+  if(!arr.length){ $('issueChart').innerHTML=`<div class="empty">${t('no_issue')}</div>`; return; }
   const max=Math.max(...arr.map(a=>a[1]));
   $('issueChart').innerHTML=arr.map(([sid,n])=>{
     const pct=Math.round(n/max*100); const col=n>=max*0.66?'var(--red)':n>=max*0.33?'var(--amber)':'var(--navy-2)';
@@ -517,13 +517,13 @@ function renderIssueChart(){
   }).join('');
 }
 function renderRecent(){
-  if(!INSPECTIONS.length){ $('recentList').innerHTML='<div class="empty">ยังไม่มีการตรวจ</div>'; return; }
+  if(!INSPECTIONS.length){ $('recentList').innerHTML=`<div class="empty">${t('no_insp')}</div>`; return; }
   $('recentList').innerHTML=INSPECTIONS.slice(0,10).map(i=>{
     const c=i.result==='pass'?'green':'red';
     const ic=i.result==='pass'?'#0E8A5F':'#D62828';
     return `<div class="row" data-insp="${esc(i.id)}" style="cursor:pointer">
       <div class="av" style="background:rgba(${c==='green'?'14,138,95':'214,40,40'},.12);color:${ic}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">${i.result==='pass'?'<path d="M20 6L9 17l-5-5"/>':'<path d="M12 9v4m0 4h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/>'}</svg></div>
-      <div class="main"><b>${esc(i.stationId)} <span class="badge ${c}">${i.result==='pass'?'ผ่าน':i.result==='needs_repair'?'ต้องแก้ไข':'ไม่ผ่าน'}</span>${i.missingItems?.length?` <span class="badge red">ของหาย ${i.missingItems.length}</span>`:''}</b>
+      <div class="main"><b>${esc(i.stationId)} <span class="badge ${c}">${esc(resultLabel(i.result))}</span>${i.missingItems?.length?` <span class="badge red">${t('missing_n')} ${i.missingItems.length}</span>`:''}</b>
         <div class="meta">${esc(i.inspectorName||'')} · ${fmt(tsDate(i.createdAt))} ${i.gpsDistanceM!=null?'· '+i.gpsDistanceM+'ม.':''}</div></div>
       <div class="badge gray">${(i.photos?.length||0)} 📷</div></div>`;
   }).join('');
