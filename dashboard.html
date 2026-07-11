@@ -309,13 +309,100 @@ const SHIFT_DAY_START = 7, SHIFT_DAY_END = 19; // กะกลางวัน 07
 const app=initializeApp(FIREBASE_CONFIG); const db=getFirestore(app);
 const $=id=>document.getElementById(id);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); // escape quotes ด้วย เพราะใช้ใน attribute
+
+/* ===== i18n (TH / EN) — key ร่วม fhs_lang กับ admin ===== */
+let LANG = localStorage.getItem('fhs_lang') || 'th';
+const I18N = {
+ th:{ nav_inspect:'ตรวจ', nav_report:'รายงาน', signout:'ออก', f_empid:'รหัสพนักงาน', f_pw:'รหัสผ่าน', signin:'เข้าสู่ระบบ',
+  tab_dash:'📊 ภาพรวม', tab_cases:'🎥 สอบสวน CCTV', tab_history:'📋 ประวัติการตรวจ', tab_plan:'🗓 แผนการตรวจ', tab_alerts:'🔔 แจ้งเตือน',
+  h_map:'แผนที่สถานี', h_issue:'สถิติปัญหา/ของหาย รายสถานี', h_recent:'กิจกรรมล่าสุด', sub_recent:'10 รายการ',
+  lg_ok:'ผ่าน/ปกติ', lg_over:'เกินกำหนดตรวจ', lg_fail:'ไม่ผ่าน/มีเคสเปิด', lg_never:'ยังไม่เคยตรวจ',
+  nodata:'ไม่มีข้อมูล', loading:'กำลังโหลด…',
+  cf_open:'เปิดอยู่ (investigating)', cf_all:'ทั้งหมด', cf_found:'พบแล้ว', cf_repl:'เปลี่ยนใหม่', cf_closed:'ปิดเคส',
+  hs_search:'ค้นหา สถานี/ผู้ตรวจ…', all_sites:'ทุกไซต์', all_results:'ทุกผล', r_pass:'ผ่าน', r_fail:'ไม่ผ่าน', r_repair:'ต้องแก้ไข',
+  th_datetime:'วันเวลา', th_station:'สถานี', th_site:'ไซต์', th_inspector:'ผู้ตรวจ', th_result:'ผล', th_missing:'ของหาย', th_photo:'รูป',
+  all_assignees:'ผู้รับผิดชอบทั้งหมด', unassigned_opt:'— ยังไม่มอบหมาย —', all_status:'ทุกสถานะ',
+  ps_over:'พลาดกะก่อน', ps_soon:'รอตรวจกะนี้', ps_ok:'ครบกะนี้', ps_never:'ยังไม่เคยตรวจ',
+  th_assignee:'ผู้รับผิดชอบ', th_today:'กะวันนี้ ☀️/🌙', th_last:'ตรวจล่าสุด', th_curshift:'กะปัจจุบัน', th_status:'สถานะ',
+  m_case:'ใบสอบสวน CCTV', m_insp:'รายละเอียดการตรวจ',
+  shift_day:'กลางวัน', shift_night:'กลางคืน',
+  cs_inv:'กำลังสอบสวน', cs_found:'พบแล้ว', cs_repl:'เปลี่ยนใหม่', cs_closed:'ปิดเคส',
+  st_all:'สถานีทั้งหมด', st_sites:'ไซต์ · ตรวจ 2 ครั้ง/วัน', st_compliance:'Compliance · กะ', st_donecur:'ตรวจแล้วกะนี้',
+  st_opencase:'🎥 เคสของหายเปิดอยู่', st_wait_cctv:'รอสอบสวน CCTV', st_missed:'พลาดกะก่อนหน้า', st_missed_sub:'ยังไม่ตรวจกะที่ผ่านมา',
+  has_coord:'มีพิกัด', not_inspected:'ยังไม่ตรวจ', map_last:'ตรวจล่าสุด', map_result:'ผล',
+  no_issue:'ยังไม่มีปัญหาบันทึก ✓', no_insp:'ยังไม่มีการตรวจ', missing_n:'ของหาย',
+  no_case_cat:'ไม่มีเคสในหมวดนี้ ✓', item:'อุปกรณ์', stale_d:'ค้าง', days:'วัน', reported:'แจ้ง', by:'โดย', cameras:'กล้อง',
+  no_alerts:'ไม่มีการแจ้งเตือน ทุกอย่างปกติ ✓', ag_missing:'🎥 อุปกรณ์หาย — รอสอบสวน', open_cctv:'เปิดเคส CCTV',
+  ag_over:'⏰ พลาดกะที่ผ่านมา — ยังไม่ตรวจ', not_done_shift:'ยังไม่ตรวจกะ', last_shift:'ที่ผ่านมา', inspect_now:'ตรวจด่วน',
+  open_for:'เปิดมาแล้ว', not_closed:'ยังไม่ปิด', chase:'เร่งติดตาม',
+  ag_seal:'🔒 ซีลเปลี่ยน/ไม่ตรงกับครั้งก่อน', seal_now:'ซีลล่าสุด', seal_prev:'ก่อนหน้า', check:'ตรวจสอบ',
+  no_rows:'ไม่พบรายการ', no_plan:'ไม่พบสถานีตามเงื่อนไข',
+  pl_missed:'พลาดกะก่อนหน้า', pl_missed_sub:'ยังไม่ตรวจกะที่ผ่านมา', pl_pending:'รอตรวจกะปัจจุบัน', pl_pending_sub:'ยังไม่ได้ตรวจกะนี้',
+  pl_noassign:'ยังไม่มอบหมายผู้ตรวจ', pl_noassign_sub:'กำหนดได้ใน Admin', unassigned:'ยังไม่มอบหมาย', done:'ครบ', pending:'รอตรวจ',
+  k_inspector:'ผู้ตรวจ', k_datetime:'วันเวลา', k_shift:'กะ', k_result:'ผล', k_pressure:'แรงดัน', k_seal:'ซีล', k_equip:'อุปกรณ์',
+  k_checklist:'รายการตรวจ', k_note:'หมายเหตุ', k_photos:'รูปหลักฐาน', k_sign:'ลายเซ็นผู้ตรวจ',
+  eq_present:'ครบ', eq_missing:'หาย', eq_damaged:'ชำรุด', c_pass:'✓ ผ่าน', c_fail:'✕ ไม่ผ่าน',
+  err_fill:'กรอกข้อมูลให้ครบ', err_nouser:'ไม่พบผู้ใช้', err_nocc:'บัญชีนี้ไม่มีสิทธิ์เข้า Command Center', err_wrongpw:'รหัสผ่านไม่ถูกต้อง',
+  save:'บันทึก', save_fail:'บันทึกไม่สำเร็จ: ', admin_only:'เฉพาะ admin' },
+ en:{ nav_inspect:'Inspect', nav_report:'Report', signout:'Out', f_empid:'Employee ID', f_pw:'Password', signin:'Sign in',
+  tab_dash:'📊 Overview', tab_cases:'🎥 CCTV Cases', tab_history:'📋 History', tab_plan:'🗓 Plan', tab_alerts:'🔔 Alerts',
+  h_map:'Station map', h_issue:'Issues / losses by station', h_recent:'Recent activity', sub_recent:'10 items',
+  lg_ok:'Pass / OK', lg_over:'Overdue', lg_fail:'Fail / open case', lg_never:'Never inspected',
+  nodata:'No data', loading:'Loading…',
+  cf_open:'Open (investigating)', cf_all:'All', cf_found:'Found', cf_repl:'Replaced', cf_closed:'Closed',
+  hs_search:'Search station/inspector…', all_sites:'All sites', all_results:'All results', r_pass:'Pass', r_fail:'Fail', r_repair:'Needs repair',
+  th_datetime:'Date/time', th_station:'Station', th_site:'Site', th_inspector:'Inspector', th_result:'Result', th_missing:'Missing', th_photo:'Photos',
+  all_assignees:'All assignees', unassigned_opt:'— Unassigned —', all_status:'All statuses',
+  ps_over:'Missed shift', ps_soon:'Pending shift', ps_ok:'Shift done', ps_never:'Never inspected',
+  th_assignee:'Assignee', th_today:"Today ☀️/🌙", th_last:'Last inspected', th_curshift:'Current shift', th_status:'Status',
+  m_case:'CCTV Investigation', m_insp:'Inspection detail',
+  shift_day:'Day', shift_night:'Night',
+  cs_inv:'Investigating', cs_found:'Found', cs_repl:'Replaced', cs_closed:'Closed',
+  st_all:'Total stations', st_sites:'sites · 2×/day', st_compliance:'Compliance · ', st_donecur:'done this shift',
+  st_opencase:'🎥 Open loss cases', st_wait_cctv:'awaiting CCTV', st_missed:'Missed last shift', st_missed_sub:'not inspected last shift',
+  has_coord:'with GPS', not_inspected:'not inspected', map_last:'Last inspected', map_result:'Result',
+  no_issue:'No issues logged ✓', no_insp:'No inspections yet', missing_n:'missing',
+  no_case_cat:'No cases in this category ✓', item:'Item', stale_d:'stale', days:'days', reported:'reported', by:'by', cameras:'cameras',
+  no_alerts:'No alerts — all good ✓', ag_missing:'🎥 Missing items — awaiting investigation', open_cctv:'CCTV case open',
+  ag_over:'⏰ Missed shift — not inspected', not_done_shift:'not inspected the ', last_shift:' shift', inspect_now:'inspect now',
+  open_for:'open for', not_closed:'still open', chase:'follow up',
+  ag_seal:'🔒 Seal changed / mismatched', seal_now:'latest seal', seal_prev:'previous', check:'check',
+  no_rows:'No records found', no_plan:'No stations match filters',
+  pl_missed:'Missed last shift', pl_missed_sub:'not inspected last shift', pl_pending:'Pending current shift', pl_pending_sub:'not inspected this shift',
+  pl_noassign:'Unassigned inspector', pl_noassign_sub:'set in Admin', unassigned:'Unassigned', done:'Done', pending:'Pending',
+  k_inspector:'Inspector', k_datetime:'Date/time', k_shift:'Shift', k_result:'Result', k_pressure:'Pressure', k_seal:'Seal', k_equip:'Equipment',
+  k_checklist:'Checklist', k_note:'Note', k_photos:'Evidence photos', k_sign:'Inspector signature',
+  eq_present:'present', eq_missing:'missing', eq_damaged:'damaged', c_pass:'✓ Pass', c_fail:'✕ Fail',
+  err_fill:'Please fill in all fields', err_nouser:'User not found', err_nocc:'This account cannot access Command Center', err_wrongpw:'Incorrect password',
+  save:'Save', save_fail:'Save failed: ', admin_only:'admin only' }
+};
+const t=k=>(I18N[LANG]&&I18N[LANG][k])??I18N.th[k]??k;
+const L=(en,th)=>LANG==='en'?en:th;
+const resultLabel=r=>t(r==='pass'?'r_pass':r==='needs_repair'?'r_repair':'r_fail');
+const caseStatusLabel=s=>({investigating:t('cs_inv'),found:t('cs_found'),replaced:t('cs_repl'),closed:t('cs_closed')}[s]||s);
+const planStatusLabel=s=>({overdue:t('ps_over'),soon:t('ps_soon'),ontrack:t('ps_ok'),never:t('ps_never')}[s]||s);
+function applyLang(){
+  document.documentElement.lang=LANG;
+  document.querySelectorAll('[data-i18n]').forEach(el=>el.textContent=t(el.dataset.i18n));
+  document.querySelectorAll('[data-i18n-ph]').forEach(el=>el.setAttribute('placeholder',t(el.dataset.i18nPh)));
+  const lb=$('langBtn'); if(lb) lb.textContent=LANG==='th'?'EN':'ไทย';
+  if(ADMIN){ populateFilters(); renderDash(); renderCases(); renderHistory(); renderPlan(); renderAlerts(); }
+}
+function toggleLang(){ LANG=LANG==='th'?'en':'th'; localStorage.setItem('fhs_lang',LANG); applyLang(); }
+function populateFilters(){
+  const sites=[...new Set(STATIONS.map(s=>s.site).filter(Boolean))];
+  $('histSite').innerHTML=`<option value="">${t('all_sites')}</option>`+sites.map(s=>`<option>${esc(s)}</option>`).join('');
+  $('planSite').innerHTML=`<option value="">${t('all_sites')}</option>`+sites.map(s=>`<option>${esc(s)}</option>`).join('');
+  const assignees=[...new Map(STATIONS.filter(s=>s.assignedTo).map(s=>[s.assignedTo,s.assignedToName||s.assignedTo])).entries()];
+  $('planAssignee').innerHTML=`<option value="">${t('all_assignees')}</option>`+assignees.map(([id,nm])=>`<option value="${esc(id)}">${esc(nm)}</option>`).join('')+`<option value="_none">${t('unassigned_opt')}</option>`;
+}
 async function sha256(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');}
 const tsDate=ts=>ts?(ts.toDate?ts.toDate():new Date(ts)):null;
 const fmt=d=>d?d.toLocaleString('th-TH',{day:'2-digit',month:'short',year:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
 const fmtD=d=>d?d.toLocaleDateString('th-TH',{day:'2-digit',month:'short',year:'2-digit'}):'—';
 const daysAgo=d=>d?Math.floor((Date.now()-d.getTime())/86400000):null;
 const shiftOf=d=>{ const h=(d instanceof Date?d:new Date(d)).getHours(); return (h>=SHIFT_DAY_START&&h<SHIFT_DAY_END)?'day':'night'; };
-const shiftLabel=s=>s==='day'?'กลางวัน':'กลางคืน';
+const shiftLabel=s=>t(s==='day'?'shift_day':'shift_night');
 const shiftEmoji=s=>s==='day'?'☀️':'🌙';
 const inspTime=i=>tsDate(i.createdAt)||(i.clientTime?new Date(i.clientTime):null);
 function shiftWindow(now=new Date()){ const h=now.getHours(),start=new Date(now),end=new Date(now);
@@ -330,6 +417,8 @@ function coveredIn(stationId,win){ return INSPECTIONS.some(i=>{ if(i.stationId!=
 
 let STATIONS=[],INSPECTIONS=[],CASES=[],CAMERAS=[],ADMIN=null,map=null,markers=[];
 const CHECKLIST_LABELS={B1:'ตู้/สถานีเข้าถึงได้ ไม่มีของวางบัง',B2:'กระจก/ประตูตู้สมบูรณ์ (กรณี break-glass)',B3:'สายดับเพลิงครบ ไม่ชำรุด/ไม่ขึ้นรา/ไม่รั่ว',B4:'หัวฉีดทองเหลืองอยู่ครบ',B5:'วาล์ว/landing valve ใช้งานได้ ไม่เป็นสนิม ไม่รั่ว',B6:'ข้อต่อ/coupling สมบูรณ์',B7:'ป้าย/สัญลักษณ์มองเห็นชัด',B8:'ไฟส่องสว่างบริเวณเพียงพอ',B11:'ป้ายวันตรวจล่าสุด / tag อัปเดต',B12:'ถังดับเพลิงข้างเคียง (ถ้ามี) แรงดัน+วันหมดอายุปกติ',B13:'ขวาน/อุปกรณ์เสริมในตู้ครบ'};
+const CHECKLIST_LABELS_EN={B1:'Cabinet/station accessible, nothing blocking',B2:'Glass/door intact (break-glass)',B3:'Hose complete, no damage/mould/leak',B4:'Brass nozzle present',B5:'Valve/landing valve works, no rust/leak',B6:'Coupling intact',B7:'Signage clearly visible',B8:'Adequate area lighting',B11:'Last-inspection tag updated',B12:'Nearby extinguisher (if any) pressure+expiry OK',B13:'Axe/accessories in cabinet complete'};
+const clLabel=code=>(LANG==='en'?CHECKLIST_LABELS_EN:CHECKLIST_LABELS)[code]||'';
 
 /* ===== GATE ===== */
 async function gateLogin(){
@@ -356,12 +445,7 @@ async function loadAll(){
   INSPECTIONS=ins.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(tsDate(b.createdAt)?.getTime()||0)-(tsDate(a.createdAt)?.getTime()||0));
   CASES=cs.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(tsDate(b.reportedMissingAt)?.getTime()||0)-(tsDate(a.reportedMissingAt)?.getTime()||0));
   CAMERAS=cam.docs.map(d=>({id:d.id,...d.data()}));
-  // history site filter options
-  const sites=[...new Set(STATIONS.map(s=>s.site).filter(Boolean))];
-  $('histSite').innerHTML='<option value="">ทุกไซต์</option>'+sites.map(s=>`<option>${esc(s)}</option>`).join('');
-  $('planSite').innerHTML='<option value="">ทุกไซต์</option>'+sites.map(s=>`<option>${esc(s)}</option>`).join('');
-  const assignees=[...new Map(STATIONS.filter(s=>s.assignedTo).map(s=>[s.assignedTo,s.assignedToName||s.assignedTo])).entries()];
-  $('planAssignee').innerHTML='<option value="">ผู้รับผิดชอบทั้งหมด</option>'+assignees.map(([id,nm])=>`<option value="${esc(id)}">${esc(nm)}</option>`).join('')+'<option value="_none">— ยังไม่มอบหมาย —</option>';
+  populateFilters();
   renderDash(); renderCases(); renderHistory(); renderPlan(); renderAlerts(); renderBadges();
 }
 
