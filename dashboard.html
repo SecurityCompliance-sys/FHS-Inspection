@@ -377,7 +377,7 @@ const I18N = {
   save:'Save', save_fail:'Save failed: ', admin_only:'admin only' }
 };
 const t=k=>(I18N[LANG]&&I18N[LANG][k])??I18N.th[k]??k;
-const L=(en,th)=>LANG==='en'?en:th;
+const TL=(en,th)=>LANG==='en'?en:th; // i18n helper (ห้ามชื่อ L — ชนกับ Leaflet global L)
 const resultLabel=r=>t(r==='pass'?'r_pass':r==='needs_repair'?'r_repair':'r_fail');
 const caseStatusLabel=s=>({investigating:t('cs_inv'),found:t('cs_found'),replaced:t('cs_repl'),closed:t('cs_closed')}[s]||s);
 const planStatusLabel=s=>({overdue:t('ps_over'),soon:t('ps_soon'),ontrack:t('ps_ok'),never:t('ps_never')}[s]||s);
@@ -573,28 +573,28 @@ function openCase(id){
   const tl=stationTimeline(c.stationId,c.itemId);
 
   $('caseBody').innerHTML=`
-    <div class="inv-head"><div class="t">${esc(c.itemName||t('item'))} ${L('missing','หาย')}</div><div class="s">${esc(c.stationName||'')} · ${esc(c.stationId)} · ${L('case','เคส')} ${esc(c.id.slice(0,8).toUpperCase())}</div></div>
+    <div class="inv-head"><div class="t">${esc(c.itemName||t('item'))} ${TL('missing','หาย')}</div><div class="s">${esc(c.stationName||'')} · ${esc(c.stationId)} · ${TL('case','เคส')} ${esc(c.id.slice(0,8).toUpperCase())}</div></div>
     <div class="kv">
-      <div class="k">${L('Current status','สถานะปัจจุบัน')}</div><div class="v">${caseStatusLabel(c.status)}</div>
-      <div class="k">${L('Last seen','เห็นครั้งสุดท้าย')}</div><div class="v">${seen?fmt(seen):L('no data','ไม่มีข้อมูล')} ${c.lastSeenBy?'· '+L('by','โดย')+' '+esc(c.lastSeenBy):''}</div>
-      <div class="k">${L('Reported missing','แจ้งหาย')}</div><div class="v">${fmt(rep)} · ${L('by','โดย')} ${esc(c.reportedBy||'—')}</div>
+      <div class="k">${TL('Current status','สถานะปัจจุบัน')}</div><div class="v">${caseStatusLabel(c.status)}</div>
+      <div class="k">${TL('Last seen','เห็นครั้งสุดท้าย')}</div><div class="v">${seen?fmt(seen):TL('no data','ไม่มีข้อมูล')} ${c.lastSeenBy?'· '+TL('by','โดย')+' '+esc(c.lastSeenBy):''}</div>
+      <div class="k">${TL('Reported missing','แจ้งหาย')}</div><div class="v">${fmt(rep)} · ${TL('by','โดย')} ${esc(c.reportedBy||'—')}</div>
     </div>
     <div class="win">
-      <div class="wt">🎥 ${L('CCTV time window to review (D3)','ช่วงเวลาที่ต้องตรวจ CCTV (D3)')}</div>
-      <div style="font-size:14px;font-weight:600">${winStart?fmt(winStart):L('(start unknown — check back from previous inspection)','(ไม่ทราบจุดเริ่ม — ตรวจย้อนจากการตรวจก่อนหน้า)')} &nbsp;→&nbsp; ${fmt(winEnd)}</div>
-      <div class="hint" style="margin-top:4px">${L('Approx. window','ช่วงเวลาโดยประมาณ')}: <b>${durTxt}</b> — ${L('item went missing during this period','อุปกรณ์หายไประหว่างนี้')}</div>
+      <div class="wt">🎥 ${TL('CCTV time window to review (D3)','ช่วงเวลาที่ต้องตรวจ CCTV (D3)')}</div>
+      <div style="font-size:14px;font-weight:600">${winStart?fmt(winStart):TL('(start unknown — check back from previous inspection)','(ไม่ทราบจุดเริ่ม — ตรวจย้อนจากการตรวจก่อนหน้า)')} &nbsp;→&nbsp; ${fmt(winEnd)}</div>
+      <div class="hint" style="margin-top:4px">${TL('Approx. window','ช่วงเวลาโดยประมาณ')}: <b>${durTxt}</b> — ${TL('item went missing during this period','อุปกรณ์หายไประหว่างนี้')}</div>
     </div>
-    <div style="margin-bottom:6px"><label>${L('Cameras to review (D4)','กล้องที่ต้องเปิดดู (D4)')}</label></div>
-    <div class="cam-list" style="margin-bottom:16px">${cams.length?cams.map(cm=>`<span class="cam-pill" title="${esc(cm.name)} ${esc(cm.loc)}">🎥 ${esc(cm.id)}</span>`).join(''):`<span class="hint">${L('This station has no cameras linked in Admin','สถานีนี้ยังไม่ได้ผูกกล้องใน Admin')}</span>`}</div>
-    <div style="margin-bottom:6px"><label>${L('Station timeline (D6) — item status history','ไทม์ไลน์สถานี (D6) — สถานะอุปกรณ์ย้อนหลัง')}</label></div>
-    <div class="timeline">${tl.length?tl.map(x=>`<div class="tl-item ${x.status==='missing'?'miss':x.status==='present'?'ok':''}"><div class="tt">${x.status==='present'?L('✓ present','✓ พบอุปกรณ์'):x.status==='missing'?L('✕ not found','✕ ไม่พบ'):L('— n/a','— ไม่ระบุ')}</div><div class="td">${fmt(x.date)} · ${esc(x.by||'')}</div></div>`).join(''):`<div class="hint">${L('No history','ไม่มีประวัติ')}</div>`}</div>
-    <div style="margin-bottom:6px"><label>${L('Update case status (D7)','อัปเดตสถานะเคส (D7)')}</label></div>
+    <div style="margin-bottom:6px"><label>${TL('Cameras to review (D4)','กล้องที่ต้องเปิดดู (D4)')}</label></div>
+    <div class="cam-list" style="margin-bottom:16px">${cams.length?cams.map(cm=>`<span class="cam-pill" title="${esc(cm.name)} ${esc(cm.loc)}">🎥 ${esc(cm.id)}</span>`).join(''):`<span class="hint">${TL('This station has no cameras linked in Admin','สถานีนี้ยังไม่ได้ผูกกล้องใน Admin')}</span>`}</div>
+    <div style="margin-bottom:6px"><label>${TL('Station timeline (D6) — item status history','ไทม์ไลน์สถานี (D6) — สถานะอุปกรณ์ย้อนหลัง')}</label></div>
+    <div class="timeline">${tl.length?tl.map(x=>`<div class="tl-item ${x.status==='missing'?'miss':x.status==='present'?'ok':''}"><div class="tt">${x.status==='present'?TL('✓ present','✓ พบอุปกรณ์'):x.status==='missing'?TL('✕ not found','✕ ไม่พบ'):TL('— n/a','— ไม่ระบุ')}</div><div class="td">${fmt(x.date)} · ${esc(x.by||'')}</div></div>`).join(''):`<div class="hint">${TL('No history','ไม่มีประวัติ')}</div>`}</div>
+    <div style="margin-bottom:6px"><label>${TL('Update case status (D7)','อัปเดตสถานะเคส (D7)')}</label></div>
     <div class="life">
       ${['investigating','found','replaced','closed'].map(s=>`<button data-s="${s}" class="${c.status===s?'on':''}">${caseStatusLabel(s)}</button>`).join('')}
     </div>
-    <div style="margin-bottom:12px"><textarea id="caseNote" placeholder="${L('Investigation notes…','บันทึกผลการสอบสวน / หมายเหตุ…')}" style="width:100%;min-height:70px">${esc(c.notes||'')}</textarea></div>
+    <div style="margin-bottom:12px"><textarea id="caseNote" placeholder="${TL('Investigation notes…','บันทึกผลการสอบสวน / หมายเหตุ…')}" style="width:100%;min-height:70px">${esc(c.notes||'')}</textarea></div>
     <div style="display:flex;gap:10px">
-      <button class="btn btn-ghost btn-sm" id="printInv">🖨 ${L('Print sheet (D5)','พิมพ์ใบสอบสวน (D5)')}</button>
+      <button class="btn btn-ghost btn-sm" id="printInv">🖨 ${TL('Print sheet (D5)','พิมพ์ใบสอบสวน (D5)')}</button>
       <button class="btn btn-primary btn-sm" id="saveCase" style="margin-left:auto" ${ADMIN.role!=='admin'?`disabled title="${t('admin_only')}"`:''}>${t('save')}</button>
     </div>`;
 
@@ -669,7 +669,7 @@ function openInsp(id){
       <div class="k">${t('k_datetime')}</div><div class="v">${fmt(tsDate(i.createdAt))}</div>
       <div class="k">${t('k_shift')}</div><div class="v">${i.shift?shiftEmoji(i.shift)+' '+shiftLabel(i.shift):'—'}</div>
       <div class="k">${t('k_result')}</div><div class="v tag-result ${i.result}">${esc(resultLabel(i.result))}</div>
-      <div class="k">GPS</div><div class="v">${i.gpsDistanceM!=null?L('away ','ห่าง ')+i.gpsDistanceM+L(' m',' ม.'):'—'}</div>
+      <div class="k">GPS</div><div class="v">${i.gpsDistanceM!=null?TL('away ','ห่าง ')+i.gpsDistanceM+TL(' m',' ม.'):'—'}</div>
       <div class="k">${t('k_pressure')}</div><div class="v">${i.pressureValue!=null?i.pressureValue+' bar':'—'}</div>
       <div class="k">${t('k_seal')}</div><div class="v mono">${esc(i.sealNumber||'—')}</div>
     </div>
@@ -705,7 +705,7 @@ function renderAlerts(){
   if(!countAlerts()){ el.innerHTML=`<div class="empty">${t('no_alerts')}</div>`; return; }
   if(a.missing.length){ html+=`<div class="alert-grp"><div class="gh">${t('ag_missing')} <span class="ct">${a.missing.length}</span></div><div class="panel">${a.missing.map(c=>`<div class="row" data-case="${esc(c.id)}" style="cursor:pointer"><div class="av" style="background:rgba(214,40,40,.1);color:#D62828">!</div><div class="main"><b>${esc(c.itemName)}</b><div class="meta">${esc(c.stationId)} · ${t('reported')} ${fmt(tsDate(c.reportedMissingAt))}</div></div><span class="badge amber">${t('open_cctv')}</span></div>`).join('')}</div></div>`; }
   if(a.overdue.length){ html+=`<div class="alert-grp"><div class="gh">${t('ag_over')} <span class="ct">${a.overdue.length}</span></div><div class="panel">${a.overdue.map(o=>`<div class="row"><div class="av" style="background:rgba(230,81,0,.13);color:#E65100">${shiftEmoji(o.p.prev.shift)}</div><div class="main"><b>${esc(o.s.id)} <span class="badge navy">${esc(o.s.site||'')}</span></b><div class="meta">${esc(o.s.name||'')} · ${t('not_done_shift')}${shiftLabel(o.p.prev.shift)}${t('last_shift')}</div></div><span class="badge amber">${t('inspect_now')}</span></div>`).join('')}</div></div>`; }
-  if(a.stale.length){ html+=`<div class="alert-grp"><div class="gh">${L(`🐌 Stale cases (>${STALE_CASE_DAYS} days)`,`🐌 เคสค้างนาน (>${STALE_CASE_DAYS} วัน)`)} <span class="ct">${a.stale.length}</span></div><div class="panel">${a.stale.map(c=>`<div class="row" data-case="${esc(c.id)}" style="cursor:pointer"><div class="av" style="background:rgba(214,40,40,.1);color:#D62828">${daysAgo(tsDate(c.reportedMissingAt))}</div><div class="main"><b>${esc(c.itemName)} @ ${esc(c.stationId)}</b><div class="meta">${t('open_for')} ${daysAgo(tsDate(c.reportedMissingAt))} ${t('days')} ${t('not_closed')}</div></div><span class="badge red">${t('chase')}</span></div>`).join('')}</div></div>`; }
+  if(a.stale.length){ html+=`<div class="alert-grp"><div class="gh">${TL(`🐌 Stale cases (>${STALE_CASE_DAYS} days)`,`🐌 เคสค้างนาน (>${STALE_CASE_DAYS} วัน)`)} <span class="ct">${a.stale.length}</span></div><div class="panel">${a.stale.map(c=>`<div class="row" data-case="${esc(c.id)}" style="cursor:pointer"><div class="av" style="background:rgba(214,40,40,.1);color:#D62828">${daysAgo(tsDate(c.reportedMissingAt))}</div><div class="main"><b>${esc(c.itemName)} @ ${esc(c.stationId)}</b><div class="meta">${t('open_for')} ${daysAgo(tsDate(c.reportedMissingAt))} ${t('days')} ${t('not_closed')}</div></div><span class="badge red">${t('chase')}</span></div>`).join('')}</div></div>`; }
   if(a.seal.length){ html+=`<div class="alert-grp"><div class="gh">${t('ag_seal')} <span class="ct">${a.seal.length}</span></div><div class="panel">${a.seal.map(x=>`<div class="row"><div class="av" style="background:rgba(230,81,0,.13);color:#E65100">🔒</div><div class="main"><b>${esc(x.s.id)}</b><div class="meta">${t('seal_now')} <span class="mono">${esc(x.now)}</span> · ${t('seal_prev')} <span class="mono">${esc(x.prev)}</span></div></div><span class="badge amber">${t('check')}</span></div>`).join('')}</div></div>`; }
   el.innerHTML=html;
   el.querySelectorAll('[data-case]').forEach(r=>r.onclick=()=>openCase(r.dataset.case));
