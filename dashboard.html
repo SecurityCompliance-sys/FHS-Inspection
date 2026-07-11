@@ -189,26 +189,26 @@ tr:hover td{background:var(--surface-2);cursor:pointer}
     <h1>Command Center</h1>
     <p>Security &amp; Compliance · FHS</p>
     <div id="gateAlert"></div>
-    <div style="margin-bottom:14px"><label>รหัสพนักงาน</label><input type="text" id="gId" class="mono" style="text-transform:uppercase;width:100%" placeholder="EMP-1001"></div>
-    <div style="margin-bottom:18px"><label>รหัสผ่าน</label><input type="password" id="gPw" style="width:100%" placeholder="••••••••"></div>
-    <button class="btn btn-primary" style="width:100%" id="gBtn">เข้าสู่ระบบ</button>
+    <div style="margin-bottom:14px"><label data-i18n="f_empid">รหัสพนักงาน</label><input type="text" id="gId" class="mono" style="text-transform:uppercase;width:100%" placeholder="EMP-1001"></div>
+    <div style="margin-bottom:18px"><label data-i18n="f_pw">รหัสผ่าน</label><input type="password" id="gPw" style="width:100%" placeholder="••••••••"></div>
+    <button class="btn btn-primary" style="width:100%" id="gBtn" data-i18n="signin">เข้าสู่ระบบ</button>
   </div>
 </div>
 
 <div class="topbar">
   <div class="logo"><svg viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="7" fill="#1E2761"/><rect x="9" y="11" width="14" height="10" rx="2" fill="#D62828"/><circle cx="16" cy="16" r="2.4" fill="#fff"/></svg>
     <div><b>FHS Command Center</b><span>SECURITY &amp; COMPLIANCE</span></div></div>
-  <nav class="appsw"><a href="index.html">ตรวจ</a><a href="dashboard.html" class="cur">Dashboard</a><a href="report.html">รายงาน</a><a href="admin.html">Admin</a></nav>
-  <div class="right"><span id="adminName"></span><a id="logout">ออก</a></div>
+  <nav class="appsw"><a href="index.html" data-i18n="nav_inspect">ตรวจ</a><a href="dashboard.html" class="cur">Dashboard</a><a href="report.html" data-i18n="nav_report">รายงาน</a><a href="admin.html">Admin</a></nav>
+  <div class="right"><a id="langBtn" style="border:1px solid rgba(255,255,255,.3);border-radius:7px;padding:4px 9px;font-size:11px;font-weight:700">EN</a><span id="adminName"></span><a id="logout" data-i18n="signout">ออก</a></div>
 </div>
 
 <div class="wrap">
   <div class="tabs">
-    <button class="tab on" data-tab="dash">📊 ภาพรวม</button>
-    <button class="tab" data-tab="cases">🎥 สอบสวน CCTV <span class="dot" id="caseDot" style="display:none">0</span></button>
-    <button class="tab" data-tab="history">📋 ประวัติการตรวจ</button>
-    <button class="tab" data-tab="plan">🗓 แผนการตรวจ</button>
-    <button class="tab" data-tab="alerts">🔔 แจ้งเตือน <span class="dot" id="alertDot" style="display:none">0</span></button>
+    <button class="tab on" data-tab="dash" data-i18n="tab_dash">📊 ภาพรวม</button>
+    <button class="tab" data-tab="cases"><span data-i18n="tab_cases">🎥 สอบสวน CCTV</span> <span class="dot" id="caseDot" style="display:none">0</span></button>
+    <button class="tab" data-tab="history" data-i18n="tab_history">📋 ประวัติการตรวจ</button>
+    <button class="tab" data-tab="plan" data-i18n="tab_plan">🗓 แผนการตรวจ</button>
+    <button class="tab" data-tab="alerts"><span data-i18n="tab_alerts">🔔 แจ้งเตือน</span> <span class="dot" id="alertDot" style="display:none">0</span></button>
   </div>
 
   <!-- DASHBOARD -->
@@ -216,73 +216,73 @@ tr:hover td{background:var(--surface-2);cursor:pointer}
     <div class="stats" id="statCards"></div>
     <div class="grid2">
       <div class="panel">
-        <div class="panel-h"><h3>แผนที่สถานี</h3><span class="sub" id="mapSub"></span></div>
+        <div class="panel-h"><h3 data-i18n="h_map">แผนที่สถานี</h3><span class="sub" id="mapSub"></span></div>
         <div id="map"></div>
         <div class="legend">
-          <span><i style="background:#0E8A5F"></i>ผ่าน/ปกติ</span>
-          <span><i style="background:#E65100"></i>เกินกำหนดตรวจ</span>
-          <span><i style="background:#D62828"></i>ไม่ผ่าน/มีเคสเปิด</span>
-          <span><i style="background:#64708A"></i>ยังไม่เคยตรวจ</span>
+          <span><i style="background:#0E8A5F"></i><span data-i18n="lg_ok">ผ่าน/ปกติ</span></span>
+          <span><i style="background:#E65100"></i><span data-i18n="lg_over">เกินกำหนดตรวจ</span></span>
+          <span><i style="background:#D62828"></i><span data-i18n="lg_fail">ไม่ผ่าน/มีเคสเปิด</span></span>
+          <span><i style="background:#64708A"></i><span data-i18n="lg_never">ยังไม่เคยตรวจ</span></span>
         </div>
       </div>
       <div class="panel">
-        <div class="panel-h"><h3>สถิติปัญหา/ของหาย รายสถานี</h3><span class="sub">D9</span></div>
-        <div class="panel-b" id="issueChart"><div class="empty">ไม่มีข้อมูล</div></div>
+        <div class="panel-h"><h3 data-i18n="h_issue">สถิติปัญหา/ของหาย รายสถานี</h3><span class="sub">D9</span></div>
+        <div class="panel-b" id="issueChart"><div class="empty" data-i18n="nodata">ไม่มีข้อมูล</div></div>
       </div>
     </div>
     <div class="panel">
-      <div class="panel-h"><h3>กิจกรรมล่าสุด</h3><span class="sub">10 รายการ</span></div>
-      <div id="recentList"><div class="empty">กำลังโหลด…</div></div>
+      <div class="panel-h"><h3 data-i18n="h_recent">กิจกรรมล่าสุด</h3><span class="sub" data-i18n="sub_recent">10 รายการ</span></div>
+      <div id="recentList"><div class="empty" data-i18n="loading">กำลังโหลด…</div></div>
     </div>
   </div>
 
   <!-- CASES -->
   <div class="page" id="page-cases">
     <div class="filters">
-      <select id="caseFilter"><option value="open">เปิดอยู่ (investigating)</option><option value="all">ทั้งหมด</option><option value="found">พบแล้ว</option><option value="replaced">เปลี่ยนใหม่</option><option value="closed">ปิดเคส</option></select>
+      <select id="caseFilter"><option value="open" data-i18n="cf_open">เปิดอยู่ (investigating)</option><option value="all" data-i18n="cf_all">ทั้งหมด</option><option value="found" data-i18n="cf_found">พบแล้ว</option><option value="replaced" data-i18n="cf_repl">เปลี่ยนใหม่</option><option value="closed" data-i18n="cf_closed">ปิดเคส</option></select>
       <button class="btn btn-green btn-sm" id="exportCases" style="margin-left:auto">⬇ Export Excel</button>
     </div>
-    <div class="panel" id="caseList"><div class="empty">กำลังโหลด…</div></div>
+    <div class="panel" id="caseList"><div class="empty" data-i18n="loading">กำลังโหลด…</div></div>
   </div>
 
   <!-- HISTORY -->
   <div class="page" id="page-history">
     <div class="filters">
-      <input type="text" id="histSearch" placeholder="ค้นหา สถานี/ผู้ตรวจ…" style="flex:1;min-width:160px">
-      <select id="histSite"><option value="">ทุกไซต์</option></select>
-      <select id="histResult"><option value="">ทุกผล</option><option value="pass">ผ่าน</option><option value="fail">ไม่ผ่าน</option><option value="needs_repair">ต้องแก้ไข</option></select>
+      <input type="text" id="histSearch" data-i18n-ph="hs_search" placeholder="ค้นหา สถานี/ผู้ตรวจ…" style="flex:1;min-width:160px">
+      <select id="histSite"><option value="" data-i18n="all_sites">ทุกไซต์</option></select>
+      <select id="histResult"><option value="" data-i18n="all_results">ทุกผล</option><option value="pass" data-i18n="r_pass">ผ่าน</option><option value="fail" data-i18n="r_fail">ไม่ผ่าน</option><option value="needs_repair" data-i18n="r_repair">ต้องแก้ไข</option></select>
       <button class="btn btn-green btn-sm" id="exportHist">⬇ Export Excel</button>
     </div>
-    <div class="panel" style="overflow-x:auto"><table id="histTable"><thead><tr><th>วันเวลา</th><th>สถานี</th><th>ไซต์</th><th>ผู้ตรวจ</th><th>ผล</th><th>ของหาย</th><th>รูป</th></tr></thead><tbody id="histBody"><tr><td colspan="7"><div class="empty">กำลังโหลด…</div></td></tr></tbody></table></div>
+    <div class="panel" style="overflow-x:auto"><table id="histTable"><thead><tr><th data-i18n="th_datetime">วันเวลา</th><th data-i18n="th_station">สถานี</th><th data-i18n="th_site">ไซต์</th><th data-i18n="th_inspector">ผู้ตรวจ</th><th data-i18n="th_result">ผล</th><th data-i18n="th_missing">ของหาย</th><th data-i18n="th_photo">รูป</th></tr></thead><tbody id="histBody"><tr><td colspan="7"><div class="empty" data-i18n="loading">กำลังโหลด…</div></td></tr></tbody></table></div>
   </div>
 
   <!-- PLAN -->
   <div class="page" id="page-plan">
     <div class="stats" id="planStats" style="grid-template-columns:repeat(3,1fr)"></div>
     <div class="filters">
-      <select id="planSite"><option value="">ทุกไซต์</option></select>
-      <select id="planAssignee"><option value="">ผู้รับผิดชอบทั้งหมด</option></select>
-      <select id="planStatus"><option value="">ทุกสถานะ</option><option value="overdue">พลาดกะก่อน</option><option value="soon">รอตรวจกะนี้</option><option value="ontrack">ครบกะนี้</option><option value="never">ยังไม่เคยตรวจ</option></select>
+      <select id="planSite"><option value="" data-i18n="all_sites">ทุกไซต์</option></select>
+      <select id="planAssignee"><option value="" data-i18n="all_assignees">ผู้รับผิดชอบทั้งหมด</option></select>
+      <select id="planStatus"><option value="" data-i18n="all_status">ทุกสถานะ</option><option value="overdue" data-i18n="ps_over">พลาดกะก่อน</option><option value="soon" data-i18n="ps_soon">รอตรวจกะนี้</option><option value="ontrack" data-i18n="ps_ok">ครบกะนี้</option><option value="never" data-i18n="ps_never">ยังไม่เคยตรวจ</option></select>
       <button class="btn btn-green btn-sm" id="exportPlan" style="margin-left:auto">⬇ Export Excel</button>
     </div>
-    <div class="panel" style="overflow-x:auto"><table id="planTable"><thead><tr><th>สถานี</th><th>ไซต์</th><th>ผู้รับผิดชอบ</th><th>กะวันนี้ ☀️/🌙</th><th>ตรวจล่าสุด</th><th>กะปัจจุบัน</th><th>สถานะ</th></tr></thead><tbody id="planBody"><tr><td colspan="7"><div class="empty">กำลังโหลด…</div></td></tr></tbody></table></div>
+    <div class="panel" style="overflow-x:auto"><table id="planTable"><thead><tr><th data-i18n="th_station">สถานี</th><th data-i18n="th_site">ไซต์</th><th data-i18n="th_assignee">ผู้รับผิดชอบ</th><th data-i18n="th_today">กะวันนี้ ☀️/🌙</th><th data-i18n="th_last">ตรวจล่าสุด</th><th data-i18n="th_curshift">กะปัจจุบัน</th><th data-i18n="th_status">สถานะ</th></tr></thead><tbody id="planBody"><tr><td colspan="7"><div class="empty" data-i18n="loading">กำลังโหลด…</div></td></tr></tbody></table></div>
   </div>
 
   <!-- ALERTS -->
   <div class="page" id="page-alerts">
-    <div id="alertsBody"><div class="empty">กำลังโหลด…</div></div>
+    <div id="alertsBody"><div class="empty" data-i18n="loading">กำลังโหลด…</div></div>
   </div>
 </div>
 
 <!-- CASE / INVESTIGATION MODAL -->
 <div class="modal" id="caseModal"><div class="modal-box">
-  <div class="modal-h"><h3>ใบสอบสวน CCTV</h3><button class="x" data-close>✕</button></div>
+  <div class="modal-h"><h3 data-i18n="m_case">ใบสอบสวน CCTV</h3><button class="x" data-close>✕</button></div>
   <div class="modal-b" id="caseBody"></div>
 </div></div>
 
 <!-- INSPECTION DETAIL MODAL -->
 <div class="modal" id="inspModal"><div class="modal-box">
-  <div class="modal-h"><h3>รายละเอียดการตรวจ</h3><button class="x" data-close>✕</button></div>
+  <div class="modal-h"><h3 data-i18n="m_insp">รายละเอียดการตรวจ</h3><button class="x" data-close>✕</button></div>
   <div class="modal-b" id="inspBody"></div>
 </div></div>
 
