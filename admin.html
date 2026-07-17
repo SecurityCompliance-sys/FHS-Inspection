@@ -181,6 +181,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--navy-2);
   <!-- CAMERAS -->
   <div class="page" id="page-cameras">
     <div class="page-head"><h2 data-i18n="h_cameras">กล้อง CCTV</h2><button class="btn btn-primary" id="addCamera" data-i18n="add_camera">+ เพิ่มกล้อง</button></div>
+    <div style="margin-bottom:12px"><select id="camSiteFilter" style="max-width:240px"><option value="" data-i18n="all_camsites">ทุกคลัง</option></select></div>
     <div class="card" id="cameraList"><div class="empty" data-i18n="loading">กำลังโหลด…</div></div>
   </div>
 
@@ -282,7 +283,8 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--navy-2);
   <div class="modal-h"><h3 id="cmTitle">เพิ่มกล้อง</h3><button class="x" data-close>✕</button></div>
   <div class="modal-b">
     <div id="cmAlert"></div>
-    <div class="field"><label><span data-i18n="f_camid">รหัสกล้อง</span> <span style="color:var(--red)">*</span></label><input type="text" id="cmId" class="mono" style="text-transform:uppercase" placeholder="CAM-12"></div>
+    <div class="field"><label><span data-i18n="f_camid">รหัสกล้อง</span> <span style="color:var(--red)">*</span></label><input type="text" id="cmId" class="mono" style="text-transform:uppercase" placeholder="WN-CH1"></div>
+    <div class="field"><label><span data-i18n="f_camsite">คลัง/ไซต์</span> <span style="color:var(--red)">*</span></label><input type="text" id="cmSite" placeholder="NDC-WN" list="siteList"><p class="hint" data-i18n="hint_camsite">กล้องจะผูกกับคลังนี้ และจะเลือกให้สถานีได้เฉพาะคลังเดียวกัน</p></div>
     <div class="field"><label data-i18n="f_camname">ชื่อ/ตำแหน่งกล้อง</label><input type="text" id="cmName" data-i18n-ph="ph_camname" placeholder="กล้องโซน A ทางเดิน"></div>
     <div class="field" style="margin-bottom:0"><label data-i18n="f_mount">จุดติดตั้ง</label><input type="text" id="cmLoc" data-i18n-ph="ph_mount" placeholder="เพดานโซน A"></div>
   </div>
@@ -338,13 +340,13 @@ const I18N = {
   f_equip:'อุปกรณ์ในสถานี (รายชิ้น)', sm_addeq:'+ เพิ่มอุปกรณ์', cancel:'ยกเลิก', save:'บันทึก',
   f_name:'ชื่อ', f_role:'บทบาท', role_inspector:'Inspector (ตรวจ)', role_admin:'Admin (ดูแลระบบ)', role_viewer:'Viewer (ดูอย่างเดียว)',
   ph_setpw:'ตั้งรหัสผ่าน', umpw_hint:'เว้นว่างไว้หากไม่ต้องการเปลี่ยนรหัส (โหมดแก้ไข)',
-  f_camid:'รหัสกล้อง', f_camname:'ชื่อ/ตำแหน่งกล้อง', f_mount:'จุดติดตั้ง', ph_camname:'กล้องโซน A ทางเดิน', ph_mount:'เพดานโซน A', none_opt:'— ไม่ระบุ —',
+  f_camid:'รหัสกล้อง', f_camsite:'คลัง/ไซต์', hint_camsite:'กล้องจะผูกกับคลังนี้ และจะเลือกให้สถานีได้เฉพาะคลังเดียวกัน', all_camsites:'ทุกคลัง', f_camname:'ชื่อ/ตำแหน่งกล้อง', f_mount:'จุดติดตั้ง', ph_camname:'กล้องโซน A ทางเดิน', ph_mount:'เพดานโซน A', none_opt:'— ไม่ระบุ —',
   title_add_station:'เพิ่มสถานี', title_edit_station:'แก้ไขสถานี', title_add_user:'เพิ่มผู้ใช้', title_edit_user:'แก้ไขผู้ใช้', title_add_camera:'เพิ่มกล้อง', title_edit_camera:'แก้ไขกล้อง',
   edit:'แก้ไข', del:'ลบ', empty_stations:'ยังไม่มีสถานี — กด “เพิ่มสถานี”', empty_users:'ยังไม่มีผู้ใช้',
   empty_cameras:'ยังไม่มีกล้อง — เพิ่มกล้องเพื่อผูกกับสถานีสำหรับสอบสวน CCTV', empty_stations_short:'ยังไม่มีสถานี',
   suspended:'ระงับ', brass:'ทองเหลือง', ph_eqname:'ชื่ออุปกรณ์', ph_eqtype:'ประเภท', print_pick:'เลือกพิมพ์',
   alert_fillall:'กรอกข้อมูลให้ครบ', err_nouser:'ไม่พบผู้ใช้', err_notadmin:'บัญชีนี้ไม่มีสิทธิ์ Admin', err_wrongpw:'รหัสผ่านไม่ถูกต้อง',
-  err_station_req:'กรอกรหัสสถานีและไซต์', err_station_dup:'มีรหัสสถานีนี้แล้ว', err_user_req:'กรอกรหัสและชื่อ', err_pw_req:'ตั้งรหัสผ่าน', err_id_dup:'มีรหัสนี้แล้ว', err_cam_req:'กรอกรหัสกล้อง',
+  err_station_req:'กรอกรหัสสถานีและไซต์', err_station_dup:'มีรหัสสถานีนี้แล้ว', err_user_req:'กรอกรหัสและชื่อ', err_pw_req:'ตั้งรหัสผ่าน', err_id_dup:'มีรหัสนี้แล้ว', err_cam_req:'กรอกรหัสกล้อง', err_cam_site:'กรุณาระบุคลัง/ไซต์',
   del_self:'ลบบัญชีตัวเองไม่ได้', upload_fail:'อัปโหลดรูปไม่สำเร็จ', uploading:'กำลังอัปโหลด…', pick_one:'เลือกอย่างน้อย 1 สถานี', scan_hint:'📱 สแกนเพื่อบันทึกการตรวจ',
   gps_unsupported:'ไม่รองรับ GPS', gps_locating:'📍 กำลังระบุ…', gps_saved:'📍 บันทึกพิกัดแล้ว', gps_fail:'เข้าถึง GPS ไม่ได้',
   no_insp_data:'ไม่มีข้อมูลการตรวจ', no_data_range:'ไม่มีข้อมูลในช่วงที่เลือก', cancel_del:'ยกเลิกการลบ', del_fail:'ลบไม่สำเร็จ: ', ref_saved:'บันทึกรูปตัวอย่างแล้ว ✓',
@@ -370,13 +372,13 @@ const I18N = {
   f_equip:'Equipment (per item)', sm_addeq:'+ Add equipment', cancel:'Cancel', save:'Save',
   f_name:'Name', f_role:'Role', role_inspector:'Inspector', role_admin:'Admin', role_viewer:'Viewer (read-only)',
   ph_setpw:'Set password', umpw_hint:'Leave blank to keep the current password (edit mode).',
-  f_camid:'Camera ID', f_camname:'Camera name / position', f_mount:'Mounting point', ph_camname:'Zone A camera, walkway', ph_mount:'Zone A ceiling', none_opt:'— None —',
+  f_camid:'Camera ID', f_camsite:'Warehouse/Site', hint_camsite:'This camera belongs to this warehouse; only same-warehouse cameras can be linked to a station.', all_camsites:'All sites', f_camname:'Camera name / position', f_mount:'Mounting point', ph_camname:'Zone A camera, walkway', ph_mount:'Zone A ceiling', none_opt:'— None —',
   title_add_station:'Add station', title_edit_station:'Edit station', title_add_user:'Add user', title_edit_user:'Edit user', title_add_camera:'Add camera', title_edit_camera:'Edit camera',
   edit:'Edit', del:'Delete', empty_stations:'No stations yet — tap “Add station”', empty_users:'No users yet',
   empty_cameras:'No cameras yet — add one to link stations for CCTV investigation', empty_stations_short:'No stations yet',
   suspended:'Suspended', brass:'Brass', ph_eqname:'Equipment name', ph_eqtype:'Type', print_pick:'Print',
   alert_fillall:'Please fill in all fields', err_nouser:'User not found', err_notadmin:'This account is not an admin', err_wrongpw:'Incorrect password',
-  err_station_req:'Enter station ID and site', err_station_dup:'This station ID already exists', err_user_req:'Enter ID and name', err_pw_req:'Set a password', err_id_dup:'This ID already exists', err_cam_req:'Enter a camera ID',
+  err_station_req:'Enter station ID and site', err_station_dup:'This station ID already exists', err_user_req:'Enter ID and name', err_pw_req:'Set a password', err_id_dup:'This ID already exists', err_cam_req:'Enter a camera ID', err_cam_site:'Warehouse/Site is required',
   del_self:'You can’t delete your own account', upload_fail:'Image upload failed', uploading:'Uploading…', pick_one:'Select at least 1 station', scan_hint:'📱 Scan to record inspection',
   gps_unsupported:'GPS not supported', gps_locating:'📍 Locating…', gps_saved:'📍 Coordinates saved', gps_fail:'Can’t access GPS',
   no_insp_data:'No inspection data', no_data_range:'No data in the selected range', cancel_del:'Deletion cancelled', del_fail:'Delete failed: ', ref_saved:'Reference images saved ✓',
@@ -395,6 +397,7 @@ function applyLang(){
 function toggleLang(){ LANG=LANG==='th'?'en':'th'; localStorage.setItem('fhs_lang',LANG); applyLang(); }
 
 let STATIONS=[], USERS=[], CAMERAS=[], INSPECTIONS=[], CASES=[], ADMIN=null, editStationId=null, editUserId=null, editCameraId=null;
+let smSelectedCams=new Set(); // tracked CCTV selection for the station modal (survives site re-scoping)
 
 /* ===== LOGIN GATE ===== */
 async function gateLogin(){
@@ -458,11 +461,22 @@ function renderStations(){
 }
 
 /* ===== STATION MODAL ===== */
+// Render the CCTV multi-select scoped to the station's site. Cameras of the same warehouse show;
+// already-picked cameras stay visible/selected even if cross-site (tagged), so re-scoping never drops picks.
+function renderSmCams(){
+  const site=$('smSite').value.trim();
+  // sync tracked selection to the widget's current state (only for options currently shown)
+  [...$('smCams').options].forEach(o=>{ if(o.selected) smSelectedCams.add(o.value); else smSelectedCams.delete(o.value); });
+  const list=CAMERAS.filter(c=>(c.site||'')===site || smSelectedCams.has(c.id))
+    .sort((a,b)=>a.id.localeCompare(b.id));
+  $('smCams').innerHTML=list.map(c=>{
+    const cross=(c.site||'')!==site, tag=cross?` [${esc(c.site||'—')}]`:'';
+    return `<option value="${esc(c.id)}"${smSelectedCams.has(c.id)?' selected':''}>${esc(c.id)} — ${esc(c.name||'')}${tag}</option>`;
+  }).join('');
+}
 function openStation(id){
   editStationId=id||null;
   $('smTitle').textContent=id?t('title_edit_station'):t('title_add_station'); $('smAlert').innerHTML='';
-  // camera options
-  $('smCams').innerHTML=CAMERAS.map(c=>`<option value="${esc(c.id)}">${esc(c.id)} — ${esc(c.name||'')}</option>`).join('');
   // assignee options (inspectors + admins)
   $('smAssignee').innerHTML=`<option value="">${t('none_opt')}</option>`+USERS.filter(u=>['inspector','admin'].includes(u.role)).map(u=>`<option value="${esc(u.id)}">${esc(u.name||u.id)} (${esc(u.id)})</option>`).join('');
   const s=id?STATIONS.find(x=>x.id===id):null;
@@ -470,7 +484,8 @@ function openStation(id){
   $('smSite').value=s?.site||''; $('smName').value=s?.name||''; $('smLoc').value=s?.location||'';
   $('smLat').value=s?.gps?.lat??''; $('smLng').value=s?.gps?.lng??'';
   $('smAssignee').value=s?.assignedTo||'';
-  [...$('smCams').options].forEach(o=>o.selected=(s?.cctvCameras||[]).includes(o.value));
+  // CCTV picker scoped to the station's warehouse (re-scopes live when the site field changes)
+  smSelectedCams=new Set(s?.cctvCameras||[]); $('smCams').innerHTML=''; renderSmCams(); $('smSite').oninput=renderSmCams;
   $('smEquip').innerHTML=''; (s?.equipment||[]).forEach(addEqRow);
   if(!s||!(s.equipment||[]).length){ addEqRow({name:t('brass_default'),type:t('nozzle'),isBrass:true}); addEqRow({name:t('hose'),type:t('hose_type')}); }
   $('stationModal').classList.add('on');
@@ -590,13 +605,19 @@ async function delUser(id){ if(id===ADMIN.id){alert(t('del_self'));return;} if(!
 /* ===== CAMERAS ===== */
 function renderCameras(){
   const el=$('cameraList');
-  if(!CAMERAS.length){el.innerHTML=`<div class="empty">${t('empty_cameras')}</div>`;return;}
-  el.innerHTML=CAMERAS.sort((a,b)=>a.id.localeCompare(b.id)).map(c=>{
+  // refresh the warehouse filter from distinct camera sites (preserve current pick)
+  const fsel=$('camSiteFilter');
+  if(fsel){ const prev=fsel.value; const sites=[...new Set(CAMERAS.map(c=>c.site).filter(Boolean))].sort();
+    fsel.innerHTML=`<option value="">${t('all_camsites')}</option>`+sites.map(s=>`<option${s===prev?' selected':''}>${esc(s)}</option>`).join(''); }
+  const fs=fsel?fsel.value:'';
+  let list=CAMERAS.slice(); if(fs) list=list.filter(c=>(c.site||'')===fs);
+  if(!list.length){el.innerHTML=`<div class="empty">${t('empty_cameras')}</div>`;return;}
+  el.innerHTML=list.sort((a,b)=>a.id.localeCompare(b.id)).map(c=>{
     const cover=STATIONS.filter(s=>(s.cctvCameras||[]).includes(c.id)).length;
     const coverTxt=LANG==='en'?`covers ${cover} stations`:`ครอบคลุม ${cover} สถานี`;
     return `<div class="row">
       <div class="av"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#15234A" stroke-width="2"><path d="m23 7-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></div>
-      <div class="main"><b>${esc(c.id)}</b><div class="meta">${esc(c.name||'')} ${c.location?'· '+esc(c.location):''} · ${coverTxt}</div></div>
+      <div class="main"><b>${esc(c.id)} <span class="badge navy">${esc(c.site||'-')}</span></b><div class="meta">${esc(c.name||'')} ${c.location?'· '+esc(c.location):''} · ${coverTxt}</div></div>
       <div class="actions">
         <button class="icbtn" data-edit-camera="${esc(c.id)}" title="${t('edit')}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4z"/></svg></button>
         <button class="icbtn danger" data-del-camera="${esc(c.id)}" title="${t('del')}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>
@@ -608,16 +629,17 @@ function renderCameras(){
 function openCamera(id){
   editCameraId=id||null; $('cmTitle').textContent=id?t('title_edit_camera'):t('title_add_camera'); $('cmAlert').innerHTML='';
   const c=id?CAMERAS.find(x=>x.id===id):null;
-  $('cmId').value=c?c.id:''; $('cmId').disabled=!!id; $('cmName').value=c?.name||''; $('cmLoc').value=c?.location||'';
+  $('cmId').value=c?c.id:''; $('cmId').disabled=!!id; $('cmSite').value=c?.site||''; $('cmName').value=c?.name||''; $('cmLoc').value=c?.location||'';
   $('cameraModal').classList.add('on');
 }
 async function saveCamera(){
-  const id=$('cmId').value.trim().toUpperCase(), a=$('cmAlert');
+  const id=$('cmId').value.trim().toUpperCase(), site=$('cmSite').value.trim(), a=$('cmAlert');
   if(!id){a.innerHTML=`<div class="alert err">${t('err_cam_req')}</div>`;return;}
+  if(!site){a.innerHTML=`<div class="alert err">${t('err_cam_site')}</div>`;return;}
   if(!editCameraId && CAMERAS.some(c=>c.id===id)){a.innerHTML=`<div class="alert err">${t('err_id_dup')}</div>`;return;}
   const btn=$('cmSave');btn.disabled=true;btn.innerHTML='<div class="spinner"></div>';
   try{
-    const data={cameraId:id,name:$('cmName').value.trim(),location:$('cmLoc').value.trim()};
+    const data={cameraId:id,site,name:$('cmName').value.trim(),location:$('cmLoc').value.trim()};
     if(editCameraId) await updateDoc(doc(db,'cctvCameras',id),data);
     else await setDoc(doc(db,'cctvCameras',id),{...data,createdAt:serverTimestamp()});
     $('cameraModal').classList.remove('on'); await loadCameras();
@@ -687,6 +709,7 @@ document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>b.closest('.m
 $('addStation').onclick=()=>openStation(null);
 $('addUser').onclick=()=>openUser(null);
 $('addCamera').onclick=()=>openCamera(null);
+$('camSiteFilter').onchange=renderCameras;
 $('smAddEq').onclick=()=>addEqRow();
 $('smSave').onclick=saveStation;
 $('umSave').onclick=saveUser;
