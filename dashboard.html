@@ -240,6 +240,7 @@ tr:hover td{background:var(--surface-2);cursor:pointer}
   <div class="page" id="page-cases">
     <div class="filters">
       <select id="caseFilter"><option value="open" data-i18n="cf_open">เปิดอยู่ (investigating)</option><option value="all" data-i18n="cf_all">ทั้งหมด</option><option value="found" data-i18n="cf_found">พบแล้ว</option><option value="replaced" data-i18n="cf_repl">เปลี่ยนใหม่</option><option value="closed" data-i18n="cf_closed">ปิดเคส</option></select>
+      <select id="caseSite"><option value="" data-i18n="all_sites">ทุกไซต์</option></select>
       <button class="btn btn-green btn-sm" id="exportCases" style="margin-left:auto">⬇ Export Excel</button>
     </div>
     <div class="panel" id="caseList"><div class="empty" data-i18n="loading">กำลังโหลด…</div></div>
@@ -391,6 +392,7 @@ function applyLang(){
 function toggleLang(){ LANG=LANG==='th'?'en':'th'; localStorage.setItem('fhs_lang',LANG); applyLang(); }
 function populateFilters(){
   const sites=[...new Set(STATIONS.map(s=>s.site).filter(Boolean))];
+  $('caseSite').innerHTML=`<option value="">${t('all_sites')}</option>`+sites.map(s=>`<option>${esc(s)}</option>`).join('');
   $('histSite').innerHTML=`<option value="">${t('all_sites')}</option>`+sites.map(s=>`<option>${esc(s)}</option>`).join('');
   $('planSite').innerHTML=`<option value="">${t('all_sites')}</option>`+sites.map(s=>`<option>${esc(s)}</option>`).join('');
   const assignees=[...new Map(STATIONS.filter(s=>s.assignedTo).map(s=>[s.assignedTo,s.assignedToName||s.assignedTo])).entries()];
@@ -538,19 +540,21 @@ function renderBadges(){
   $('alertDot').style.display=alerts?'grid':'none'; $('alertDot').textContent=alerts;
 }
 function renderCases(){
-  const f=$('caseFilter').value;
+  const f=$('caseFilter').value, fsite=$('caseSite')?.value||'';
   let list=CASES.slice();
   if(f==='open')list=list.filter(c=>c.status==='investigating');
   else if(f!=='all')list=list.filter(c=>c.status===f);
+  if(fsite) list=list.filter(c=>(c.site||STATIONS.find(s=>s.id===c.stationId)?.site||'')===fsite);
   const el=$('caseList');
   if(!list.length){ el.innerHTML=`<div class="empty">${t('no_case_cat')}</div>`; return; }
   const sc={investigating:'amber',found:'green',replaced:'navy',closed:'gray'};
   el.innerHTML=list.map(c=>{
     const rep=tsDate(c.reportedMissingAt); const stale=c.status==='investigating'&&daysAgo(rep)>STALE_CASE_DAYS;
+    const cSite=c.site||STATIONS.find(s=>s.id===c.stationId)?.site||'';
     return `<div class="row" data-case="${esc(c.id)}" style="cursor:pointer">
       <div class="av" style="background:rgba(214,40,40,.1);color:#D62828"><svg width="18" height="18" viewBox="0 0 24 24" fill="#D62828"><path d="M12 2C9 6 7 8 7 11.5A5 5 0 0 0 12 16a5 5 0 0 0 5-4.5C17 8 15 6 12 2z"/></svg></div>
       <div class="main"><b>${esc(c.itemName||t('item'))} <span class="badge ${sc[c.status]||'gray'}">${caseStatusLabel(c.status)}</span>${stale?` <span class="badge red">${t('stale_d')} ${daysAgo(rep)} ${t('days')}</span>`:''}</b>
-        <div class="meta"><span class="mono">${esc(c.stationId)}</span> · ${t('reported')} ${fmt(rep)} · ${t('by')} ${esc(c.reportedBy||'—')} · 🎥 ${(c.cctvCameras||[]).length} ${t('cameras')}</div></div>
+        <div class="meta"><span class="mono">${esc(c.stationId)}</span>${cSite?` · ${esc(cSite)}`:''} · ${t('reported')} ${fmt(rep)} · ${t('by')} ${esc(c.reportedBy||'—')} · 🎥 ${(c.cctvCameras||[]).length} ${t('cameras')}</div></div>
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64708A" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></div>`;
   }).join('');
   el.querySelectorAll('[data-case]').forEach(r=>r.onclick=()=>openCase(r.dataset.case));
@@ -790,6 +794,7 @@ document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
 });
 document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>b.closest('.modal').classList.remove('on'));
 $('caseFilter').onchange=renderCases;
+$('caseSite').onchange=renderCases;
 ['histSearch','histSite','histResult'].forEach(id=>$(id).addEventListener('input',renderHistory));
 $('exportHist').onclick=exportHistory;
 $('exportCases').onclick=exportCases;

@@ -654,7 +654,7 @@ async function submitInspection(){
       for(const m of missingItems){
         const prev=(CURRENT_STATION.equipment||[]).find(e=>e.id===m.id)||{};
         await addDoc(collection(db,'cases'),{
-          stationId:CURRENT_STATION.id, stationName:CURRENT_STATION.name||'',
+          stationId:CURRENT_STATION.id, stationName:CURRENT_STATION.name||'', site:CURRENT_STATION.site||'',
           itemId:m.id, itemName:m.name,
           lastSeenAt: prev.lastSeenAt||null, lastSeenBy: prev.lastSeenBy||null,
           reportedMissingAt:serverTimestamp(), reportedBy:CURRENT_USER.name,
