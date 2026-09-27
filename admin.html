@@ -312,6 +312,8 @@ const FIREBASE_CONFIG = {
 const app=initializeApp(FIREBASE_CONFIG); const db=getFirestore(app);
 const $=id=>document.getElementById(id);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); // escape quotes ด้วย เพราะใช้ใน attribute
+// Cloudinary transform for reference-image previews (saves bandwidth on the admin page too).
+const cld=(u,w)=>{ if(!u||typeof u!=='string')return u; const m=u.match(/^(https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/)(.+)$/); return m?`${m[1]}w_${w||400},q_auto,f_auto/${m[2]}`:u; };
 async function sha256(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');}
 function randSalt(){return [...crypto.getRandomValues(new Uint8Array(16))].map(b=>b.toString(16).padStart(2,'0')).join('');}
 const tsDate=ts=>ts?(ts.toDate?ts.toDate():new Date(ts)):null;
@@ -651,7 +653,7 @@ async function delCamera(id){ if(!confirm(LANG==='en'?`Delete camera ${id}?`:`�
 /* ===== REFERENCE IMAGES (รูปตัวอย่างอุปกรณ์) ===== */
 const CLOUDINARY_CONFIG = { cloudName: "diiqvxqqd", uploadPreset: "fhs_inspection" };
 async function uploadCloudinary(blob){ const fd=new FormData(); fd.append('file',blob); fd.append('upload_preset',CLOUDINARY_CONFIG.uploadPreset); const r=await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/image/upload`,{method:'POST',body:fd}); if(!r.ok)throw new Error('cloudinary'); const d=await r.json(); return d.secure_url; }
-function riPrev(code){ const u=$('ri'+code).value.trim(); $('ri'+code+'prev').innerHTML=(u&&u!==t('uploading'))?`<img src="${esc(u)}" style="max-width:150px;border:1px solid var(--line);border-radius:8px">`:''; }
+function riPrev(code){ const u=$('ri'+code).value.trim(); $('ri'+code+'prev').innerHTML=(u&&u!==t('uploading'))?`<img src="${esc(cld(u,300))}" style="max-width:150px;border:1px solid var(--line);border-radius:8px">`:''; }
 async function loadRefImages(){ try{ const snap=await getDoc(doc(db,'settings','referenceImages')); const d=snap.exists()?snap.data():{}; $('riB6').value=d.B6||''; $('riB5').value=d.B5||''; riPrev('B6'); riPrev('B5'); }catch(e){} }
 async function riUpload(code,file){ if(!file)return; const inp=$('ri'+code); const old=inp.value; inp.value=t('uploading'); inp.disabled=true;
   try{ const url=await uploadCloudinary(file); inp.value=url; riPrev(code); }catch(e){ inp.value=old; alert(t('upload_fail')); } finally{ inp.disabled=false; } }

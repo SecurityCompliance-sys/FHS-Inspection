@@ -162,6 +162,8 @@ const REPORT_BASE_URL = location.href.replace(/report\.html.*$/,'dashboard.html'
 const app=initializeApp(FIREBASE_CONFIG); const db=getFirestore(app);
 const $=id=>document.getElementById(id);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); // escape quotes ด้วย เพราะใช้ใน attribute
+// Cloudinary transform: thumbs/comparison images use w+q_auto+f_auto → 80-90% less bandwidth. Non-Cloudinary URLs unchanged.
+const cld=(u,w)=>{ if(!u||typeof u!=='string')return u; const m=u.match(/^(https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/)(.+)$/); return m?`${m[1]}w_${w||400},q_auto,f_auto/${m[2]}`:u; };
 
 /* ===== i18n (TH / EN) — key ร่วม fhs_lang; เนื้อหาอีเมลคงเป็นไทย (ส่งถึงผู้รับไทย) ===== */
 let LANG = localStorage.getItem('fhs_lang') || 'th';
@@ -280,7 +282,7 @@ function renderReport(){
       html+=`<tr><td class="mono">${esc(i.stationId)}</td><td>${esc(i.site||'')}</td><td>${esc(i.inspectorName||'')}</td><td>${fmt(tsDate(i.createdAt))}</td>
         <td class="tag ${i.result}">${i.result==='needs_repair'?L('Needs repair','ต้องแก้ไข'):L('Fail','ไม่ผ่าน')}</td>
         <td style="font-size:12px">${esc(probs.join(', ')||'-')}</td>
-        <td><div class="thumbs">${(i.photos||[]).slice(0,3).map(p=>`<img class="thumb" src="${esc(p.url)}">`).join('')||'—'}</div></td></tr>`;
+        <td><div class="thumbs">${(i.photos||[]).slice(0,3).map(p=>`<img class="thumb" src="${esc(cld(p.url,180))}">`).join('')||'—'}</div></td></tr>`;
     });
     html+=`</tbody></table>`;
   } else html+=`<div class="ok-line">${L('✓ All stations inspected this week passed','✓ ทุกสถานีที่ตรวจในสัปดาห์นี้ผ่านหมด')}</div>`;
@@ -306,8 +308,8 @@ function renderReport(){
   if(R.cmp.length){
     html+=R.cmp.slice(0,8).map(x=>`<div class="cmp"><div class="ct"><span class="mono">${esc(x.s.id)}</span> ${esc(x.s.name||'')}</div>
       <div class="cmp-grid">
-        <div class="cmp-col"><div class="cl">${L('Last week','สัปดาห์ก่อน')} · ${fmtD(R.prev.start)}</div>${x.prev?`<img src="${esc(x.prev)}">`:`<div class="no">${L('no photo','ไม่มีรูป')}</div>`}</div>
-        <div class="cmp-col"><div class="cl">${L('This week','สัปดาห์นี้')} · ${fmtD(R.cur.start)}</div>${x.now?`<img src="${esc(x.now)}">`:`<div class="no">${L('no photo','ไม่มีรูป')}</div>`}</div>
+        <div class="cmp-col"><div class="cl">${L('Last week','สัปดาห์ก่อน')} · ${fmtD(R.prev.start)}</div>${x.prev?`<img src="${esc(cld(x.prev,480))}">`:`<div class="no">${L('no photo','ไม่มีรูป')}</div>`}</div>
+        <div class="cmp-col"><div class="cl">${L('This week','สัปดาห์นี้')} · ${fmtD(R.cur.start)}</div>${x.now?`<img src="${esc(cld(x.now,480))}">`:`<div class="no">${L('no photo','ไม่มีรูป')}</div>`}</div>
       </div></div>`).join('');
     html+=`<p class="hint">${L('Compare cabinet/hose/nozzle condition — spot changes or anomalies between weeks','ใช้เทียบสภาพตู้/สาย/หัวฉีด ดูการเปลี่ยนแปลงหรือสิ่งผิดปกติระหว่างสัปดาห์')}</p>`;
   } else html+=`<div class="empty">${L('No stations inspected in both weeks to compare','ยังไม่มีสถานีที่ตรวจทั้งสองสัปดาห์เพื่อเทียบรูป')}</div>`;

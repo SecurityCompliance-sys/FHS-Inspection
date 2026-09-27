@@ -310,6 +310,9 @@ const SHIFT_DAY_START = 7, SHIFT_DAY_END = 19; // กะกลางวัน 07
 const app=initializeApp(FIREBASE_CONFIG); const db=getFirestore(app);
 const $=id=>document.getElementById(id);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); // escape quotes ด้วย เพราะใช้ใน attribute
+// Cloudinary transform helper: rewrites .../upload/<version>/... to .../upload/w_<W>,q_auto,f_auto/<version>/...
+// Thumbnails on the list cut bandwidth ~90% (WebP + w=200). Non-Cloudinary URLs pass through unchanged.
+const cld=(u,w)=>{ if(!u||typeof u!=='string')return u; const m=u.match(/^(https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/)(.+)$/); return m?`${m[1]}w_${w||400},q_auto,f_auto/${m[2]}`:u; };
 
 /* ===== i18n (TH / EN) — key ร่วม fhs_lang กับ admin ===== */
 let LANG = localStorage.getItem('fhs_lang') || 'th';
@@ -680,10 +683,10 @@ function openInsp(id){
     ${eq?`<div style="margin-bottom:6px"><label>${t('k_equip')}</label></div><div style="margin-bottom:16px;display:flex;flex-wrap:wrap;gap:6px">${eq}</div>`:''}
     <div style="margin-bottom:6px"><label>${t('k_checklist')}</label></div><div style="margin-bottom:16px">${clHtml||'<span class="hint">—</span>'}</div>
     ${i.notes?`<div style="margin-bottom:6px"><label>${t('k_note')}</label></div><div style="margin-bottom:16px;font-size:13.5px">${esc(i.notes)}</div>`:''}
-    ${i.photos?.length?`<div style="margin-bottom:6px"><label>${t('k_photos')} (${i.photos.length})</label></div><div class="photos">${i.photos.map(p=>`<img src="${esc(p.url)}">`).join('')}</div>`:''}
-    ${i.signatureUrl?`<div style="margin-top:14px;margin-bottom:6px"><label>${t('k_sign')}</label></div><img src="${esc(i.signatureUrl)}" style="max-width:240px;border:1px solid var(--line);border-radius:9px;background:#fff;padding:6px">`:''}`;
+    ${i.photos?.length?`<div style="margin-bottom:6px"><label>${t('k_photos')} (${i.photos.length})</label></div><div class="photos">${i.photos.map(p=>`<img src="${esc(cld(p.url,300))}" data-full="${esc(p.url)}">`).join('')}</div>`:''}
+    ${i.signatureUrl?`<div style="margin-top:14px;margin-bottom:6px"><label>${t('k_sign')}</label></div><img src="${esc(cld(i.signatureUrl,320))}" style="max-width:240px;border:1px solid var(--line);border-radius:9px;background:#fff;padding:6px">`:''}`;
   // เปิดรูปผ่าน listener ไม่ใช่ inline onclick — กัน JS-string injection จาก URL ในฐานข้อมูล
-  $('inspBody').querySelectorAll('.photos img').forEach(im=>im.onclick=()=>window.open(im.src,'_blank'));
+  $('inspBody').querySelectorAll('.photos img').forEach(im=>im.onclick=()=>window.open(im.dataset.full||im.src,'_blank'));
   $('inspModal').classList.add('on');
 }
 

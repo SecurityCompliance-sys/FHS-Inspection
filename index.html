@@ -515,7 +515,19 @@ function initSignature(){
   $('sigClear').onclick=()=>{ ctx.clearRect(0,0,cv.width,cv.height); sigHasInk=false; };
 }
 function signatureBlob(){
-  return new Promise(res=>{ if(!sigHasInk)return res(null); $('sigPad').toBlob(b=>res(b),'image/png'); });
+  // Storage saver: signature was PNG (~30-80 KB with alpha). Composite onto white,
+  // resize to max 640px width, encode JPEG q=0.75 → typically 6-15 KB. Same visual quality.
+  return new Promise(res=>{
+    if(!sigHasInk) return res(null);
+    const src=$('sigPad');
+    const max=640; let w=src.width, h=src.height;
+    if(w>max){ h=h*max/w; w=max; }
+    const cv=document.createElement('canvas'); cv.width=w; cv.height=h;
+    const ctx=cv.getContext('2d');
+    ctx.fillStyle='#fff'; ctx.fillRect(0,0,w,h);
+    ctx.drawImage(src,0,0,w,h);
+    cv.toBlob(b=>res(b||null),'image/jpeg',0.75);
+  });
 }
 
 /* ============ RESULT (B15) ============ */
@@ -553,12 +565,14 @@ async function addPhoto(file){
 }
 function updatePhotoCount(){ $('photoCount').textContent=`${photos.length} รูป`; }
 function compressAndWatermark(file){
+  // Storage saver: was max=1280 / q=0.82 (~250-500 KB). Now max=1024 / q=0.72
+  // → typically 60-150 KB per photo. Still clearly readable for inspection evidence.
   return new Promise((res,rej)=>{
     const img=new Image(), r=new FileReader();
     r.onload=()=>img.src=r.result; r.onerror=rej;
     img.onload=()=>{
-      const max=1280; let{width:w,height:h}=img;
-      if(w>h&&w>max){h=h*max/w;w=max;} else if(h>max){w=w*max/h;h=max;}
+      const max=1024; let{width:w,height:h}=img;
+      if(w>h&&w>max){h=Math.round(h*max/w);w=max;} else if(h>max){w=Math.round(w*max/h);h=max;}
       const cv=document.createElement('canvas'); cv.width=w; cv.height=h;
       const ctx=cv.getContext('2d'); ctx.drawImage(img,0,0,w,h);
       // watermark (C2)
@@ -567,7 +581,7 @@ function compressAndWatermark(file){
       const tw=ctx.measureText(stamp).width;
       ctx.fillStyle='rgba(15,26,46,.72)'; ctx.fillRect(0,h-fs-16,tw+22,fs+16);
       ctx.fillStyle='#fff'; ctx.textBaseline='middle'; ctx.fillText(stamp,11,h-fs/2-8);
-      cv.toBlob(b=>b?res(b):rej(new Error('blob')),'image/jpeg',0.82);
+      cv.toBlob(b=>b?res(b):rej(new Error('blob')),'image/jpeg',0.72);
     };
     r.readAsDataURL(file);
   });
