@@ -1,0 +1,55 @@
+name: FHS Weekly Report (auto send)
+
+# ทุกวันจันทร์ 08:00 Asia/Bangkok = 01:00 UTC
+# รันสัปดาห์ที่แล้ว (week=1) อัตโนมัติ + ปุ่มรันเองผ่าน workflow_dispatch
+on:
+  schedule:
+    - cron: "0 1 * * 1"
+  workflow_dispatch:
+    inputs:
+      week:
+        description: "week offset (0=this, 1=last, 2=2 weeks ago)"
+        required: false
+        default: "1"
+
+concurrency:
+  group: fhs-weekly-report
+  cancel-in-progress: false
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Playwright + Chromium
+        run: |
+          npm init -y >/dev/null
+          npm install --no-save playwright@1.47.2
+          npx playwright install --with-deps chromium
+
+      - name: Run auto-send
+        env:
+          FHS_REPORT_URL: https://securitycompliance-sys.github.io/FHS-Inspection/report.html
+          FHS_NOTIFY_TO: Jakkaphan_boonnarangsri@bevchain.co.th
+          FHS_WEEK: ${{ github.event.inputs.week || '1' }}
+        run: node scripts/send-weekly.mjs
+
+      - name: Upload artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-debug-${{ github.run_id }}
+          path: |
+            /tmp/fhs-*.png
+            /tmp/fhs-*.log
+          if-no-files-found: ignore
+          retention-days: 7

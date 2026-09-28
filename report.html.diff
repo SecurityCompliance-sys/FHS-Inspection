@@ -1,0 +1,92 @@
+--- report.original.html	2026-09-28 10:21:53.960176498 +0700
++++ report.html	2026-09-28 10:24:51.605555685 +0700
+@@ -110,6 +110,8 @@
+ </style>
+ </head>
+ <body>
++<!-- autoResult: probed by GitHub Actions / Playwright weekly report runner -->
++<div id="autoResult" data-status="idle" data-ok="0" data-fail="0" style="position:fixed;bottom:8px;right:8px;padding:6px 10px;background:#0F1A2E;color:#CADCFC;font:12px monospace;z-index:9999;border-radius:6px;display:none;max-width:60vw;word-break:break-all"></div>
+ <div class="hazard"></div>
+ 
+ <div id="gate">
+@@ -392,7 +394,80 @@
+ $('logout').onclick=()=>{sessionStorage.removeItem('fhs_admin');location.reload();};
+ $('langBtn').onclick=toggleLang;
+ applyLang();
++
++/* ===== AUTO-SEND MODE =====
++   Triggered by ?autosend=1&week=<n>[&notify=email]
++   - Bypasses login gate (synthetic admin)
++   - Loads Firestore data, renders report, calls EmailJS for SITE_RECIPIENTS
++   - Writes final status to #autoResult[data-status]:
++       running | success | partial | failure
++   - Optionally sends a summary to `notify` recipient */
++async function runAutoSend(params){
++  const box=$('autoResult'); box.style.display='block';
++  const setStatus=(status,msg,extra)=>{
++    box.setAttribute('data-status',status);
++    if(extra){ Object.keys(extra).forEach(k=>box.setAttribute('data-'+k,String(extra[k]))); }
++    box.textContent=`[${status}] ${msg}`;
++  };
++  const weekOff=parseInt(params.get('week')||'1');
++  try{
++    setStatus('running','init');
++    ADMIN={id:'autoscheduler',name:'Auto Weekly',role:'admin'};
++    $('period').value=String(weekOff);
++    if(EMAILJS.publicKey&&!EMAILJS.publicKey.startsWith('YOUR')) emailjs.init({publicKey:EMAILJS.publicKey});
++    setStatus('running','loading-firestore');
++    const [st,ins,cs]=await Promise.all([getDocs(collection(db,'stations')),getDocs(collection(db,'inspections')),getDocs(collection(db,'cases'))]);
++    STATIONS=st.docs.map(d=>({id:d.id,...d.data()}));
++    INSPECTIONS=ins.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(tsDate(b.createdAt)?.getTime()||0)-(tsDate(a.createdAt)?.getTime()||0));
++    CASES=cs.docs.map(d=>({id:d.id,...d.data()}));
++    $('gate').style.display='none';
++    renderReport();
++    setStatus('running','building-jobs');
++    const range=weekRange(weekOff);
++    const sitesWithData=[...new Set(INSPECTIONS.filter(i=>inRange(i,range)).map(i=>i.site).filter(Boolean))];
++    const jobs=[];
++    sitesWithData.forEach(site=>{ if(SITE_RECIPIENTS[site]) jobs.push({to:SITE_RECIPIENTS[site],site}); });
++    if(SITE_RECIPIENTS._all) jobs.push({to:SITE_RECIPIENTS._all,site:null});
++    if(!jobs.length){ setStatus('failure','no-recipients-configured'); return; }
++    const dryrun=params.get('dryrun')==='1';
++    setStatus('running',`sending jobs=${jobs.length}${dryrun?' (DRYRUN)':''}`);
++    let ok=0,fail=0; const errs=[];
++    for(const j of jobs){
++      const {html,subject}=buildEmailHtml(weekOff,j.site);
++      const addrs=j.to.split(/[,;]/).map(s=>s.trim()).filter(Boolean);
++      for(const addr of addrs){
++        if(dryrun){ console.log('[auto][dryrun] would send to',addr,'subject:',subject); ok++; continue; }
++        try{ await emailjs.send(EMAILJS.serviceId,EMAILJS.templateId,{email:addr,subject,html_content:html}); ok++; }
++        catch(e){ fail++; errs.push(`${addr}: ${e&&e.text||e&&e.message||e}`); console.error('[auto]',addr,e); }
++      }
++    }
++    // notification summary
++    const notifyTo=(params.get('notify')||'').trim();
++    if(notifyTo && !dryrun){
++      const periodTxt=`${fmtD(range.start)} – ${fmtD(new Date(range.end-1))}`;
++      const stampBkk=new Date().toLocaleString('th-TH',{timeZone:'Asia/Bangkok'});
++      const status = fail===0 ? 'สำเร็จ' : (ok===0 ? 'ล้มเหลวทั้งหมด' : 'ส่งได้บางส่วน');
++      const body = `<div style="font-family:'IBM Plex Sans Thai',sans-serif;padding:16px;background:#f4f6fa;border-radius:8px;color:#0F1A2E">
++        <h3 style="margin:0 0 10px">🤖 รายงาน FHS อัตโนมัติ · ${status}</h3>
++        <div>เวลาดำเนินการ: ${stampBkk} (Asia/Bangkok)</div>
++        <div>ช่วงเวลา (week=${weekOff}): ${periodTxt}</div>
++        <div style="margin-top:8px"><b style="color:#0E8A5F">ส่งสำเร็จ ${ok} ฉบับ</b> · <b style="color:${fail?'#D62828':'#64708A'}">ล้มเหลว ${fail} ฉบับ</b></div>
++        ${errs.length?`<pre style="background:#fff;border:1px solid #D7DDE8;border-radius:6px;padding:10px;margin-top:8px;font-size:12px;overflow:auto">${esc(errs.join('\n'))}</pre>`:''}
++      </div>`;
++      try{ await emailjs.send(EMAILJS.serviceId,EMAILJS.templateId,{email:notifyTo,subject:`[FHS auto weekly] ${status} · ok:${ok} fail:${fail}`,html_content:body}); }
++      catch(e){ console.error('[auto][notify]',e); }
++    }
++    const final = fail===0 ? 'success' : (ok===0 ? 'failure' : 'partial');
++    setStatus(final,`ok=${ok} fail=${fail}`,{ok,fail});
++  }catch(e){
++    setStatus('failure',(e&&e.message)||String(e));
++    console.error('[auto][fatal]',e);
++  }
++}
++
+ (async function(){
++  const params=new URLSearchParams(location.search);
++  if(params.get('autosend')==='1'){ return runAutoSend(params); }
+   let s=null; try{ s=JSON.parse(sessionStorage.getItem('fhs_admin')); }catch(e){}
+   if(!s||!s.id) return;
+   try{ const snap=await getDoc(doc(db,'users',s.id)); const u=snap.exists()?snap.data():null;
