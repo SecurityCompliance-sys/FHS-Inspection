@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>ตรวจสอบสถานีหัวดับเพลิง · BevChain</title>
 <link rel="manifest" href="manifest.json">
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
-<link rel="icon" type="image/png" href="icon-192.png">
 <meta name="theme-color" content="#15234A">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -110,15 +108,6 @@ textarea{resize:vertical;min-height:74px}
 .tog[data-on="pass"]{background:var(--green);border-color:var(--green);color:#fff}
 .tog[data-on="fail"]{background:var(--red);border-color:var(--red);color:#fff}
 .tog[data-on="na"]{background:var(--ink);border-color:var(--ink);color:#fff}
-.tog[data-on="shift"]{background:var(--navy);border-color:var(--navy);color:#fff}
-.ex-btn{margin-left:8px;font:inherit;font-family:"Bai Jamjuree";font-size:11px;font-weight:600;color:var(--navy-2);background:rgba(30,39,97,.08);border:1px solid var(--line);border-radius:14px;padding:2px 9px;cursor:pointer;white-space:nowrap;vertical-align:middle}
-.ex-btn:active{transform:scale(.95)}
-.ex-modal{position:fixed;inset:0;background:rgba(15,26,46,.82);display:none;align-items:center;justify-content:center;z-index:60;padding:18px}
-.ex-modal.on{display:flex}
-.ex-box{background:#fff;border-radius:14px;max-width:440px;width:100%;overflow:hidden;position:relative;box-shadow:var(--shadow)}
-.ex-box img{width:100%;display:block;max-height:68vh;object-fit:contain;background:#0F1A2E;min-height:120px}
-.ex-cap{padding:12px 14px;font-size:13px;font-weight:600;color:var(--ink)}
-.ex-close{position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:50%;background:rgba(15,26,46,.65);color:#fff;border:none;cursor:pointer;font-size:15px;z-index:1}
 .cl-note{margin-top:8px;display:none}
 .cl-note.show{display:block}
 .cl-note input{padding:9px 12px;font-size:13px;border-radius:9px}
@@ -236,14 +225,12 @@ textarea{resize:vertical;min-height:74px}
       </div>
     </div>
   </main>
-  <div class="footer">BevChain Thailand · Security &amp; Compliance Dept.<br>Fire Hose Station Inspection System v1.0<br><a href="manual-inspector.html" style="color:var(--muted);text-decoration:underline">📖 คู่มือผู้ตรวจ</a> · <a href="dashboard.html" style="color:var(--muted);text-decoration:underline">เข้าระบบหลังบ้าน (Dashboard / Admin)</a></div>
+  <div class="footer">BevChain Thailand · Security &amp; Compliance Dept.<br>Fire Hose Station Inspection System v1.0<br><a href="dashboard.html" style="color:var(--muted);text-decoration:underline">เข้าระบบหลังบ้าน (Dashboard / Admin)</a></div>
 </div>
-
-<div class="ex-modal" id="exModal"><div class="ex-box"><button class="ex-close" id="exClose">✕</button><img id="exImg" alt="ตัวอย่างอุปกรณ์"><div class="ex-cap" id="exCap"></div></div></div>
 
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import { getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, collection, serverTimestamp, enableIndexedDbPersistence, Timestamp }
+import { getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, collection, serverTimestamp, increment, enableIndexedDbPersistence, Timestamp }
   from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
 /* ============== CONFIG — กรอกค่าของคุณ ============== */
@@ -256,9 +243,9 @@ const FIREBASE_CONFIG = {
   appId: "1:568964415233:web:4be7220d2d14644fbce500"
 };
 const CLOUDINARY_CONFIG = { cloudName: "diiqvxqqd", uploadPreset: "fhs_inspection" };
-const GPS_WARN_METERS = 120;          // เตือนถ้าห่างจากสถานีเกินระยะนี้ (A5)
+const GPS_WARN_METERS = 60;          // เตือนถ้าห่างจากสถานีเกินระยะนี้ (A5)
+const PRESSURE_MIN = 4.5, PRESSURE_MAX = 12; // ช่วงแรงดันปกติ (bar) เตือนถ้าผิด (I7)
 const MAX_LOGIN_FAILS = 5, LOCK_MINUTES = 15; // brute-force lockout (I1)
-const SHIFT_DAY_START = 7, SHIFT_DAY_END = 19; // กะกลางวัน 07:00–19:00 / กะกลางคืน 19:00–07:00
 /* ==================================================== */
 
 const app = initializeApp(FIREBASE_CONFIG);
@@ -287,17 +274,13 @@ const eqState = {};      // equipment statuses
 const photos = [];       // {url,label}
 let submitting = false;
 let gps = {lat:null,lng:null,distance:null,ok:false};
-let currentShift = 'day';
-let REF_IMAGES = {};
 
 /* ---------- helpers ---------- */
 const $ = id => document.getElementById(id);
-const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); // XSS (I3) — ต้อง escape เครื่องหมายคำพูดด้วย เพราะใช้ใน attribute
+const esc = s => { const d=document.createElement('div'); d.textContent = s==null?'':String(s); return d.innerHTML; }; // XSS (I3)
 function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on')); $(id).classList.add('on'); window.scrollTo(0,0); }
 async function sha256(str){ const buf=await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str)); return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join(''); }
 function haversine(a,b,c,d){ const R=6371000,t=x=>x*Math.PI/180; const dLat=t(c-a),dLng=t(d-b); const h=Math.sin(dLat/2)**2+Math.cos(t(a))*Math.cos(t(c))*Math.sin(dLng/2)**2; return Math.round(R*2*Math.atan2(Math.sqrt(h),Math.sqrt(1-h))); }
-const shiftOf=d=>{ const h=(d instanceof Date?d:new Date(d)).getHours(); return (h>=SHIFT_DAY_START&&h<SHIFT_DAY_END)?'day':'night'; };
-const shiftLabel=s=>s==='day'?'กลางวัน':'กลางคืน';
 
 /* ============ AUTH (I1) ============ */
 async function doLogin(){
@@ -358,11 +341,11 @@ function captureGPS(){
       gps.distance = haversine(gps.lat,gps.lng,CURRENT_STATION.gps.lat,CURRENT_STATION.gps.lng);
       gps.ok = gps.distance <= GPS_WARN_METERS;
       el.className = gps.ok?'gps ok':'gps warn';
-      el.innerHTML = `<span class="dot"></span>${gps.ok?'อยู่ที่สถานี':'⚠ ห่างจากสถานี (บันทึกไม่ได้)'} · ${gps.distance} ม.`;
+      el.innerHTML = `<span class="dot"></span>${gps.ok?'อยู่ที่สถานี':'⚠ ห่างจากสถานี'} · ${gps.distance} ม.`;
     }else{
       gps.ok=true; el.className='gps ok'; el.innerHTML='<span class="dot"></span>บันทึกพิกัดแล้ว (สถานียังไม่ตั้งพิกัดอ้างอิง)';
     }
-  },()=>{ el.className='gps warn'; el.innerHTML='<span class="dot"></span>⚠ เข้าถึง GPS ไม่ได้ — เปิด GPS/อนุญาตตำแหน่งเพื่อบันทึก'; },{enableHighAccuracy:true,timeout:10000});
+  },()=>{ el.className='gps warn'; el.innerHTML='<span class="dot"></span>⚠ ไม่สามารถเข้าถึง GPS — ตรวจต่อได้แต่ไม่มีพิกัดยืนยัน'; },{enableHighAccuracy:true,timeout:10000});
 }
 
 /* ============ RENDER INSPECTION FORM ============ */
@@ -388,7 +371,7 @@ function enterInspection(){
 
   const clRows = CHECKLIST.map(c=>`
     <div class="cl-item">
-      <div class="cl-top"><span class="cl-code ${c.brass?'brass':''}">${c.code}</span><span class="cl-label">${esc(c.label)}${REF_IMAGES[c.code]?` <button type="button" class="ex-btn" data-ex="${c.code}">📷 ดูตัวอย่าง</button>`:''}</span></div>
+      <div class="cl-top"><span class="cl-code ${c.brass?'brass':''}">${c.code}</span><span class="cl-label">${esc(c.label)}</span></div>
       <div class="cl-buttons">
         <button class="tog" data-cl="${c.code}" data-v="pass">ผ่าน</button>
         <button class="tog" data-cl="${c.code}" data-v="fail">ไม่ผ่าน</button>
@@ -410,16 +393,6 @@ function enterInspection(){
     <div class="gps wait" id="gpsBox"><span class="dot"></span>กำลังระบุตำแหน่ง GPS…</div>
 
     <div class="card">
-      <div class="card-h"><div class="ix">🕐</div><h3>กะการตรวจ</h3><span class="sub">เลือกให้ตรง</span></div>
-      <div class="card-b">
-        <div class="cl-buttons" id="shiftBtns" style="grid-template-columns:1fr 1fr">
-          <button class="tog" data-shift="day">☀️ กลางวัน <span style="font-weight:400;font-size:11px">07:00–19:00</span></button>
-          <button class="tog" data-shift="night">🌙 กลางคืน <span style="font-weight:400;font-size:11px">19:00–07:00</span></button>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
       <div class="card-h"><div class="ix">B</div><h3>รายการตรวจสอบ</h3><span class="sub">${CHECKLIST.length} รายการ</span></div>
       <div class="card-b" id="clBody">${clRows}</div>
     </div>
@@ -430,11 +403,19 @@ function enterInspection(){
     </div>
 
     <div class="card">
+      <div class="card-h"><div class="ix">B9</div><h3>แรงดัน & ซีล</h3></div>
+      <div class="card-b">
+        <div class="field"><label>แรงดันเกจ (bar)</label><input type="number" id="pressure" step="0.1" inputmode="decimal" placeholder="เช่น 7.0"><div id="pressureWarn"></div></div>
+        <div class="field" style="margin-bottom:0"><label>หมายเลขซีล (B10)</label><input type="text" id="sealNo" class="mono" placeholder="SEAL-00123"></div>
+      </div>
+    </div>
+
+    <div class="card">
       <div class="card-h"><div class="ix">C</div><h3>รูปหลักฐาน</h3><span class="sub" id="photoCount">0 รูป</span></div>
       <div class="card-b">
         <p class="hint" style="margin-top:0;margin-bottom:8px">ถ่ายรูปสภาพตู้/สาย/หัวฉีด — รูปจะติดวันเวลา+รหัสสถานีอัตโนมัติ <b>(บังคับอย่างน้อย 1 รูป)</b></p>
         <div class="photo-grid" id="photoGrid">
-          <label class="photo-add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 4h-5L8 6H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-4l-1.5-2z"/><circle cx="12" cy="13" r="3.2"/></svg>เพิ่มรูป<input type="file" accept="image/*" capture="environment" id="photoInput" hidden multiple></label>
+          <label class="photo-add" id="photoCamBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 4h-5L8 6H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-4l-1.5-2z"/><circle cx="12" cy="13" r="3.2"/></svg>ถ่ายรูป<input type="file" accept="image/*" capture="environment" id="photoInput" hidden></label><label class="photo-add" id="photoGalBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>จากคลังรูป<input type="file" accept="image/*" id="photoGallery" hidden multiple></label>
         </div>
       </div>
     </div>
@@ -471,29 +452,77 @@ function enterInspection(){
     $('note-'+code).classList.toggle('show', v==='fail');
     updateResult();
   }));
-  // wire reference-image buttons (📷 ดูตัวอย่าง)
-  $('clBody').querySelectorAll('[data-ex]').forEach(b=>b.addEventListener('click',()=>openExample(b.dataset.ex)));
   // wire equipment toggles
   $('eqBody').querySelectorAll('[data-eq]').forEach(b=>b.addEventListener('click',()=>{
     const id=b.dataset.eq, v=b.dataset.v;
     document.querySelectorAll(`[data-eq="${id}"]`).forEach(x=>x.removeAttribute('data-on'));
     b.setAttribute('data-on',v); eqState[id]=v; updateResult();
   }));
+  // pressure warn (I7)
+  $('pressure').addEventListener('input',e=>{
+    const v=parseFloat(e.target.value); const w=$('pressureWarn');
+    if(e.target.value!==''&&(v<PRESSURE_MIN||v>PRESSURE_MAX)) w.innerHTML=`<div class="alert warn" style="margin-top:8px;margin-bottom:0">⚠ ค่าแรงดัน ${v} bar อยู่นอกช่วงปกติ (${PRESSURE_MIN}–${PRESSURE_MAX}) โปรดตรวจสอบ</div>`;
+    else w.innerHTML='';
+  });
   $('photoInput').addEventListener('change', handlePhotos);
+  $('photoGallery').addEventListener('change', handlePhotos);
+  // save everything BEFORE the camera/gallery opens — Android may kill the tab while camera is open
+  ['photoCamBtn','photoGalBtn'].forEach(id=>$(id).addEventListener('click',()=>saveDraft(true)));
+  $('scrInspect').addEventListener('input',()=>saveDraft());
+  $('scrInspect').addEventListener('click',()=>setTimeout(()=>saveDraft(),0));
   $('btnSubmit').addEventListener('click', submitInspection);
-  $('btnCancel').addEventListener('click', ()=>location.href=location.pathname);
+  $('btnCancel').addEventListener('click', ()=>{ clearDraft(s.id); location.href=location.pathname; });
 
-  currentShift = shiftOf(new Date());
-  $('shiftBtns').querySelectorAll('[data-shift]').forEach(b=>b.addEventListener('click',()=>{
-    currentShift=b.dataset.shift;
-    $('shiftBtns').querySelectorAll('[data-shift]').forEach(x=>x.removeAttribute('data-on'));
-    b.setAttribute('data-on','shift');
-  }));
-  $('shiftBtns').querySelector(`[data-shift="${currentShift}"]`)?.setAttribute('data-on','shift');
+  // keep station in URL so a reload (tab killed by camera) comes straight back here
+  try{ const u=new URL(location.href); if(u.searchParams.get('station')!==s.id){ u.searchParams.set('station',s.id); history.replaceState(null,'',u); } }catch(e){}
 
   show('scrInspect');
-  initSignature(); // ต้อง init หลังหน้าจอแสดงผลแล้ว ไม่งั้น canvas วัดขนาดได้ 0×0 เซ็นไม่ติด
+  initSignature();            // ต้องทำหลัง show — ถ้าจอยังซ่อน canvas จะกว้าง 0px และลายเซ็นไม่ถูกบันทึก
   captureGPS();
+  const d=loadDraft(s.id);
+  if(d && (!d.user || d.user===CURRENT_USER?.id)) restoreDraft(d);
+}
+
+/* ============ DRAFT AUTOSAVE (กันข้อมูลหายตอนเปิดกล้อง) ============ */
+const DRAFT_TTL_MS = 12*3600*1000;
+const draftKey = sid => 'fhs_draft_'+sid;
+let _draftTimer=null;
+function saveDraft(now){
+  if(!CURRENT_STATION || submitting || !$('scrInspect').classList.contains('on')) return;
+  const run=()=>{
+    if(submitting || !$('scrInspect').classList.contains('on')) return;
+    const clNotes={}; CHECKLIST.forEach(c=>{ const i=document.querySelector('#note-'+c.code+' input'); if(i&&i.value) clNotes[c.code]=i.value; });
+    const cl={}; Object.entries(clState).forEach(([k,v])=>{ if(v?.status) cl[k]=v.status; });
+    const d={ ts:Date.now(), user:CURRENT_USER?.id||null, cl, clNotes, eq:{...eqState},
+      pressure:$('pressure')?.value||'', seal:$('sealNo')?.value||'', notes:$('notes')?.value||'', photos:photos.slice() };
+    try{ localStorage.setItem(draftKey(CURRENT_STATION.id), JSON.stringify(d)); }catch(e){}
+  };
+  clearTimeout(_draftTimer); if(now) run(); else _draftTimer=setTimeout(run,300);
+}
+function loadDraft(sid){
+  try{ const d=JSON.parse(localStorage.getItem(draftKey(sid))||'null'); if(!d) return null;
+    if(Date.now()-d.ts>DRAFT_TTL_MS){ clearDraft(sid); return null; } return d; }catch(e){ return null; }
+}
+function clearDraft(sid){ clearTimeout(_draftTimer); try{ localStorage.removeItem(draftKey(sid)); }catch(e){} }
+function restoreDraft(d){
+  const has = Object.keys(d.cl||{}).length || Object.keys(d.eq||{}).length || (d.photos||[]).length || d.pressure || d.seal || d.notes;
+  if(!has) return;
+  Object.entries(d.cl||{}).forEach(([code,v])=>{ const b=document.querySelector(`[data-cl="${code}"][data-v="${v}"]`); if(b) b.click(); });
+  Object.entries(d.clNotes||{}).forEach(([code,t])=>{ const i=document.querySelector('#note-'+code+' input'); if(i) i.value=t; });
+  Object.entries(d.eq||{}).forEach(([id,v])=>{ const b=[...document.querySelectorAll('[data-eq]')].find(x=>x.dataset.eq===id&&x.dataset.v===v); if(b) b.click(); });
+  if(d.pressure){ $('pressure').value=d.pressure; $('pressure').dispatchEvent(new Event('input')); }
+  if(d.seal) $('sealNo').value=d.seal;
+  if(d.notes) $('notes').value=d.notes;
+  (d.photos||[]).forEach(p=>{ if(p?.url && !photos.some(x=>x.url===p.url)){ photos.push(p); const c=newPhotoCell(); renderPhotoCell(c,p.url); } });
+  updatePhotoCount(); updateResult();
+  toast('กู้คืนข้อมูลที่กรอกไว้แล้ว ✓ (ถ้ารูปล่าสุดไม่ขึ้น กรุณาถ่ายใหม่)');
+}
+function toast(msg,err){
+  let t=$('fhsToast'); if(!t){ t=document.createElement('div'); t.id='fhsToast';
+    t.style.cssText='position:fixed;left:50%;bottom:22px;transform:translateX(-50%);max-width:92vw;padding:11px 16px;border-radius:11px;color:#fff;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.25);transition:opacity .3s;text-align:center';
+    document.body.appendChild(t); }
+  t.style.background=err?'#D62828':'#0E8A5F'; t.textContent=msg; t.style.opacity='1';
+  clearTimeout(t._h); t._h=setTimeout(()=>t.style.opacity='0',4200);
 }
 
 /* ============ SIGNATURE PAD (J1) ============ */
@@ -515,19 +544,7 @@ function initSignature(){
   $('sigClear').onclick=()=>{ ctx.clearRect(0,0,cv.width,cv.height); sigHasInk=false; };
 }
 function signatureBlob(){
-  // Storage saver: signature was PNG (~30-80 KB with alpha). Composite onto white,
-  // resize to max 640px width, encode JPEG q=0.75 → typically 6-15 KB. Same visual quality.
-  return new Promise(res=>{
-    if(!sigHasInk) return res(null);
-    const src=$('sigPad');
-    const max=640; let w=src.width, h=src.height;
-    if(w>max){ h=h*max/w; w=max; }
-    const cv=document.createElement('canvas'); cv.width=w; cv.height=h;
-    const ctx=cv.getContext('2d');
-    ctx.fillStyle='#fff'; ctx.fillRect(0,0,w,h);
-    ctx.drawImage(src,0,0,w,h);
-    cv.toBlob(b=>res(b||null),'image/jpeg',0.75);
-  });
+  return new Promise(res=>{ if(!sigHasInk)return res(null); $('sigPad').toBlob(b=>res(b),'image/png'); });
 }
 
 /* ============ RESULT (B15) ============ */
@@ -543,47 +560,60 @@ function updateResult(){
 
 /* ============ PHOTOS (C1–C4) ============ */
 async function handlePhotos(e){
-  const files=[...e.target.files]; e.target.value='';
-  for(const f of files){ if(f.type.startsWith('image/')) await addPhoto(f); }
+  const files=[...(e.target.files||[])]; e.target.value='';
+  for(const f of files){ if(!f.type || f.type.startsWith('image/')) await addPhoto(f); }   // one at a time = low memory
 }
-async function addPhoto(file){
+function newPhotoCell(){
   const grid=$('photoGrid'); const addBtn=grid.querySelector('.photo-add');
   const cell=document.createElement('div'); cell.className='photo-cell';
+  grid.insertBefore(cell, addBtn); return cell;
+}
+function renderPhotoCell(cell,url){
+  cell.innerHTML='';
+  const img=document.createElement('img'); img.loading='lazy';
+  img.src=url.replace('/image/upload/','/image/upload/c_fill,w_240,h_240,q_auto/');   // thumbnail, not full-size
+  cell.appendChild(img);
+  const del=document.createElement('button'); del.className='del'; del.innerHTML='✕';
+  del.onclick=()=>{ const i=photos.findIndex(p=>p.url===url); if(i>=0)photos.splice(i,1); cell.remove(); updatePhotoCount(); saveDraft(true); };
+  cell.appendChild(del);
+}
+async function addPhoto(file){
+  const cell=newPhotoCell();
   cell.innerHTML='<div class="uploading"><div style="text-align:center"><div class="spinner" style="border-color:rgba(21,35,74,.2);border-top-color:#15234A;margin:0 auto 6px"></div>กำลังอัป…</div></div>';
-  grid.insertBefore(cell, addBtn);
   try{
     const blob = await compressAndWatermark(file);          // C2 + C4
     const url = await uploadCloudinary(blob);                // C1
     photos.push({url,label:'inspection'});
-    const img=document.createElement('img'); img.src=url; cell.innerHTML='';
-    cell.appendChild(img);
-    const del=document.createElement('button'); del.className='del'; del.innerHTML='✕';
-    del.onclick=()=>{ const i=photos.findIndex(p=>p.url===url); if(i>=0)photos.splice(i,1); cell.remove(); updatePhotoCount(); };
-    cell.appendChild(del);
-  }catch(err){ cell.innerHTML='<div class="uploading" style="color:#D62828;font-size:10px">อัปไม่สำเร็จ</div>'; setTimeout(()=>cell.remove(),1500); }
+    renderPhotoCell(cell,url);
+    saveDraft(true);
+  }catch(err){
+    console.error('photo',err);
+    cell.innerHTML='<div class="uploading" style="color:#D62828;font-size:10px">อัปไม่สำเร็จ</div>'; setTimeout(()=>cell.remove(),1800);
+    toast(navigator.onLine?'อัปโหลดรูปไม่สำเร็จ ลองถ่ายใหม่อีกครั้ง':'ไม่มีสัญญาณเน็ต — ต่อเน็ตแล้วถ่ายใหม่', true);
+  }
   updatePhotoCount();
 }
 function updatePhotoCount(){ $('photoCount').textContent=`${photos.length} รูป`; }
 function compressAndWatermark(file){
-  // Storage saver: was max=1280 / q=0.82 (~250-500 KB). Now max=1024 / q=0.72
-  // → typically 60-150 KB per photo. Still clearly readable for inspection evidence.
   return new Promise((res,rej)=>{
-    const img=new Image(), r=new FileReader();
-    r.onload=()=>img.src=r.result; r.onerror=rej;
+    // objectURL instead of FileReader/base64 — avoids a ~10MB string that crashes low-RAM phones
+    const img=new Image(); const src=URL.createObjectURL(file);
+    img.onerror=()=>{ URL.revokeObjectURL(src); rej(new Error('decode')); };
     img.onload=()=>{
-      const max=1024; let{width:w,height:h}=img;
-      if(w>h&&w>max){h=Math.round(h*max/w);w=max;} else if(h>max){w=Math.round(w*max/h);h=max;}
+      const max=1280; let w=img.naturalWidth, h=img.naturalHeight;
+      if(w>=h&&w>max){h=Math.round(h*max/w);w=max;} else if(h>w&&h>max){w=Math.round(w*max/h);h=max;}
       const cv=document.createElement('canvas'); cv.width=w; cv.height=h;
       const ctx=cv.getContext('2d'); ctx.drawImage(img,0,0,w,h);
+      img.onerror=null; URL.revokeObjectURL(src);
       // watermark (C2)
       const stamp=`${CURRENT_STATION.id}  ·  ${new Date().toLocaleString('th-TH')}`;
       const fs=Math.max(13,Math.round(w/42)); ctx.font=`600 ${fs}px IBM Plex Mono, monospace`;
       const tw=ctx.measureText(stamp).width;
       ctx.fillStyle='rgba(15,26,46,.72)'; ctx.fillRect(0,h-fs-16,tw+22,fs+16);
       ctx.fillStyle='#fff'; ctx.textBaseline='middle'; ctx.fillText(stamp,11,h-fs/2-8);
-      cv.toBlob(b=>b?res(b):rej(new Error('blob')),'image/jpeg',0.72);
+      cv.toBlob(b=>{ cv.width=cv.height=0; b?res(b):rej(new Error('blob')); },'image/jpeg',0.82);   // free canvas memory
     };
-    r.readAsDataURL(file);
+    img.src=src;
   });
 }
 async function uploadCloudinary(blob){
@@ -599,11 +629,6 @@ async function submitInspection(){
   const errs=[];
 
   // validation (I4)
-  // GPS gate (A5) — ต้องอยู่ในระยะที่กำหนดจากสถานี ถึงจะบันทึกได้
-  if(!gps.ok){
-    if(gps.distance!=null) errs.push(`อยู่นอกระยะที่กำหนด — ห่างจากสถานี ${gps.distance} ม. (ต้องไม่เกิน ${GPS_WARN_METERS} ม.) ไปยืนใกล้สถานีแล้วลองใหม่`);
-    else errs.push(`ยืนยันตำแหน่งไม่สำเร็จ — เปิด GPS / อนุญาตการเข้าถึงตำแหน่ง แล้วรอสักครู่ก่อนกดบันทึก (ต้องอยู่ในระยะ ${GPS_WARN_METERS} ม. จากสถานี)`);
-  }
   const unset = CHECKLIST.filter(c=>!clState[c.code]?.status);
   if(unset.length) errs.push(`ยังตรวจไม่ครบ: ${unset.map(c=>c.code).join(', ')}`);
   const eqTotal=(CURRENT_STATION.equipment||[]).length;
@@ -645,45 +670,41 @@ async function submitInspection(){
 
     const insp={
       stationId:CURRENT_STATION.id, stationName:CURRENT_STATION.name||'', site:CURRENT_STATION.site||'',
-      inspectorId:CURRENT_USER.id, inspectorName:CURRENT_USER.name, shift:currentShift,
+      inspectorId:CURRENT_USER.id, inspectorName:CURRENT_USER.name,
       serverTimestamp:serverTimestamp(), clientTime:new Date().toISOString(),
       gps:{lat:gps.lat,lng:gps.lng}, gpsDistanceM:gps.distance,
-      checklist, photos, signatureUrl, result, equipmentSnapshot, missingItems,
+      checklist, pressureValue: $('pressure').value!==''?parseFloat($('pressure').value):null,
+      sealNumber: $('sealNo').value.trim(), photos, signatureUrl, result, equipmentSnapshot, missingItems,
       notes: $('notes').value.trim(), createdAt:serverTimestamp()
     };
+    const ref = await addDoc(collection(db,'inspections'), insp);
+
     // update station: lastSeen for present items (D2), status of all items, lastInspection
     const updatedEquipment=(CURRENT_STATION.equipment||[]).map(e=>{
       const st=eqState[e.id]||'present'; const o={...e,status:st};
       if(st==='present'){ o.lastSeenAt=new Date().toISOString(); o.lastSeenBy=CURRENT_USER.name; }
       return o;
     });
+    await updateDoc(doc(db,'stations',CURRENT_STATION.id),{
+      equipment:updatedEquipment, lastInspectionAt:serverTimestamp(), lastResult:result
+    });
 
-    const inspRef = doc(collection(db,'inspections'));
-    const writeAll = async ()=>{
-      await setDoc(inspRef, insp);
-      await updateDoc(doc(db,'stations',CURRENT_STATION.id),{
-        equipment:updatedEquipment, lastInspectionAt:serverTimestamp(), lastResult:result
+    // auto-create CCTV cases for missing items (bridge to D3/D4)
+    for(const m of missingItems){
+      const prev=(CURRENT_STATION.equipment||[]).find(e=>e.id===m.id)||{};
+      await addDoc(collection(db,'cases'),{
+        stationId:CURRENT_STATION.id, stationName:CURRENT_STATION.name||'',
+        itemId:m.id, itemName:m.name,
+        lastSeenAt: prev.lastSeenAt||null, lastSeenBy: prev.lastSeenBy||null,
+        reportedMissingAt:serverTimestamp(), reportedBy:CURRENT_USER.name,
+        cctvCameras: CURRENT_STATION.cctvCameras||[],
+        cctvWindow:{ start: prev.lastSeenAt||null, end:new Date().toISOString() },
+        status:'investigating', notes:'', createdAt:serverTimestamp()
       });
-      // auto-create CCTV cases for missing items (bridge to D3/D4)
-      for(const m of missingItems){
-        const prev=(CURRENT_STATION.equipment||[]).find(e=>e.id===m.id)||{};
-        await addDoc(collection(db,'cases'),{
-          stationId:CURRENT_STATION.id, stationName:CURRENT_STATION.name||'', site:CURRENT_STATION.site||'',
-          itemId:m.id, itemName:m.name,
-          lastSeenAt: prev.lastSeenAt||null, lastSeenBy: prev.lastSeenBy||null,
-          reportedMissingAt:serverTimestamp(), reportedBy:CURRENT_USER.name,
-          cctvCameras: CURRENT_STATION.cctvCameras||[],
-          cctvWindow:{ start: prev.lastSeenAt||null, end:new Date().toISOString() },
-          status:'investigating', notes:'', createdAt:serverTimestamp()
-        });
-      }
-    };
-    // ออฟไลน์: promise ของ Firestore จะค้างจนกว่า server ตอบ — ไม่ await เพื่อไม่ให้ปุ่มหมุนค้าง
-    // (Firestore persistence คิว write ไว้และซิงค์เองเมื่อมีเน็ต — A7)
-    if(navigator.onLine) await writeAll();
-    else writeAll().catch(()=>{});
+    }
 
-    renderSuccess(inspRef.id, result, missingItems);
+    clearDraft(CURRENT_STATION.id);
+    renderSuccess(ref.id, result, missingItems);
   }catch(e){
     submitting=false; btn.disabled=false; btn.innerHTML='บันทึกผลการตรวจ';
     alertBox.innerHTML=`<div class="alert err">บันทึกไม่สำเร็จ: ${esc(e.message)} (ข้อมูลจะถูกซิงค์อัตโนมัติเมื่อมีเน็ต)</div>`;
@@ -698,7 +719,6 @@ function renderSuccess(id,result,missing){
     <div style="display:flex;justify-content:space-between;padding:6px 0"><span class="hint">สถานี</span><b class="mono">${esc(CURRENT_STATION.id)}</b></div>
     <div style="display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid var(--line)"><span class="hint">ผู้ตรวจ</span><b>${esc(CURRENT_USER.name)}</b></div>
     <div style="display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid var(--line)"><span class="hint">เวลา</span><b>${esc(new Date().toLocaleString('th-TH'))}</b></div>
-    <div style="display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid var(--line)"><span class="hint">กะ</span><b>${currentShift==='day'?'☀️ กลางวัน':'🌙 กลางคืน'}</b></div>
     <div style="display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid var(--line)"><span class="hint">ผล</span><b style="color:${resColor}">${esc(resLabel)}</b></div>`;
   if(missing.length){
     html+=`<div style="margin-top:10px;padding:11px;background:rgba(214,40,40,.06);border-radius:10px;border:1px solid rgba(214,40,40,.2)">
@@ -711,37 +731,29 @@ function renderSuccess(id,result,missing){
 }
 
 /* ============ QR SCANNER ============ */
-let scanner=null, scanHandled=false;
+let scanner=null;
 function startScan(){
   $('btnStartScan').style.display='none'; $('scanArea').style.display='block';
-  scanHandled=false;
   scanner=new Html5Qrcode('reader');
   scanner.start({facingMode:'environment'},{fps:10,qrbox:{width:230,height:230}},onScan,()=>{})
     .catch(()=>{ $('scanArea').innerHTML='<div class="alert warn">ไม่สามารถเปิดกล้องได้ โปรดอนุญาตการเข้าถึงกล้อง หรือพิมพ์รหัสสถานีด้านล่าง</div>'; $('btnStartScan').style.display='flex'; });
 }
 function onScan(text){
-  if(scanHandled) return; scanHandled=true; // กล้องอาจยิง callback ซ้ำหลายเฟรมก่อน stop เสร็จ
   let sid=text.trim();
   try{ const u=new URL(text); sid=u.searchParams.get('station')||sid; }catch(e){}
-  if(scanner){ scanner.stop().catch(()=>{}); }
   goToStation(sid.toUpperCase());
 }
-function savedUser(){ try{ return JSON.parse(sessionStorage.getItem('fhs_user')); }catch(e){ return null; } }
-function backToScan(msg){ show('scrScan'); $('scanArea').style.display='none'; $('btnStartScan').style.display='flex'; alert(msg); }
-async function loadRefImages(){ try{ const snap=await getDoc(doc(db,'settings','referenceImages')); REF_IMAGES = snap.exists()?(snap.data()||{}):{}; }catch(e){ REF_IMAGES={}; } }
-function openExample(code){ const url=REF_IMAGES[code]; if(!url) return; const cap = code==='B6'?'ตัวอย่าง: ข้อต่อ/coupling (หัวต่อสายดับเพลิง)':code==='B5'?'ตัวอย่าง: landing valve (วาล์วเปิด-ปิดน้ำสำหรับต่อสาย)':'ตัวอย่างอุปกรณ์'; $('exImg').src=url; $('exCap').textContent=cap; $('exModal').classList.add('on'); }
+function stopScanner(){ if(scanner){ const sc=scanner; scanner=null; sc.stop().then(()=>sc.clear()).catch(()=>{}); } }
 async function goToStation(sid){
   if(!sid) return;
+  stopScanner();
   show('scrLoading');
-  let st;
-  try{ st=await loadStation(sid); }
-  catch(e){ backToScan('โหลดข้อมูลสถานีไม่สำเร็จ: '+e.message); return; }
-  if(!st){ backToScan('ไม่พบสถานี '+sid+' ในระบบ'); return; }
+  const st=await loadStation(sid);
+  if(!st){ show('scrScan'); $('scanArea').style.display='none'; $('btnStartScan').style.display='flex'; alert('ไม่พบสถานี '+sid+' ในระบบ'); return; }
   CURRENT_STATION=st;
-  await loadRefImages();
   // already logged in?
-  const saved=savedUser();
-  if(saved){ CURRENT_USER=saved; renderWho(); enterInspection(); }
+  const saved=sessionStorage.getItem('fhs_user');
+  if(saved){ CURRENT_USER=JSON.parse(saved); renderWho(); enterInspection(); }
   else{ $('loginStationHint').innerHTML=`ตรวจสถานี <b class="mono">${esc(st.id)}</b>`; show('scrLogin'); }
 }
 
@@ -753,8 +765,6 @@ $('btnLogin').addEventListener('click',doLogin);
 $('loginPw').addEventListener('keydown',e=>{ if(e.key==='Enter')doLogin(); });
 $('btnScanNext').addEventListener('click',()=>location.href=location.pathname);
 $('btnLogout').addEventListener('click',logout);
-$('exClose').addEventListener('click',()=>$('exModal').classList.remove('on'));
-$('exModal').addEventListener('click',e=>{ if(e.target===$('exModal')) $('exModal').classList.remove('on'); });
 
 /* ===== NFC (J2) — Chrome Android เท่านั้น ===== */
 if('NDEFReader' in window){
@@ -775,8 +785,15 @@ if('NDEFReader' in window){
 /* ===== PWA service worker (J4) ===== */
 if('serviceWorker' in navigator){ window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{})); }
 
+window.addEventListener('error',e=>{ console.error(e.error||e.message); });
+window.addEventListener('unhandledrejection',e=>{ console.error(e.reason); });
+
 (function init(){
-  const saved=savedUser(); if(saved){ CURRENT_USER=saved; renderWho(); }
+  // เปิดผ่าน LINE/Facebook in-app browser → กล้อง/อัปรูปมักเด้ง ให้เปิดใน Chrome/Safari แทน
+  const ua=navigator.userAgent||'';
+  if(/\bLine\//i.test(ua)){ const u=new URL(location.href); if(!u.searchParams.has('openExternalBrowser')){ u.searchParams.set('openExternalBrowser','1'); location.replace(u); return; } }
+  if(/FBAN|FBAV|Instagram/i.test(ua)){ setTimeout(()=>toast('แนะนำให้เปิดลิงก์นี้ใน Chrome/Safari (เมนู ⋮ → เปิดในเบราว์เซอร์) เพื่อให้ถ่ายรูปได้เสถียร',true),800); }
+  const saved=sessionStorage.getItem('fhs_user'); if(saved){ CURRENT_USER=JSON.parse(saved); renderWho(); }
   const sid=new URLSearchParams(location.search).get('station');
   if(sid){ goToStation(sid.toUpperCase()); }
   else{ show('scrScan'); }
