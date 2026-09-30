@@ -4,13 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>รายงานประจำสัปดาห์ · FHS · BevChain</title>
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
-<link rel="icon" type="image/png" href="icon-192.png">
-<meta name="theme-color" content="#15234A">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@500;600;700&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
 :root{
   --bg:#E9ECF2;--surface:#FFFFFF;--surface-2:#F4F6FA;--ink:#0F1A2E;--navy:#15234A;--navy-2:#1E2761;
@@ -110,42 +107,40 @@ td{padding:9px 11px;border-bottom:1px solid var(--line);vertical-align:middle}
 </style>
 </head>
 <body>
-<!-- autoResult: probed by GitHub Actions / Playwright weekly report runner -->
-<div id="autoResult" data-status="idle" data-ok="0" data-fail="0" style="position:fixed;bottom:8px;right:8px;padding:6px 10px;background:#0F1A2E;color:#CADCFC;font:12px monospace;z-index:9999;border-radius:6px;display:none;max-width:60vw;word-break:break-all"></div>
 <div class="hazard"></div>
 
 <div id="gate">
   <div class="box">
     <div style="text-align:center;margin-bottom:16px"><svg width="48" height="48" viewBox="0 0 64 64" fill="none"><path d="M32 6l22 8v16c0 14-9 23-22 28C19 53 10 44 10 30V14l22-8z" fill="#1E2761"/><path d="M22 24h20M22 31h20M22 38h13" stroke="#CADCFC" stroke-width="2.5" stroke-linecap="round"/></svg></div>
-    <h1 data-i18n="gate_h">รายงานประจำสัปดาห์</h1><p>Security &amp; Compliance · FHS</p>
+    <h1>รายงานประจำสัปดาห์</h1><p>Security &amp; Compliance · FHS</p>
     <div id="gateAlert"></div>
-    <div style="margin-bottom:14px"><label data-i18n="f_empid">รหัสพนักงาน</label><input type="text" id="gId" class="mono" style="text-transform:uppercase;width:100%" placeholder="EMP-1001"></div>
-    <div style="margin-bottom:18px"><label data-i18n="f_pw">รหัสผ่าน</label><input type="password" id="gPw" style="width:100%" placeholder="••••••••"></div>
-    <button class="btn btn-primary" style="width:100%" id="gBtn" data-i18n="signin">เข้าสู่ระบบ</button>
+    <div style="margin-bottom:14px"><label>รหัสพนักงาน</label><input type="text" id="gId" class="mono" style="text-transform:uppercase;width:100%" placeholder="EMP-1001"></div>
+    <div style="margin-bottom:18px"><label>รหัสผ่าน</label><input type="password" id="gPw" style="width:100%" placeholder="••••••••"></div>
+    <button class="btn btn-primary" style="width:100%" id="gBtn">เข้าสู่ระบบ</button>
   </div>
 </div>
 
 <div class="topbar">
   <div class="logo"><svg viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="7" fill="#1E2761"/><path d="M10 9h12M10 14h12M10 19h8" stroke="#CADCFC" stroke-width="2" stroke-linecap="round"/><circle cx="23" cy="22" r="4" fill="#D62828"/></svg>
     <div><b>Weekly Report</b><span>SECURITY &amp; COMPLIANCE</span></div></div>
-  <nav class="appsw"><a href="index.html" data-i18n="nav_inspect">ตรวจ</a><a href="dashboard.html">Dashboard</a><a href="report.html" class="cur" data-i18n="nav_report">รายงาน</a><a href="admin.html">Admin</a></nav>
-  <div class="right"><a id="langBtn" style="border:1px solid rgba(255,255,255,.3);border-radius:7px;padding:4px 9px;font-size:11px;font-weight:700">EN</a><span id="adminName"></span><a id="logout" data-i18n="signout">ออก</a></div>
+  <nav class="appsw"><a href="index.html">ตรวจ</a><a href="dashboard.html">Dashboard</a><a href="report.html" class="cur">รายงาน</a><a href="admin.html">Admin</a></nav>
+  <div class="right"><span id="adminName"></span><a id="logout">ออก</a></div>
 </div>
 
 <div class="wrap">
   <div class="toolbar">
-    <div><label data-i18n="tb_period">ช่วงเวลา</label><select id="period"><option value="0" selected data-i18n="p_this">สัปดาห์นี้</option><option value="1" data-i18n="p_last">สัปดาห์ที่แล้ว</option><option value="2" data-i18n="p_2ago">2 สัปดาห์ก่อน</option></select></div>
+    <div><label>ช่วงเวลา</label><select id="period"><option value="0">สัปดาห์นี้</option><option value="1" selected>สัปดาห์ที่แล้ว</option><option value="2">2 สัปดาห์ก่อน</option></select></div>
     <div class="grow"></div>
-    <button class="btn btn-ghost btn-sm" id="btnPrint" data-i18n="btn_print">🖨 พิมพ์ / PDF</button>
-    <button class="btn btn-green btn-sm" id="btnSend" data-i18n="btn_send">📧 ส่งอีเมล</button>
+    <button class="btn btn-ghost btn-sm" id="btnPrint">🖨 พิมพ์ / PDF</button>
+    <button class="btn btn-green btn-sm" id="btnSend">📧 ส่งอีเมล</button>
   </div>
   <div id="sendAlert"></div>
-  <div class="report" id="report"><div class="empty" data-i18n="loading">กำลังโหลดข้อมูล…</div></div>
+  <div class="report" id="report"><div class="empty">กำลังโหลดข้อมูล…</div></div>
 </div>
 
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import { getFirestore, doc, getDoc, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+import { getFirestore, doc, getDoc, collection, getDocs, query, where, orderBy, Timestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
 /* ============ CONFIG ============ */
 const FIREBASE_CONFIG = {
@@ -153,74 +148,55 @@ const FIREBASE_CONFIG = {
   storageBucket: "bevchain-fhs.firebasestorage.app", messagingSenderId: "568964415233", appId: "1:568964415233:web:4be7220d2d14644fbce500"
 };
 // EmailJS — สมัครที่ emailjs.com → สร้าง service + template ที่มีตัวแปร {{to_email}} {{subject}} {{{html_content}}}
-const EMAILJS = { publicKey: "jlcMr7JQb8exygtzY", serviceId: "service_x1ikhw4", templateId: "template_5jp881p" };
-// ผู้รับอีเมล — ใส่หลายอีเมลคั่นด้วย , ; _all = ได้รับทุกไซต์; เพิ่มรายไซต์ได้ เช่น LLKDC: "a@x.com" (ส่งเฉพาะสัปดาห์ที่ไซต์นั้นมีข้อมูล)
+const EMAILJS = { publicKey: "YOUR_EMAILJS_PUBLIC_KEY", serviceId: "YOUR_SERVICE_ID", templateId: "YOUR_TEMPLATE_ID" };
+// ผู้รับอีเมลแยกตามไซต์ (E4) — ใส่หลายอีเมลคั่นด้วย , ; _all = ผู้บริหาร/ส่วนกลางได้รับทุกไซต์
 const SITE_RECIPIENTS = {
-  _all:  "Pongsatorn_Untharindr@bevchain.co.th, Wanida_Kongcharit@bevchain.co.th, Surat_Pumyu@BevChain.co.th, jakkaphan_boonnarangsri@bevchain.co.th, Sayan_Nuangthanee@BevChain.co.th"
+  LLKDC: "llkdc-manager@bevchain.co.th",
+  NDC:   "ndc-manager@bevchain.co.th",
+  Wangnoi: "wangnoi-manager@bevchain.co.th",
+  _all:  "egm@bevchain.co.th, security-head@bevchain.co.th"
 };
 const REPORT_BASE_URL = location.href.replace(/report\.html.*$/,'dashboard.html'); // ลิงก์ดูรายละเอียดในอีเมล
 /* ================================ */
 
 const app=initializeApp(FIREBASE_CONFIG); const db=getFirestore(app);
 const $=id=>document.getElementById(id);
-const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); // escape quotes ด้วย เพราะใช้ใน attribute
-// Cloudinary transform: thumbs/comparison images use w+q_auto+f_auto → 80-90% less bandwidth. Non-Cloudinary URLs unchanged.
-const cld=(u,w)=>{ if(!u||typeof u!=='string')return u; const m=u.match(/^(https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/)(.+)$/); return m?`${m[1]}w_${w||400},q_auto,f_auto/${m[2]}`:u; };
-
-/* ===== i18n (TH / EN) — key ร่วม fhs_lang; เนื้อหาอีเมลคงเป็นไทย (ส่งถึงผู้รับไทย) ===== */
-let LANG = localStorage.getItem('fhs_lang') || 'th';
-const I18N = {
- th:{ nav_inspect:'ตรวจ', nav_report:'รายงาน', signout:'ออก', f_empid:'รหัสพนักงาน', f_pw:'รหัสผ่าน', signin:'เข้าสู่ระบบ', gate_h:'รายงานประจำสัปดาห์',
-  tb_period:'ช่วงเวลา', p_this:'สัปดาห์นี้', p_last:'สัปดาห์ที่แล้ว', p_2ago:'2 สัปดาห์ก่อน', btn_print:'🖨 พิมพ์ / PDF', btn_send:'📧 ส่งอีเมล', loading:'กำลังโหลดข้อมูล…',
-  err_fill:'กรอกข้อมูลให้ครบ', err_nouser:'ไม่พบผู้ใช้', err_noaccess:'ไม่มีสิทธิ์เข้าถึง', err_wrongpw:'รหัสผ่านไม่ถูกต้อง',
-  send_adminonly:'เฉพาะผู้ใช้สิทธิ์ admin เท่านั้นที่ส่งอีเมลได้', send_norecip:'ไม่มีผู้รับที่ตั้งค่าไว้ใน SITE_RECIPIENTS', sending:'ส่ง…', send_ok:'ส่งสำเร็จ', send_fail:'ล้มเหลว', see_console:'ดู console', copies:'ฉบับ' },
- en:{ nav_inspect:'Inspect', nav_report:'Report', signout:'Out', f_empid:'Employee ID', f_pw:'Password', signin:'Sign in', gate_h:'Weekly Report',
-  tb_period:'Period', p_this:'This week', p_last:'Last week', p_2ago:'2 weeks ago', btn_print:'🖨 Print / PDF', btn_send:'📧 Send email', loading:'Loading…',
-  err_fill:'Please fill in all fields', err_nouser:'User not found', err_noaccess:'No access', err_wrongpw:'Incorrect password',
-  send_adminonly:'Only admin users can send emails', send_norecip:'No recipients configured in SITE_RECIPIENTS', sending:'Sending…', send_ok:'Sent', send_fail:'failed', see_console:'see console', copies:'' }
-};
-const t=k=>(I18N[LANG]&&I18N[LANG][k])??I18N.th[k]??k;
-const L=(en,th)=>LANG==='en'?en:th;
-function applyLang(){
-  document.documentElement.lang=LANG;
-  document.querySelectorAll('[data-i18n]').forEach(el=>el.textContent=t(el.dataset.i18n));
-  const lb=$('langBtn'); if(lb) lb.textContent=LANG==='th'?'EN':'ไทย';
-  if(ADMIN) renderReport();
-}
-function toggleLang(){ LANG=LANG==='th'?'en':'th'; localStorage.setItem('fhs_lang',LANG); applyLang(); }
+const esc=s=>{const d=document.createElement('div');d.textContent=s==null?'':String(s);return d.innerHTML;};
 async function sha256(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');}
 const tsDate=ts=>ts?(ts.toDate?ts.toDate():new Date(ts)):null;
 const fmtD=d=>d?d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'2-digit'}):'—';
 const fmt=d=>d?d.toLocaleString('th-TH',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'—';
+// Cloudinary: ขอรูปย่อแทนรูปเต็ม (โหลดเร็วขึ้นมาก) — คลิกยังเปิดรูปเต็มได้
+const cld=(u,t)=>u&&u.includes('/image/upload/')?u.replace('/image/upload/',`/image/upload/${t}/`):u;
 function weekRange(off=0){ const n=new Date(); const day=(n.getDay()+6)%7; const mon=new Date(n); mon.setDate(n.getDate()-day-off*7); mon.setHours(0,0,0,0); const end=new Date(mon); end.setDate(mon.getDate()+7); return {start:mon,end}; }
 
-let STATIONS=[],INSPECTIONS=[],CASES=[],ADMIN=null;
+let STATIONS=[],INSPECTIONS=[],CASES=[],ADMIN=null,LAST_REPORT=null;
 
 async function gateLogin(){
   const id=$('gId').value.trim().toUpperCase(),pw=$('gPw').value,a=$('gateAlert');a.innerHTML='';
-  if(!id||!pw){a.innerHTML=`<div class="alert err">${t('err_fill')}</div>`;return;}
+  if(!id||!pw){a.innerHTML='<div class="alert err">กรอกข้อมูลให้ครบ</div>';return;}
   const btn=$('gBtn');btn.disabled=true;btn.innerHTML='<div class="spinner"></div>';
   try{
-    const snap=await getDoc(doc(db,'users',id)); if(!snap.exists())throw new Error(t('err_nouser'));
-    const u=snap.data(); if(!['admin','viewer'].includes(u.role))throw new Error(t('err_noaccess'));
-    if((await sha256((u.salt||'')+pw))!==u.passwordHash)throw new Error(t('err_wrongpw'));
+    const snap=await getDoc(doc(db,'users',id)); if(!snap.exists())throw new Error('ไม่พบผู้ใช้');
+    const u=snap.data(); if(!['admin','viewer'].includes(u.role))throw new Error('ไม่มีสิทธิ์เข้าถึง');
+    if((await sha256((u.salt||'')+pw))!==u.passwordHash)throw new Error('รหัสผ่านไม่ถูกต้อง');
     ADMIN={id,name:u.name||id,role:u.role}; sessionStorage.setItem('fhs_admin',JSON.stringify(ADMIN)); boot();
   }catch(e){a.innerHTML=`<div class="alert err">${esc(e.message)}</div>`;}
-  finally{btn.disabled=false;btn.textContent=t('signin');}
+  finally{btn.disabled=false;btn.textContent='เข้าสู่ระบบ';}
 }
 async function boot(){
-  $('gate').style.display='none'; $('adminName').textContent=ADMIN.name+(ADMIN.role!=='admin'?L(' · viewer (read-only)',' · viewer (อ่านอย่างเดียว)'):'');
-  if(ADMIN.role!=='admin'){ $('btnSend').disabled=true; $('btnSend').title=t('send_adminonly'); }
+  $('gate').style.display='none'; $('adminName').textContent=ADMIN.name;
   if(EMAILJS.publicKey&&!EMAILJS.publicKey.startsWith('YOUR')) emailjs.init({publicKey:EMAILJS.publicKey});
-  const [st,ins,cs]=await Promise.all([getDocs(collection(db,'stations')),getDocs(collection(db,'inspections')),getDocs(collection(db,'cases'))]);
+  const maxOff=Math.max(...[...$('period').options].map(o=>parseInt(o.value)||0));
+  const since=Timestamp.fromDate(weekRange(maxOff+1).start);   // เฉพาะช่วงที่รายงานใช้จริง
+  const insQ=query(collection(db,'inspections'),where('createdAt','>=',since),orderBy('createdAt','desc'));
+  const [st,ins,cs]=await Promise.all([getDocs(collection(db,'stations')),getDocs(insQ),getDocs(collection(db,'cases'))]);
   STATIONS=st.docs.map(d=>({id:d.id,...d.data()}));
   INSPECTIONS=ins.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(tsDate(b.createdAt)?.getTime()||0)-(tsDate(a.createdAt)?.getTime()||0));
   CASES=cs.docs.map(d=>({id:d.id,...d.data()}));
   renderReport();
 }
 
-const inspTime=i=>tsDate(i.createdAt)||(i.clientTime?new Date(i.clientTime):null);
-const shiftOf=d=>{ const h=(d instanceof Date?d:new Date(d)).getHours(); return (h>=7&&h<19)?'day':'night'; };
 function inRange(i,r){ const d=tsDate(i.createdAt); return d&&d>=r.start&&d<r.end; }
 function compute(off){
   const cur=weekRange(off), prev=weekRange(off+1);
@@ -228,8 +204,7 @@ function compute(off){
   const stat=arr=>{ const pass=arr.filter(i=>i.result==='pass').length; const fail=arr.length-pass;
     const issues=arr.reduce((s,i)=>s+(i.missingItems?.length||0),0);
     const stationsDone=new Set(arr.map(i=>i.stationId)).size;
-    const dayCount=arr.filter(i=>shiftOf(inspTime(i))==='day').length;
-    return {count:arr.length,pass,fail,issues,stationsDone,dayCount,nightCount:arr.length-dayCount,rate:arr.length?Math.round(pass/arr.length*100):0}; };
+    return {count:arr.length,pass,fail,issues,stationsDone,rate:arr.length?Math.round(pass/arr.length*100):0}; };
   const c=stat(ci), p=stat(pi);
   const uninspected=STATIONS.filter(s=>!ci.some(i=>i.stationId===s.id));
   const failList=ci.filter(i=>i.result!=='pass');
@@ -246,83 +221,75 @@ function compute(off){
 function delta(now,was,inv=false){
   const d=now-was; const cls=d===0?'flat':((d>0)!==inv?'up':'down');
   const arrow=d>0?'▲':d<0?'▼':'—';
-  return `<div class="d ${cls}">${arrow} ${d>0?'+':''}${d} ${L('vs last week','จากสัปดาห์ก่อน')}</div>`;
+  return `<div class="d ${cls}">${arrow} ${d>0?'+':''}${d} จากสัปดาห์ก่อน</div>`;
 }
 
 function renderReport(){
   const off=parseInt($('period').value);
-  const R=compute(off);
+  const R=compute(off); LAST_REPORT=R;
   const periodTxt=`${fmtD(R.cur.start)} – ${fmtD(new Date(R.cur.end-1))}`;
 
   let html=`<div class="r-head">
-    <div class="et">${L('Fire Hose Station Inspection Report','รายงานตรวจสอบสถานีหัวดับเพลิง')}</div>
-    <div class="ep">Security &amp; Compliance · ${L('week','ประจำสัปดาห์')} ${periodTxt}</div>
-    <div class="badge-site">${L('All sites','ทุกไซต์')} · ${STATIONS.length} ${L('stations','สถานี')}</div>
+    <div class="et">รายงานตรวจสอบสถานีหัวดับเพลิง</div>
+    <div class="ep">BevChain Thailand · Security &amp; Compliance · ประจำสัปดาห์ ${periodTxt}</div>
+    <div class="badge-site">ทุกไซต์ · ${STATIONS.length} สถานี</div>
   </div>`;
 
   // KPIs + week over week (E7)
-  html+=`<div class="sec"><h3>${L('📊 Overview (vs last week)','📊 ภาพรวม (เทียบสัปดาห์ก่อน)')}</h3><div class="kpis">
-    <div class="kpi navy"><div class="v">${R.c.count}</div><div class="l">${L('Inspections','การตรวจ')}</div>${delta(R.c.count,R.p.count)}</div>
-    <div class="kpi ${R.c.rate>=80?'green':R.c.rate>=50?'amber':'red'}"><div class="v">${R.c.rate}%</div><div class="l">${L('Pass rate','อัตราผ่าน')}</div>${delta(R.c.rate,R.p.rate)}</div>
-    <div class="kpi ${R.c.fail?'red':'green'}"><div class="v">${R.c.fail}</div><div class="l">${L('Fail/repair','ไม่ผ่าน/ต้องแก้')}</div>${delta(R.c.fail,R.p.fail,true)}</div>
-    <div class="kpi ${R.c.issues?'red':'green'}"><div class="v">${R.c.issues}</div><div class="l">${L('Items missing','อุปกรณ์หาย')}</div>${delta(R.c.issues,R.p.issues,true)}</div>
-  </div></div>`;
-
-  // shift breakdown
-  html+=`<div class="sec"><h3>${L('🕐 By shift (this week)','🕐 แยกตามกะ (สัปดาห์นี้)')}</h3><div class="kpis" style="grid-template-columns:1fr 1fr">
-    <div class="kpi navy"><div class="v">☀️ ${R.c.dayCount}</div><div class="l">${L('Day-shift inspections','ตรวจกะกลางวัน')}</div>${delta(R.c.dayCount,R.p.dayCount)}</div>
-    <div class="kpi navy"><div class="v">🌙 ${R.c.nightCount}</div><div class="l">${L('Night-shift inspections','ตรวจกะกลางคืน')}</div>${delta(R.c.nightCount,R.p.nightCount)}</div>
+  html+=`<div class="sec"><h3>📊 ภาพรวม (เทียบสัปดาห์ก่อน)</h3><div class="kpis">
+    <div class="kpi navy"><div class="v">${R.c.count}</div><div class="l">การตรวจ</div>${delta(R.c.count,R.p.count)}</div>
+    <div class="kpi ${R.c.rate>=80?'green':R.c.rate>=50?'amber':'red'}"><div class="v">${R.c.rate}%</div><div class="l">อัตราผ่าน</div>${delta(R.c.rate,R.p.rate)}</div>
+    <div class="kpi ${R.c.fail?'red':'green'}"><div class="v">${R.c.fail}</div><div class="l">ไม่ผ่าน/ต้องแก้</div>${delta(R.c.fail,R.p.fail,true)}</div>
+    <div class="kpi ${R.c.issues?'red':'green'}"><div class="v">${R.c.issues}</div><div class="l">อุปกรณ์หาย</div>${delta(R.c.issues,R.p.issues,true)}</div>
   </div></div>`;
 
   // fail table with photos (E3)
-  html+=`<div class="sec"><h3>${L('⚠️ Failed / needs repair','⚠️ รายการที่ไม่ผ่าน / ต้องแก้ไข')}</h3>`;
+  html+=`<div class="sec"><h3>⚠️ รายการที่ไม่ผ่าน / ต้องแก้ไข</h3>`;
   if(R.failList.length){
-    html+=`<table><thead><tr><th>${L('Station','สถานี')}</th><th>${L('Site','ไซต์')}</th><th>${L('Inspector','ผู้ตรวจ')}</th><th>${L('Date','วันที่')}</th><th>${L('Result','ผล')}</th><th>${L('Issue','ปัญหา')}</th><th>${L('Photo','รูป')}</th></tr></thead><tbody>`;
+    html+=`<table><thead><tr><th>สถานี</th><th>ไซต์</th><th>ผู้ตรวจ</th><th>วันที่</th><th>ผล</th><th>ปัญหา</th><th>รูป</th></tr></thead><tbody>`;
     R.failList.forEach(i=>{
       const probs=[]; Object.entries(i.checklist||{}).forEach(([k,v])=>{if(v.status==='fail')probs.push(k);});
-      (i.missingItems||[]).forEach(m=>probs.push(m.name+L('(missing)','(หาย)')));
+      (i.missingItems||[]).forEach(m=>probs.push(m.name+'(หาย)'));
       html+=`<tr><td class="mono">${esc(i.stationId)}</td><td>${esc(i.site||'')}</td><td>${esc(i.inspectorName||'')}</td><td>${fmt(tsDate(i.createdAt))}</td>
-        <td class="tag ${i.result}">${i.result==='needs_repair'?L('Needs repair','ต้องแก้ไข'):L('Fail','ไม่ผ่าน')}</td>
+        <td class="tag ${i.result}">${i.result==='needs_repair'?'ต้องแก้ไข':'ไม่ผ่าน'}</td>
         <td style="font-size:12px">${esc(probs.join(', ')||'-')}</td>
-        <td><div class="thumbs">${(i.photos||[]).slice(0,3).map(p=>`<img class="thumb" src="${esc(cld(p.url,180))}">`).join('')||'—'}</div></td></tr>`;
+        <td><div class="thumbs">${(i.photos||[]).slice(0,3).map(p=>`<img class="thumb" loading="lazy" src="${esc(cld(p.url,'c_fill,w_120,h_120,q_auto,f_auto'))}" onclick="window.open('${esc(p.url)}','_blank')">`).join('')||'—'}</div></td></tr>`;
     });
     html+=`</tbody></table>`;
-  } else html+=`<div class="ok-line">${L('✓ All stations inspected this week passed','✓ ทุกสถานีที่ตรวจในสัปดาห์นี้ผ่านหมด')}</div>`;
+  } else html+=`<div class="ok-line">✓ ทุกสถานีที่ตรวจในสัปดาห์นี้ผ่านหมด</div>`;
   html+=`</div>`;
 
   // missing items / new CCTV cases
   if(R.newCases.length){
-    html+=`<div class="sec"><h3>${L('🎥 New loss cases this week','🎥 เคสของหายที่เปิดใหม่สัปดาห์นี้')}</h3>`;
-    R.newCases.forEach(c=>{ html+=`<div class="list-row"><span class="badge red">${L('missing','หาย')}</span><b>${esc(c.itemName)}</b><span class="hint" style="margin:0">@ ${esc(c.stationId)} · ${(c.cctvCameras||[]).length} ${L('cameras to review','กล้องต้องตรวจ')}</span></div>`; });
+    html+=`<div class="sec"><h3>🎥 เคสของหายที่เปิดใหม่สัปดาห์นี้</h3>`;
+    R.newCases.forEach(c=>{ html+=`<div class="list-row"><span class="badge red">หาย</span><b>${esc(c.itemName)}</b><span class="hint" style="margin:0">@ ${esc(c.stationId)} · ${(c.cctvCameras||[]).length} กล้องต้องตรวจ</span></div>`; });
     html+=`</div>`;
   }
 
   // uninspected stations (E6)
-  html+=`<div class="sec"><h3>${L('🔍 Stations not inspected this week','🔍 สถานีที่ยังไม่ได้ตรวจในสัปดาห์นี้')}</h3>`;
+  html+=`<div class="sec"><h3>🔍 สถานีที่ยังไม่ได้ตรวจในสัปดาห์นี้</h3>`;
   if(R.uninspected.length){
-    html+=`<div class="alert info" style="margin-bottom:12px">${L(`${R.uninspected.length} stations not inspected in this period — follow up`,`${R.uninspected.length} สถานี ยังไม่มีการตรวจในช่วงนี้ — ควรติดตาม`)}</div>`;
+    html+=`<div class="alert info" style="margin-bottom:12px">${R.uninspected.length} สถานี ยังไม่มีการตรวจในช่วงนี้ — ควรติดตาม</div>`;
     html+=R.uninspected.map(s=>`<div class="list-row"><span class="badge amber">${esc(s.site||'-')}</span><b class="mono">${esc(s.id)}</b><span class="hint" style="margin:0">${esc(s.name||'')}</span></div>`).join('');
-  } else html+=`<div class="ok-line">${L('✓ All stations inspected this week','✓ ตรวจครบทุกสถานีในสัปดาห์นี้')}</div>`;
+  } else html+=`<div class="ok-line">✓ ตรวจครบทุกสถานีในสัปดาห์นี้</div>`;
   html+=`</div>`;
 
   // photo comparison week over week (C5)
-  html+=`<div class="sec"><h3>${L('📸 Photo vs last week (week-over-week)','📸 เทียบรูปกับสัปดาห์ก่อน (week-over-week)')}</h3>`;
+  html+=`<div class="sec"><h3>📸 เทียบรูปกับสัปดาห์ก่อน (week-over-week)</h3>`;
   if(R.cmp.length){
     html+=R.cmp.slice(0,8).map(x=>`<div class="cmp"><div class="ct"><span class="mono">${esc(x.s.id)}</span> ${esc(x.s.name||'')}</div>
       <div class="cmp-grid">
-        <div class="cmp-col"><div class="cl">${L('Last week','สัปดาห์ก่อน')} · ${fmtD(R.prev.start)}</div>${x.prev?`<img src="${esc(cld(x.prev,480))}">`:`<div class="no">${L('no photo','ไม่มีรูป')}</div>`}</div>
-        <div class="cmp-col"><div class="cl">${L('This week','สัปดาห์นี้')} · ${fmtD(R.cur.start)}</div>${x.now?`<img src="${esc(cld(x.now,480))}">`:`<div class="no">${L('no photo','ไม่มีรูป')}</div>`}</div>
+        <div class="cmp-col"><div class="cl">สัปดาห์ก่อน · ${fmtD(R.prev.start)}</div>${x.prev?`<img loading="lazy" src="${esc(cld(x.prev,'c_fill,w_640,h_480,q_auto,f_auto'))}" onclick="window.open('${esc(x.prev)}','_blank')">`:'<div class="no">ไม่มีรูป</div>'}</div>
+        <div class="cmp-col"><div class="cl">สัปดาห์นี้ · ${fmtD(R.cur.start)}</div>${x.now?`<img loading="lazy" src="${esc(cld(x.now,'c_fill,w_640,h_480,q_auto,f_auto'))}" onclick="window.open('${esc(x.now)}','_blank')">`:'<div class="no">ไม่มีรูป</div>'}</div>
       </div></div>`).join('');
-    html+=`<p class="hint">${L('Compare cabinet/hose/nozzle condition — spot changes or anomalies between weeks','ใช้เทียบสภาพตู้/สาย/หัวฉีด ดูการเปลี่ยนแปลงหรือสิ่งผิดปกติระหว่างสัปดาห์')}</p>`;
-  } else html+=`<div class="empty">${L('No stations inspected in both weeks to compare','ยังไม่มีสถานีที่ตรวจทั้งสองสัปดาห์เพื่อเทียบรูป')}</div>`;
+    html+=`<p class="hint">ใช้เทียบสภาพตู้/สาย/หัวฉีด ดูการเปลี่ยนแปลงหรือสิ่งผิดปกติระหว่างสัปดาห์</p>`;
+  } else html+=`<div class="empty">ยังไม่มีสถานีที่ตรวจทั้งสองสัปดาห์เพื่อเทียบรูป</div>`;
   html+=`</div>`;
 
   html+=`<div class="sec" style="background:var(--surface-2);text-align:center;color:var(--muted);font-size:12px">
-    ${L('Generated by FHS Inspection','สร้างโดยระบบ FHS Inspection')} · ${esc(ADMIN.name)} · ${new Date().toLocaleString(L('en-GB','th-TH'))}</div>`;
+    สร้างโดยระบบ FHS Inspection · ${esc(ADMIN.name)} · ${new Date().toLocaleString('th-TH')}</div>`;
 
   $('report').innerHTML=html;
-  // เปิดรูปผ่าน listener ไม่ใช่ inline onclick — กัน JS-string injection จาก URL ในฐานข้อมูล
-  $('report').querySelectorAll('img.thumb,.cmp-col img').forEach(im=>im.onclick=()=>window.open(im.src,'_blank'));
 }
 
 /* ====== build email HTML per site (E4) ====== */
@@ -346,8 +313,7 @@ function buildEmailHtml(off, site){
       <td style="text-align:center;padding:10px;border:1px solid #eee"><div style="font-size:24px;font-weight:700;color:${rate>=80?green:rate>=50?amber:red}">${rate}%</div><div style="font-size:11px;color:${mut}">อัตราผ่าน</div></td>
       <td style="text-align:center;padding:10px;border:1px solid #eee"><div style="font-size:24px;font-weight:700;color:${fails.length?red:green}">${fails.length}</div><div style="font-size:11px;color:${mut}">ไม่ผ่าน</div></td>
       <td style="text-align:center;padding:10px;border:1px solid #eee"><div style="font-size:24px;font-weight:700;color:${issues?red:green}">${issues}</div><div style="font-size:11px;color:${mut}">ของหาย</div></td>
-    </tr></table>
-    <div style="text-align:center;color:${mut};font-size:12px;margin:-6px 0 16px">☀️ กะกลางวัน ${ci.filter(i=>shiftOf(inspTime(i))==='day').length} · 🌙 กะกลางคืน ${ci.filter(i=>shiftOf(inspTime(i))==='night').length} ครั้ง</div>`;
+    </tr></table>`;
   if(fails.length){
     h+=`<div style="font-weight:700;color:${c};margin-bottom:8px">⚠️ รายการที่ไม่ผ่าน</div><table width="100%" style="border-collapse:collapse;font-size:13px;margin-bottom:18px">
       <tr style="background:#f4f6fa"><th align="left" style="padding:7px">สถานี</th><th align="left" style="padding:7px">ผู้ตรวจ</th><th align="left" style="padding:7px">ผล</th></tr>`;
@@ -357,33 +323,28 @@ function buildEmailHtml(off, site){
   if(uninsp.length) h+=`<div style="background:#fff6ef;border:1px solid #f0c9a8;border-radius:8px;padding:12px;margin-bottom:18px"><b style="color:${amber}">ยังไม่ได้ตรวจ ${uninsp.length} สถานี:</b> ${uninsp.map(s=>esc(s.id)).join(', ')}</div>`;
   h+=`<div style="text-align:center;margin:8px 0"><a href="${REPORT_BASE_URL}" style="background:${c};color:#fff;text-decoration:none;padding:11px 22px;border-radius:8px;font-weight:600;display:inline-block">ดูรายละเอียดทั้งหมด →</a></div>
     </div><div style="background:#f4f6fa;padding:12px;text-align:center;color:${mut};font-size:11px">ระบบ FHS Inspection · อีเมลอัตโนมัติ ห้ามตอบกลับ</div></div>`;
-  return {html:h,subject:`[FHS] รายงานตรวจสอบสถานีหัวดับเพลิง · ${periodTxt} · ไม่ผ่าน ${fails.length}`};
+  return {html:h,subject:`[FHS] รายงานสัปดาห์ ${site||'ทุกไซต์'} · ${periodTxt} · ไม่ผ่าน ${fails.length}`};
 }
 
 async function sendEmail(){
   const a=$('sendAlert'); a.innerHTML='';
-  if(ADMIN.role!=='admin'){ a.innerHTML=`<div class="alert err">${t('send_adminonly')}</div>`; return; }
-  if(!EMAILJS.serviceId||EMAILJS.serviceId.startsWith('YOUR')){ a.innerHTML=`<div class="alert err">${L('EmailJS not configured (publicKey/serviceId/templateId) at the top of report.html','ยังไม่ได้ตั้งค่า EmailJS (publicKey/serviceId/templateId) ที่หัวไฟล์ report.html')}</div>`; return; }
+  if(!EMAILJS.serviceId||EMAILJS.serviceId.startsWith('YOUR')){ a.innerHTML='<div class="alert err">ยังไม่ได้ตั้งค่า EmailJS (publicKey/serviceId/templateId) ที่หัวไฟล์ report.html</div>'; return; }
   const off=parseInt($('period').value);
   // recipients: each site that has data + _all
   const sitesWithData=[...new Set(INSPECTIONS.filter(i=>inRange(i,weekRange(off))).map(i=>i.site).filter(Boolean))];
   const jobs=[];
   sitesWithData.forEach(site=>{ if(SITE_RECIPIENTS[site]) jobs.push({to:SITE_RECIPIENTS[site],site}); });
   if(SITE_RECIPIENTS._all) jobs.push({to:SITE_RECIPIENTS._all,site:null});
-  if(!jobs.length){ a.innerHTML=`<div class="alert err">${t('send_norecip')}</div>`; return; }
-  const btn=$('btnSend'); btn.disabled=true; btn.innerHTML=`<div class="spinner"></div>${t('sending')}`;
+  if(!jobs.length){ a.innerHTML='<div class="alert err">ไม่มีผู้รับที่ตั้งค่าไว้ใน SITE_RECIPIENTS</div>'; return; }
+  const btn=$('btnSend'); btn.disabled=true; btn.innerHTML='<div class="spinner"></div>ส่ง…';
   let ok=0,err=0;
   for(const j of jobs){
     const {html,subject}=buildEmailHtml(off,j.site);
-    // split comma/semicolon-separated addresses so each send() gets one valid email
-    const addrs=j.to.split(/[,;]/).map(s=>s.trim()).filter(Boolean);
-    for(const addr of addrs){
-      try{ await emailjs.send(EMAILJS.serviceId,EMAILJS.templateId,{email:addr,subject,html_content:html}); ok++; }
-      catch(e){ err++; console.error(e); }
-    }
+    try{ await emailjs.send(EMAILJS.serviceId,EMAILJS.templateId,{to_email:j.to,subject,html_content:html}); ok++; }
+    catch(e){ err++; console.error(e); }
   }
-  btn.disabled=false; btn.textContent=t('btn_send');
-  a.innerHTML=`<div class="alert ${err?'err':'ok'}">${L(`Sent ${ok}${err?` · ${err} failed (see console)`:''}`,`ส่งสำเร็จ ${ok} ฉบับ${err?` · ล้มเหลว ${err} (ดู console)`:''}`)}</div>`;
+  btn.disabled=false; btn.textContent='📧 ส่งอีเมล';
+  a.innerHTML=`<div class="alert ${err?'err':'ok'}">ส่งสำเร็จ ${ok} ฉบับ${err?` · ล้มเหลว ${err} (ดู console)`:''}</div>`;
 }
 
 $('period').onchange=renderReport;
@@ -392,89 +353,7 @@ $('btnSend').onclick=sendEmail;
 $('gBtn').onclick=gateLogin;
 $('gPw').addEventListener('keydown',e=>{if(e.key==='Enter')gateLogin();});
 $('logout').onclick=()=>{sessionStorage.removeItem('fhs_admin');location.reload();};
-$('langBtn').onclick=toggleLang;
-applyLang();
-
-/* ===== AUTO-SEND MODE =====
-   Triggered by ?autosend=1&week=<n>[&notify=email]
-   - Bypasses login gate (synthetic admin)
-   - Loads Firestore data, renders report, calls EmailJS for SITE_RECIPIENTS
-   - Writes final status to #autoResult[data-status]:
-       running | success | partial | failure
-   - Optionally sends a summary to `notify` recipient */
-async function runAutoSend(params){
-  const box=$('autoResult'); box.style.display='block';
-  const setStatus=(status,msg,extra)=>{
-    box.setAttribute('data-status',status);
-    if(extra){ Object.keys(extra).forEach(k=>box.setAttribute('data-'+k,String(extra[k]))); }
-    box.textContent=`[${status}] ${msg}`;
-  };
-  const weekOff=parseInt(params.get('week')||'1');
-  try{
-    setStatus('running','init');
-    ADMIN={id:'autoscheduler',name:'Auto Weekly',role:'admin'};
-    $('period').value=String(weekOff);
-    if(EMAILJS.publicKey&&!EMAILJS.publicKey.startsWith('YOUR')) emailjs.init({publicKey:EMAILJS.publicKey});
-    setStatus('running','loading-firestore');
-    const [st,ins,cs]=await Promise.all([getDocs(collection(db,'stations')),getDocs(collection(db,'inspections')),getDocs(collection(db,'cases'))]);
-    STATIONS=st.docs.map(d=>({id:d.id,...d.data()}));
-    INSPECTIONS=ins.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(tsDate(b.createdAt)?.getTime()||0)-(tsDate(a.createdAt)?.getTime()||0));
-    CASES=cs.docs.map(d=>({id:d.id,...d.data()}));
-    $('gate').style.display='none';
-    renderReport();
-    setStatus('running','building-jobs');
-    const range=weekRange(weekOff);
-    const sitesWithData=[...new Set(INSPECTIONS.filter(i=>inRange(i,range)).map(i=>i.site).filter(Boolean))];
-    const jobs=[];
-    sitesWithData.forEach(site=>{ if(SITE_RECIPIENTS[site]) jobs.push({to:SITE_RECIPIENTS[site],site}); });
-    if(SITE_RECIPIENTS._all) jobs.push({to:SITE_RECIPIENTS._all,site:null});
-    if(!jobs.length){ setStatus('failure','no-recipients-configured'); return; }
-    const dryrun=params.get('dryrun')==='1';
-    setStatus('running',`sending jobs=${jobs.length}${dryrun?' (DRYRUN)':''}`);
-    let ok=0,fail=0; const errs=[];
-    for(const j of jobs){
-      const {html,subject}=buildEmailHtml(weekOff,j.site);
-      const addrs=j.to.split(/[,;]/).map(s=>s.trim()).filter(Boolean);
-      for(const addr of addrs){
-        if(dryrun){ console.log('[auto][dryrun] would send to',addr,'subject:',subject); ok++; continue; }
-        try{ await emailjs.send(EMAILJS.serviceId,EMAILJS.templateId,{email:addr,subject,html_content:html}); ok++; }
-        catch(e){ fail++; errs.push(`${addr}: ${e&&e.text||e&&e.message||e}`); console.error('[auto]',addr,e); }
-      }
-    }
-    // notification summary
-    const notifyTo=(params.get('notify')||'').trim();
-    if(notifyTo && !dryrun){
-      const periodTxt=`${fmtD(range.start)} – ${fmtD(new Date(range.end-1))}`;
-      const stampBkk=new Date().toLocaleString('th-TH',{timeZone:'Asia/Bangkok'});
-      const status = fail===0 ? 'สำเร็จ' : (ok===0 ? 'ล้มเหลวทั้งหมด' : 'ส่งได้บางส่วน');
-      const body = `<div style="font-family:'IBM Plex Sans Thai',sans-serif;padding:16px;background:#f4f6fa;border-radius:8px;color:#0F1A2E">
-        <h3 style="margin:0 0 10px">🤖 รายงาน FHS อัตโนมัติ · ${status}</h3>
-        <div>เวลาดำเนินการ: ${stampBkk} (Asia/Bangkok)</div>
-        <div>ช่วงเวลา (week=${weekOff}): ${periodTxt}</div>
-        <div style="margin-top:8px"><b style="color:#0E8A5F">ส่งสำเร็จ ${ok} ฉบับ</b> · <b style="color:${fail?'#D62828':'#64708A'}">ล้มเหลว ${fail} ฉบับ</b></div>
-        ${errs.length?`<pre style="background:#fff;border:1px solid #D7DDE8;border-radius:6px;padding:10px;margin-top:8px;font-size:12px;overflow:auto">${esc(errs.join('\n'))}</pre>`:''}
-      </div>`;
-      try{ await emailjs.send(EMAILJS.serviceId,EMAILJS.templateId,{email:notifyTo,subject:`[FHS auto weekly] ${status} · ok:${ok} fail:${fail}`,html_content:body}); }
-      catch(e){ console.error('[auto][notify]',e); }
-    }
-    const final = fail===0 ? 'success' : (ok===0 ? 'failure' : 'partial');
-    setStatus(final,`ok=${ok} fail=${fail}`,{ok,fail});
-  }catch(e){
-    setStatus('failure',(e&&e.message)||String(e));
-    console.error('[auto][fatal]',e);
-  }
-}
-
-(async function(){
-  const params=new URLSearchParams(location.search);
-  if(params.get('autosend')==='1'){ return runAutoSend(params); }
-  let s=null; try{ s=JSON.parse(sessionStorage.getItem('fhs_admin')); }catch(e){}
-  if(!s||!s.id) return;
-  try{ const snap=await getDoc(doc(db,'users',s.id)); const u=snap.exists()?snap.data():null;
-    if(u && ['admin','viewer'].includes(u.role) && u.active!==false){ ADMIN={id:s.id,name:u.name||s.id,role:u.role}; boot(); }
-    else { sessionStorage.removeItem('fhs_admin'); }
-  }catch(e){ if(s&&['admin','viewer'].includes(s.role)){ ADMIN=s; boot(); } }
-})();
+(function(){ const s=sessionStorage.getItem('fhs_admin'); if(s){ ADMIN=JSON.parse(s); boot(); } })();
 </script>
 </body>
 </html>
