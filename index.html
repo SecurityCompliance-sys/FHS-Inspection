@@ -133,6 +133,18 @@ textarea{resize:vertical;min-height:74px}
 .photo-cell .del{position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;background:rgba(15,26,46,.75);color:#fff;border:none;cursor:pointer;display:grid;place-items:center;font-size:13px}
 .photo-add{aspect-ratio:1;border:1.5px dashed var(--navy-2);border-radius:11px;background:rgba(30,39,97,.04);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;color:var(--navy-2);font-size:12px;font-weight:600}
 .photo-add svg{width:24px;height:24px}
+#camModal{display:none;position:fixed;inset:0;background:#000;z-index:3000;flex-direction:column}
+#camModal.on{display:flex}
+#camModal video{flex:1;width:100%;min-height:0;object-fit:cover;background:#000}
+#camTop{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:14px 16px;padding-top:max(14px,env(safe-area-inset-top));color:#fff;font-weight:600;font-size:14px;background:linear-gradient(rgba(0,0,0,.55),transparent)}
+#camTop button{background:rgba(255,255,255,.18);border:none;color:#fff;border-radius:20px;padding:8px 14px;font-weight:600;font-size:13px;font-family:inherit}
+#camBar{display:flex;align-items:center;justify-content:space-around;padding:18px 16px;padding-bottom:max(22px,env(safe-area-inset-bottom));background:#000}
+#camShot{width:74px;height:74px;border-radius:50%;border:5px solid #fff;background:#D62828;box-shadow:0 0 0 3px rgba(255,255,255,.25)}
+#camShot:active{transform:scale(.93)}
+#camShot:disabled{opacity:.5}
+#camBar .side{width:86px;background:none;border:none;color:#fff;font-size:12px;font-weight:600;font-family:inherit;text-align:center;line-height:1.3}
+#camFlash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;transition:opacity .25s}
+#camMsg{position:absolute;left:16px;right:16px;top:45%;text-align:center;color:#fff;font-size:14px}
 .uploading{position:absolute;inset:0;background:rgba(255,255,255,.85);display:grid;place-items:center;font-size:11px;color:var(--navy);font-weight:600}
 
 /* ---- result summary ---- */
@@ -225,7 +237,7 @@ textarea{resize:vertical;min-height:74px}
       </div>
     </div>
   </main>
-  <div class="footer">BevChain Thailand · Security &amp; Compliance Dept.<br>Fire Hose Station Inspection System v1.0<br><a href="dashboard.html" style="color:var(--muted);text-decoration:underline">เข้าระบบหลังบ้าน (Dashboard / Admin)</a></div>
+  <div class="footer">BevChain Thailand · Security &amp; Compliance Dept.<br>Fire Hose Station Inspection System v1.2 · 30/09/2026<br><a href="dashboard.html" style="color:var(--muted);text-decoration:underline">เข้าระบบหลังบ้าน (Dashboard / Admin)</a></div>
 </div>
 
 <script type="module">
@@ -309,7 +321,7 @@ async function doLogin(){
     }
     await updateDoc(doc(db,'users',id), { failedAttempts:0, lockedUntil:null });
     CURRENT_USER = { id, name:u.name||id, role:u.role||'inspector', site:u.site||'' };
-    sessionStorage.setItem('fhs_user', JSON.stringify(CURRENT_USER));
+    saveUser(CURRENT_USER);
     renderWho();
     enterInspection();
   }catch(e){
@@ -321,7 +333,16 @@ function renderWho(){
   $('whoBox').style.display='block';
   $('whoBox').innerHTML = `<b>${esc(CURRENT_USER.name)}</b>${esc(CURRENT_USER.role)} · ${esc(CURRENT_USER.site||'-')}`;
 }
-function logout(){ sessionStorage.removeItem('fhs_user'); location.href = location.pathname; }
+function logout(){ clearUser(); location.href = location.pathname; }
+/* login ค้างไว้ 12 ชม. (localStorage) — ไม่หลุดแม้มือถือปิดเบราว์เซอร์ตอนเปิดกล้อง */
+const LOGIN_TTL_MS = 12*3600*1000;
+function saveUser(u){ try{ localStorage.setItem('fhs_user', JSON.stringify({u, exp:Date.now()+LOGIN_TTL_MS})); }catch(e){} try{ sessionStorage.setItem('fhs_user', JSON.stringify(u)); }catch(e){} }
+function getSavedUser(){
+  try{ const o=JSON.parse(localStorage.getItem('fhs_user')||'null'); if(o&&o.u&&o.exp>Date.now()) return o.u; if(o) localStorage.removeItem('fhs_user'); }catch(e){}
+  try{ const s=JSON.parse(sessionStorage.getItem('fhs_user')||'null'); if(s) return s; }catch(e){}
+  return null;
+}
+function clearUser(){ try{ localStorage.removeItem('fhs_user'); }catch(e){} try{ sessionStorage.removeItem('fhs_user'); }catch(e){} }
 
 /* ============ STATION LOAD ============ */
 async function loadStation(stationId){
@@ -415,7 +436,7 @@ function enterInspection(){
       <div class="card-b">
         <p class="hint" style="margin-top:0;margin-bottom:8px">ถ่ายรูปสภาพตู้/สาย/หัวฉีด — รูปจะติดวันเวลา+รหัสสถานีอัตโนมัติ <b>(บังคับอย่างน้อย 1 รูป)</b></p>
         <div class="photo-grid" id="photoGrid">
-          <label class="photo-add" id="photoCamBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 4h-5L8 6H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-4l-1.5-2z"/><circle cx="12" cy="13" r="3.2"/></svg>ถ่ายรูป<input type="file" accept="image/*" capture="environment" id="photoInput" hidden></label><label class="photo-add" id="photoGalBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>จากคลังรูป<input type="file" accept="image/*" id="photoGallery" hidden multiple></label>
+          <label class="photo-add" id="photoCamBtn" role="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 4h-5L8 6H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-4l-1.5-2z"/><circle cx="12" cy="13" r="3.2"/></svg>ถ่ายรูป</label><input type="file" accept="image/*" capture="environment" id="photoInput" hidden><label class="photo-add" id="photoGalBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>จากคลังรูป<input type="file" accept="image/*" id="photoGallery" hidden multiple></label>
         </div>
       </div>
     </div>
@@ -467,7 +488,8 @@ function enterInspection(){
   $('photoInput').addEventListener('change', handlePhotos);
   $('photoGallery').addEventListener('change', handlePhotos);
   // save everything BEFORE the camera/gallery opens — Android may kill the tab while camera is open
-  ['photoCamBtn','photoGalBtn'].forEach(id=>$(id).addEventListener('click',()=>saveDraft(true)));
+  $('photoCamBtn').addEventListener('click',e=>{ e.preventDefault(); saveDraft(true); openCamera(); });
+  $('photoGalBtn').addEventListener('click',()=>saveDraft(true));
   $('scrInspect').addEventListener('input',()=>saveDraft());
   $('scrInspect').addEventListener('click',()=>setTimeout(()=>saveDraft(),0));
   $('btnSubmit').addEventListener('click', submitInspection);
@@ -519,9 +541,10 @@ function restoreDraft(d){
 }
 function toast(msg,err){
   let t=$('fhsToast'); if(!t){ t=document.createElement('div'); t.id='fhsToast';
-    t.style.cssText='position:fixed;left:50%;bottom:22px;transform:translateX(-50%);max-width:92vw;padding:11px 16px;border-radius:11px;color:#fff;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.25);transition:opacity .3s;text-align:center';
+    t.style.cssText='position:fixed;left:50%;bottom:22px;transform:translateX(-50%);max-width:92vw;padding:11px 16px;border-radius:11px;color:#fff;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.25);transition:opacity .3s;text-align:center;pointer-events:none';
     document.body.appendChild(t); }
   t.style.background=err?'#D62828':'#0E8A5F'; t.textContent=msg; t.style.opacity='1';
+  const camOn=$('camModal')?.classList.contains('on'); t.style.top=camOn?'70px':'auto'; t.style.bottom=camOn?'auto':'22px';
   clearTimeout(t._h); t._h=setTimeout(()=>t.style.opacity='0',4200);
 }
 
@@ -577,22 +600,77 @@ function renderPhotoCell(cell,url){
   del.onclick=()=>{ const i=photos.findIndex(p=>p.url===url); if(i>=0)photos.splice(i,1); cell.remove(); updatePhotoCount(); saveDraft(true); };
   cell.appendChild(del);
 }
-async function addPhoto(file){
-  const cell=newPhotoCell();
-  cell.innerHTML='<div class="uploading"><div style="text-align:center"><div class="spinner" style="border-color:rgba(21,35,74,.2);border-top-color:#15234A;margin:0 auto 6px"></div>กำลังอัป…</div></div>';
+/* ---- ลายน้ำ (C2) ใช้ร่วมทั้งกล้องในแอปและไฟล์ ---- */
+function drawWatermark(ctx,w,h){
+  const stamp=`${CURRENT_STATION.id}  ·  ${new Date().toLocaleString('th-TH')}`;
+  const fs=Math.max(13,Math.round(w/42)); ctx.font=`600 ${fs}px IBM Plex Mono, monospace`;
+  const tw=ctx.measureText(stamp).width;
+  ctx.fillStyle='rgba(15,26,46,.72)'; ctx.fillRect(0,h-fs-16,tw+22,fs+16);
+  ctx.fillStyle='#fff'; ctx.textBaseline='middle'; ctx.fillText(stamp,11,h-fs/2-8);
+}
+function fitSize(w,h,max=1280){ if(w>=h&&w>max) return [max,Math.round(h*max/w)]; if(h>w&&h>max) return [Math.round(w*max/h),max]; return [w,h]; }
+function canvasToBlob(cv){ return new Promise((res,rej)=>cv.toBlob(b=>{ cv.width=cv.height=0; b?res(b):rej(new Error('blob')); },'image/jpeg',0.82)); }
+
+/* ---- คิวอัปโหลดทีละรูป (ประหยัดแรม) ---- */
+let photoQueue=Promise.resolve();
+function queuePhoto(makeBlob){ const cell=newPhotoCell(); setUploading(cell); photoQueue=photoQueue.then(()=>processPhoto(cell,makeBlob)); return photoQueue; }
+function setUploading(cell){ cell.innerHTML='<div class="uploading"><div style="text-align:center"><div class="spinner" style="border-color:rgba(21,35,74,.2);border-top-color:#15234A;margin:0 auto 6px"></div>กำลังอัป…</div></div>'; }
+async function processPhoto(cell,makeBlob){
   try{
-    const blob = await compressAndWatermark(file);          // C2 + C4
-    const url = await uploadCloudinary(blob);                // C1
+    const blob=await makeBlob();
+    const url=await uploadCloudinary(blob);
     photos.push({url,label:'inspection'});
-    renderPhotoCell(cell,url);
-    saveDraft(true);
+    renderPhotoCell(cell,url); saveDraft(true);
   }catch(err){
     console.error('photo',err);
     cell.innerHTML='<div class="uploading" style="color:#D62828;font-size:10px">อัปไม่สำเร็จ</div>'; setTimeout(()=>cell.remove(),1800);
     toast(navigator.onLine?'อัปโหลดรูปไม่สำเร็จ ลองถ่ายใหม่อีกครั้ง':'ไม่มีสัญญาณเน็ต — ต่อเน็ตแล้วถ่ายใหม่', true);
   }
-  updatePhotoCount();
+  updatePhotoCount(); if($('camModal').classList.contains('on')) updateCamCount();
 }
+
+/* ---- กล้องในหน้าเว็บ (ไม่ออกไปแอปกล้อง → เบราว์เซอร์ไม่ถูกปิด) ---- */
+let camStream=null, camShots=0, camTorchOn=false;
+async function openCamera(){
+  if(!navigator.mediaDevices?.getUserMedia){ return openNativeCamera('เครื่องนี้ไม่รองรับกล้องในเว็บ — ใช้แอปกล้องแทน'); }
+  camShots=0; updateCamCount(); $('camMsg').textContent='กำลังเปิดกล้อง…'; $('camShot').disabled=true;
+  $('camModal').classList.add('on'); document.body.style.overflow='hidden';
+  try{
+    camStream=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}}});
+    const v=$('camVideo'); v.srcObject=camStream; await v.play().catch(()=>{});
+    $('camMsg').textContent=''; $('camShot').disabled=false;
+    const tr=camStream.getVideoTracks()[0]; const cap=tr.getCapabilities?tr.getCapabilities():{};
+    $('camTorch').style.display=cap.torch?'inline-block':'none'; camTorchOn=false;
+  }catch(err){
+    console.error('cam',err); closeCamera();
+    openNativeCamera(err?.name==='NotAllowedError'?'ไม่ได้รับอนุญาตใช้กล้อง — ใช้แอปกล้องแทน (หรืออนุญาตกล้องในการตั้งค่าเบราว์เซอร์)':'เปิดกล้องในเว็บไม่ได้ — ใช้แอปกล้องแทน');
+  }
+}
+function closeCamera(){
+  if(camStream){ camStream.getTracks().forEach(t=>t.stop()); camStream=null; }
+  const v=$('camVideo'); v.srcObject=null;
+  $('camModal').classList.remove('on'); document.body.style.overflow='';
+}
+function openNativeCamera(msg){ if(msg) toast(msg,true); saveDraft(true); $('photoInput').click(); }
+function updateCamCount(){ $('camCount').textContent=`ถ่ายแล้ว ${camShots} รูป · รวม ${photos.length} รูป`; }
+function captureFrame(){
+  const v=$('camVideo'); if(!v.videoWidth) return;
+  const [w,h]=fitSize(v.videoWidth,v.videoHeight);
+  const cv=document.createElement('canvas'); cv.width=w; cv.height=h;
+  const ctx=cv.getContext('2d'); ctx.drawImage(v,0,0,w,h); drawWatermark(ctx,w,h);
+  const fl=$('camFlash'); fl.style.transition='none'; fl.style.opacity='.85'; requestAnimationFrame(()=>{ fl.style.transition='opacity .25s'; fl.style.opacity='0'; });
+  if(navigator.vibrate) navigator.vibrate(40);
+  camShots++; updateCamCount();
+  queuePhoto(()=>canvasToBlob(cv));
+}
+$('camShot').addEventListener('click',captureFrame);
+$('camDone').addEventListener('click',closeCamera);
+$('camNative').addEventListener('click',()=>{ closeCamera(); openNativeCamera(); });
+$('camTorch').addEventListener('click',async()=>{ try{ camTorchOn=!camTorchOn; await camStream.getVideoTracks()[0].applyConstraints({advanced:[{torch:camTorchOn}]}); $('camTorch').textContent=camTorchOn?'🔦 ปิดไฟ':'🔦 ไฟฉาย'; }catch(e){} });
+window.addEventListener('pagehide',()=>{ saveDraft(true); closeCamera(); });
+document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden') saveDraft(true); });   // สลับแอป/ปิดจอ → บันทึกทันที
+
+async function addPhoto(file){ return queuePhoto(()=>compressAndWatermark(file)); }
 function updatePhotoCount(){ $('photoCount').textContent=`${photos.length} รูป`; }
 function compressAndWatermark(file){
   return new Promise((res,rej)=>{
@@ -600,17 +678,11 @@ function compressAndWatermark(file){
     const img=new Image(); const src=URL.createObjectURL(file);
     img.onerror=()=>{ URL.revokeObjectURL(src); rej(new Error('decode')); };
     img.onload=()=>{
-      const max=1280; let w=img.naturalWidth, h=img.naturalHeight;
-      if(w>=h&&w>max){h=Math.round(h*max/w);w=max;} else if(h>w&&h>max){w=Math.round(w*max/h);h=max;}
+      const [w,h]=fitSize(img.naturalWidth,img.naturalHeight);
       const cv=document.createElement('canvas'); cv.width=w; cv.height=h;
       const ctx=cv.getContext('2d'); ctx.drawImage(img,0,0,w,h);
       img.onerror=null; URL.revokeObjectURL(src);
-      // watermark (C2)
-      const stamp=`${CURRENT_STATION.id}  ·  ${new Date().toLocaleString('th-TH')}`;
-      const fs=Math.max(13,Math.round(w/42)); ctx.font=`600 ${fs}px IBM Plex Mono, monospace`;
-      const tw=ctx.measureText(stamp).width;
-      ctx.fillStyle='rgba(15,26,46,.72)'; ctx.fillRect(0,h-fs-16,tw+22,fs+16);
-      ctx.fillStyle='#fff'; ctx.textBaseline='middle'; ctx.fillText(stamp,11,h-fs/2-8);
+      drawWatermark(ctx,w,h);   // C2
       cv.toBlob(b=>{ cv.width=cv.height=0; b?res(b):rej(new Error('blob')); },'image/jpeg',0.82);   // free canvas memory
     };
     img.src=src;
@@ -752,8 +824,8 @@ async function goToStation(sid){
   if(!st){ show('scrScan'); $('scanArea').style.display='none'; $('btnStartScan').style.display='flex'; alert('ไม่พบสถานี '+sid+' ในระบบ'); return; }
   CURRENT_STATION=st;
   // already logged in?
-  const saved=sessionStorage.getItem('fhs_user');
-  if(saved){ CURRENT_USER=JSON.parse(saved); renderWho(); enterInspection(); }
+  const saved=getSavedUser();
+  if(saved){ CURRENT_USER=saved; renderWho(); enterInspection(); }
   else{ $('loginStationHint').innerHTML=`ตรวจสถานี <b class="mono">${esc(st.id)}</b>`; show('scrLogin'); }
 }
 
@@ -793,11 +865,22 @@ window.addEventListener('unhandledrejection',e=>{ console.error(e.reason); });
   const ua=navigator.userAgent||'';
   if(/\bLine\//i.test(ua)){ const u=new URL(location.href); if(!u.searchParams.has('openExternalBrowser')){ u.searchParams.set('openExternalBrowser','1'); location.replace(u); return; } }
   if(/FBAN|FBAV|Instagram/i.test(ua)){ setTimeout(()=>toast('แนะนำให้เปิดลิงก์นี้ใน Chrome/Safari (เมนู ⋮ → เปิดในเบราว์เซอร์) เพื่อให้ถ่ายรูปได้เสถียร',true),800); }
-  const saved=sessionStorage.getItem('fhs_user'); if(saved){ CURRENT_USER=JSON.parse(saved); renderWho(); }
+  const saved=getSavedUser(); if(saved){ CURRENT_USER=saved; renderWho(); }
   const sid=new URLSearchParams(location.search).get('station');
   if(sid){ goToStation(sid.toUpperCase()); }
   else{ show('scrScan'); }
 })();
 </script>
+<div id="camModal" role="dialog" aria-label="กล้องถ่ายรูปหลักฐาน">
+  <video id="camVideo" playsinline autoplay muted></video>
+  <div id="camFlash"></div>
+  <div id="camMsg"></div>
+  <div id="camTop"><span id="camCount">ถ่ายแล้ว 0 รูป</span><button type="button" id="camTorch" style="display:none">🔦 ไฟฉาย</button></div>
+  <div id="camBar">
+    <button type="button" class="side" id="camNative">ใช้กล้อง<br>ของเครื่อง</button>
+    <button type="button" id="camShot" aria-label="ถ่ายรูป"></button>
+    <button type="button" class="side" id="camDone" style="font-size:15px">เสร็จ ✓</button>
+  </div>
+</div>
 </body>
 </html>
