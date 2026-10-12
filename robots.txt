@@ -1,0 +1,5 @@
+# FHS Inspection — ห้ามเครื่องมือค้นหาเก็บดัชนี
+# (ไฟล์นี้มีผลเมื่อเว็บอยู่ที่ root ของโดเมน — สำหรับ GitHub Pages แบบ project page
+#  ตัวที่มีผลจริงคือ <meta name="robots"> ในทุกหน้าซึ่งใส่ไว้แล้ว)
+User-agent: *
+Disallow: /

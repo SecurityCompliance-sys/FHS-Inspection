@@ -298,25 +298,18 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, getDocs, serverTimestamp }
   from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
-/* ====== CONFIG — ใช้ค่าเดียวกับ index.html ====== */
-const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyBusmdWb1BuElcAgZ8IC4-bwUW0p8X0ifg",
-  authDomain: "bevchain-fhs.firebaseapp.com",
-  projectId: "bevchain-fhs",
-  storageBucket: "bevchain-fhs.firebasestorage.app",
-  messagingSenderId: "568964415233",
-  appId: "1:568964415233:web:4be7220d2d14644fbce500"
-};
-/* ================================================ */
+/* ====== CONFIG — รวมไว้ที่ src/config.js ที่เดียว ====== */
+import { FIREBASE_CONFIG, CLOUDINARY_CONFIG, RULES, PAGES, pageUrl } from './src/config.js';
+import { esc, cld, thumb, sha256 as sha256Shared, tsDate as tsDateShared, store, toast,
+         verifyAdminSession, readAdminSession, writeAdminSession, clearAdminSession,
+         fmt as fmtShared } from './src/shared.js';
 
 const app=initializeApp(FIREBASE_CONFIG); const db=getFirestore(app);
 const $=id=>document.getElementById(id);
-const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); // escape quotes ด้วย เพราะใช้ใน attribute
-// Cloudinary transform for reference-image previews (saves bandwidth on the admin page too).
-const cld=(u,w)=>{ if(!u||typeof u!=='string')return u; const m=u.match(/^(https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/)(.+)$/); return m?`${m[1]}w_${w||400},q_auto,f_auto/${m[2]}`:u; };
-async function sha256(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');}
+const sha256=(s)=>sha256Shared(s);
+const tsDate=(v)=>tsDateShared(v);
+const fmt=(d,lang)=>fmtShared(d,lang);
 function randSalt(){return [...crypto.getRandomValues(new Uint8Array(16))].map(b=>b.toString(16).padStart(2,'0')).join('');}
-const tsDate=ts=>ts?(ts.toDate?ts.toDate():new Date(ts)):null;
 const inspTime=i=>tsDate(i.createdAt)||(i.clientTime?new Date(i.clientTime):null);
 
 /* ===== i18n (TH / EN) ===== */
@@ -651,9 +644,8 @@ async function saveCamera(){
 async function delCamera(id){ if(!confirm(LANG==='en'?`Delete camera ${id}?`:`ลบกล้อง ${id}?`))return; await deleteDoc(doc(db,'cctvCameras',id)); await loadCameras(); }
 
 /* ===== REFERENCE IMAGES (รูปตัวอย่างอุปกรณ์) ===== */
-const CLOUDINARY_CONFIG = { cloudName: "diiqvxqqd", uploadPreset: "fhs_inspection" };
 async function uploadCloudinary(blob){ const fd=new FormData(); fd.append('file',blob); fd.append('upload_preset',CLOUDINARY_CONFIG.uploadPreset); const r=await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/image/upload`,{method:'POST',body:fd}); if(!r.ok)throw new Error('cloudinary'); const d=await r.json(); return d.secure_url; }
-function riPrev(code){ const u=$('ri'+code).value.trim(); $('ri'+code+'prev').innerHTML=(u&&u!==t('uploading'))?`<img src="${esc(cld(u,300))}" style="max-width:150px;border:1px solid var(--line);border-radius:8px">`:''; }
+function riPrev(code){ const u=$('ri'+code).value.trim(); $('ri'+code+'prev').innerHTML=(u&&u!==t('uploading'))?`<img src="${esc(cld(u,300))}" alt="ตัวอย่างรูปอุปกรณ์ข้อ ${esc(code)}" style="max-width:150px;border:1px solid var(--line);border-radius:8px">`:''; }
 async function loadRefImages(){ try{ const snap=await getDoc(doc(db,'settings','referenceImages')); const d=snap.exists()?snap.data():{}; $('riB6').value=d.B6||''; $('riB5').value=d.B5||''; riPrev('B6'); riPrev('B5'); }catch(e){} }
 async function riUpload(code,file){ if(!file)return; const inp=$('ri'+code); const old=inp.value; inp.value=t('uploading'); inp.disabled=true;
   try{ const url=await uploadCloudinary(file); inp.value=url; riPrev(code); }catch(e){ inp.value=old; alert(t('upload_fail')); } finally{ inp.disabled=false; } }
@@ -733,18 +725,28 @@ $('riB6').onchange=()=>riPrev('B6'); $('riB5').onchange=()=>riPrev('B5');
 $('gBtn').onclick=gateLogin;
 $('gPw').addEventListener('keydown',e=>{if(e.key==='Enter')gateLogin();});
 $('seedLink').onclick=seedAdmin;
-$('logout').onclick=()=>{sessionStorage.removeItem('fhs_admin');location.reload();};
+$('logout').onclick=()=>{ clearAdminSession(); location.reload(); };
 $('langBtn').onclick=toggleLang;
 applyLang();
 
-/* boot */
+/* boot — หลังบ้านเข้าถึงได้เฉพาะ role admin และต้องตรวจกับ Firestore ซ้ำทุกครั้ง
+ * (ของเดิมตรวจอยู่แล้วแต่ใช้ sessionStorage ตรง ๆ — ตอนนี้ใช้ helper ร่วมกับหน้าอื่น) */
 (async function(){
-  let s=null; try{ s=JSON.parse(sessionStorage.getItem('fhs_admin')); }catch(e){}
-  if(!s||!s.id) return;
-  try{ const snap=await getDoc(doc(db,'users',s.id)); const u=snap.exists()?snap.data():null;
-    if(u && u.role==='admin' && u.active!==false){ ADMIN={id:s.id,name:u.name||s.id,role:'admin'}; bootApp(); }
-    // ไม่ใช่ admin → ไม่ให้เข้าหลังบ้าน (แสดงหน้า login ตามเดิม) — กัน viewer เดินมาจาก dashboard
-  }catch(e){ if(s.role==='admin'){ ADMIN=s; bootApp(); } } // ออฟไลน์: ยังต้องเป็น admin ใน session
+  const s=readAdminSession();
+  if(!s || !s.id) return;
+  try{
+    const snap=await getDoc(doc(db,'users',s.id));
+    const u=snap.exists()?snap.data():null;
+    if(u && u.role==='admin' && u.active!==false){
+      ADMIN={id:s.id,name:u.name||s.id,role:'admin'};
+      writeAdminSession(ADMIN);
+      bootApp();
+    } else {
+      clearAdminSession();   // ไม่ใช่ admin แล้ว/ถูกระงับ → ตัดสิทธิ์ทันที
+    }
+  }catch(e){
+    if(s.role==='admin'){ ADMIN=s; bootApp(); }   // ออฟไลน์: ยังต้องเป็น admin ใน session
+  }
 })();
 </script>
 </body>

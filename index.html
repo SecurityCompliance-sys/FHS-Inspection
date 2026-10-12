@@ -2,18 +2,28 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<!-- ไม่ใส่ maximum-scale / user-scalable=no แล้ว — การห้ามซูมเป็นปัญหา accessibility
+     (WCAG 1.4.4) ใช้ touch-action:manipulation ใน CSS แทนเพื่อกันการซูมด้วยดับเบิลแตะ -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>ตรวจสอบสถานีหัวดับเพลิง · BevChain</title>
+<meta name="description" content="แอปตรวจสอบสถานีหัวดับเพลิง (Fire Hydrant Station) สำหรับผู้ตรวจภาคสนาม — BevChain Thailand">
+<meta name="robots" content="noindex, nofollow">
+<meta name="format-detection" content="telephone=no">
+<meta name="color-scheme" content="light">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#15234A">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="FHS ตรวจสถานี">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@500;600;700&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js" defer></script>
 <style>
 :root{
   --bg:#E9ECF2; --surface:#FFFFFF; --surface-2:#F4F6FA;
@@ -169,20 +179,48 @@ textarea{resize:vertical;min-height:74px}
 @keyframes spin{to{transform:rotate(360deg)}}
 .footer{text-align:center;font-size:10.5px;color:var(--muted);padding:18px;border-top:1px solid var(--line)}
 .req{color:var(--red)}
+
+/* ---- accessibility ---- */
+/* กันการซูมด้วยการดับเบิลแตะ โดยไม่ปิดการซูมของผู้ใช้ (ทดแทน user-scalable=no) */
+button,a,label,.tog,.eq-stat button,.photo-add{touch-action:manipulation}
+:focus-visible{outline:3px solid var(--amber);outline-offset:2px;border-radius:6px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.skip-link{position:absolute;left:-9999px;top:0;z-index:9999;background:var(--navy);color:#fff;padding:12px 18px;border-radius:0 0 10px 0;font-weight:600;text-decoration:none}
+.skip-link:focus{left:0}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+}
+/* ปุ่ม/ช่องกรอกต้องมีขนาดแตะไม่น้อยกว่า 44px (WCAG 2.5.8) */
+.btn,.tog,.eq-stat button{min-height:44px}
+.btn-sm{min-height:38px}
+
+/* ---- ตัวอย่างอุปกรณ์ (B5/B6) — รูปอ้างอิงจาก Admin ---- */
+.ex-btn{margin-left:8px;font:inherit;font-family:"Bai Jamjuree";font-size:11px;font-weight:600;color:var(--navy-2);
+  background:rgba(30,39,97,.08);border:1px solid var(--line);border-radius:14px;padding:3px 10px;cursor:pointer;
+  white-space:nowrap;vertical-align:middle;min-height:26px}
+.ex-btn:active{transform:scale(.95)}
+.ex-modal{position:fixed;inset:0;background:rgba(15,26,46,.82);display:none;align-items:center;justify-content:center;z-index:60;padding:18px}
+.ex-modal.on{display:flex}
+.ex-box{background:#fff;border-radius:14px;max-width:440px;width:100%;overflow:hidden;position:relative;box-shadow:var(--shadow)}
+.ex-box img{width:100%;display:block;max-height:68vh;object-fit:contain;background:#0F1A2E;min-height:120px}
+.ex-cap{padding:12px 14px;font-size:13px;font-weight:600;color:var(--ink)}
+.ex-close{position:absolute;top:8px;right:8px;width:34px;height:34px;border-radius:50%;background:rgba(15,26,46,.65);
+  color:#fff;border:none;cursor:pointer;font-size:15px;z-index:1}
 </style>
 </head>
 <body>
+<a class="skip-link" href="#mainContent">ข้ามไปที่เนื้อหาหลัก</a>
 <div class="hazard"></div>
 <div class="wrap">
   <div class="topbar">
     <div class="logo">
-      <svg viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="7" fill="#1E2761"/><path d="M16 6c-3 4-5 6-5 9.5A5 5 0 0 0 16 20a5 5 0 0 0 5-4.5C21 12 19 10 16 6z" fill="#D62828"/><path d="M16 11c-1.4 2-2.3 2.8-2.3 4.3A2.3 2.3 0 0 0 16 17.5a2.3 2.3 0 0 0 2.3-2.2C18.3 13.8 17.4 13 16 11z" fill="#E65100"/><rect x="9" y="23" width="14" height="2.4" rx="1.2" fill="#CADCFC"/></svg>
-      <div><b>FHS Inspection</b><span>SECURITY & COMPLIANCE</span></div>
+      <svg viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false"><rect width="32" height="32" rx="7" fill="#1E2761"/><path d="M16 6c-3 4-5 6-5 9.5A5 5 0 0 0 16 20a5 5 0 0 0 5-4.5C21 12 19 10 16 6z" fill="#D62828"/><path d="M16 11c-1.4 2-2.3 2.8-2.3 4.3A2.3 2.3 0 0 0 16 17.5a2.3 2.3 0 0 0 2.3-2.2C18.3 13.8 17.4 13 16 11z" fill="#E65100"/><rect x="9" y="23" width="14" height="2.4" rx="1.2" fill="#CADCFC"/></svg>
+      <div><b>FHS Inspection</b><span>SECURITY &amp; COMPLIANCE</span></div>
     </div>
     <div class="who" id="whoBox" style="display:none"></div>
   </div>
 
-  <main>
+  <main id="mainContent">
     <!-- LOADING -->
     <div class="screen on" id="scrLoading">
       <div class="hero"><div class="shield"><svg viewBox="0 0 64 64" fill="none"><path d="M32 6l22 8v16c0 14-9 23-22 28C19 53 10 44 10 30V14l22-8z" fill="#1E2761"/></svg></div><p>กำลังเชื่อมต่อระบบ…</p></div>
@@ -215,10 +253,10 @@ textarea{resize:vertical;min-height:74px}
         <p id="loginStationHint">ยืนยันตัวผู้ตรวจก่อนเริ่ม</p>
       </div>
       <div class="card"><div class="card-b">
-        <div id="loginAlert"></div>
-        <div class="field"><label>รหัสพนักงาน <span class="req">*</span></label><input type="text" id="loginId" placeholder="EMP-1023" autocomplete="username" class="mono" style="text-transform:uppercase"></div>
-        <div class="field"><label>รหัสผ่าน <span class="req">*</span></label><input type="password" id="loginPw" placeholder="••••••••" autocomplete="current-password"></div>
-        <button class="btn btn-primary" id="btnLogin">เข้าสู่ระบบ</button>
+        <div id="loginAlert" role="alert" aria-live="assertive"></div>
+        <div class="field"><label for="loginId">รหัสพนักงาน <span class="req" aria-hidden="true">*</span></label><input type="text" id="loginId" placeholder="EMP-1023" autocomplete="username" class="mono" style="text-transform:uppercase" required></div>
+        <div class="field"><label for="loginPw">รหัสผ่าน <span class="req" aria-hidden="true">*</span></label><input type="password" id="loginPw" placeholder="••••••••" autocomplete="current-password" required></div>
+        <button class="btn btn-primary" id="btnLogin" type="button">เข้าสู่ระบบ</button>
       </div></div>
     </div>
 
@@ -245,19 +283,15 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, collection, serverTimestamp, increment, enableIndexedDbPersistence, Timestamp }
   from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
-/* ============== CONFIG — กรอกค่าของคุณ ============== */
-const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyBusmdWb1BuElcAgZ8IC4-bwUW0p8X0ifg",
-  authDomain: "bevchain-fhs.firebaseapp.com",
-  projectId: "bevchain-fhs",
-  storageBucket: "bevchain-fhs.firebasestorage.app",
-  messagingSenderId: "568964415233",
-  appId: "1:568964415233:web:4be7220d2d14644fbce500"
-};
-const CLOUDINARY_CONFIG = { cloudName: "diiqvxqqd", uploadPreset: "fhs_inspection" };
-const GPS_WARN_METERS = 60;          // เตือนถ้าห่างจากสถานีเกินระยะนี้ (A5)
-const PRESSURE_MIN = 4.5, PRESSURE_MAX = 12; // ช่วงแรงดันปกติ (bar) เตือนถ้าผิด (I7)
-const MAX_LOGIN_FAILS = 5, LOCK_MINUTES = 15; // brute-force lockout (I1)
+/* ============== CONFIG — รวมไว้ที่ src/config.js ที่เดียว ==============
+ * เดิมค่าตั้งต้นถูกคัดลอกไว้ในทุกหน้า (index/admin/dashboard/report) ทำให้
+ * หมุนคีย์หรือแก้ค่าครั้งหนึ่งต้องไล่แก้ 4 ที่ ตอนนี้แก้ที่ src/config.js ที่เดียว */
+import { FIREBASE_CONFIG, CLOUDINARY_CONFIG, RULES, EXAMPLE_CAPTIONS, isPlaceholder } from './src/config.js';
+import { esc, cld, sha256, haversine, toast, store, tsDate, prefersReducedMotion } from './src/shared.js';
+
+const GPS_WARN_METERS = RULES.gpsWarnMeters;        // รัศมีที่ยอมให้บันทึกผล (A5)
+const PRESSURE_MIN = RULES.pressureMin, PRESSURE_MAX = RULES.pressureMax;  // ช่วงแรงดันปกติ (I7)
+const MAX_LOGIN_FAILS = RULES.maxLoginFails, LOCK_MINUTES = RULES.lockMinutes; // ล็อกเมื่อรหัสผิดติดกัน (I1)
 /* ==================================================== */
 
 const app = initializeApp(FIREBASE_CONFIG);
@@ -286,13 +320,14 @@ const eqState = {};      // equipment statuses
 const photos = [];       // {url,label}
 let submitting = false;
 let gps = {lat:null,lng:null,distance:null,ok:false};
+/* ถ้าผู้ตรวจยืนยันบันทึกจากระยะไกล เก็บเหตุผลไว้ในตัวเอกสารผลตรวจ (A5)
+ * → ตรวจสอบย้อนหลังได้ว่าใครบันทึกนอกพื้นที่ เพราะอะไร ไม่ใช่เงียบ ๆ */
+let gpsOverride = {reason:'', distance:null, lat:null, lng:null, at:null};
+let REF_IMAGES = {};       // รูปตัวอย่างอุปกรณ์จาก Admin (settings/referenceImages) — B5/B6
 
-/* ---------- helpers ---------- */
+/* ---------- helpers (esc / sha256 / haversine / toast มาจาก src/shared.js) ---------- */
 const $ = id => document.getElementById(id);
-const esc = s => { const d=document.createElement('div'); d.textContent = s==null?'':String(s); return d.innerHTML; }; // XSS (I3)
 function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on')); $(id).classList.add('on'); window.scrollTo(0,0); }
-async function sha256(str){ const buf=await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str)); return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join(''); }
-function haversine(a,b,c,d){ const R=6371000,t=x=>x*Math.PI/180; const dLat=t(c-a),dLng=t(d-b); const h=Math.sin(dLat/2)**2+Math.cos(t(a))*Math.cos(t(c))*Math.sin(dLng/2)**2; return Math.round(R*2*Math.atan2(Math.sqrt(h),Math.sqrt(1-h))); }
 
 /* ============ AUTH (I1) ============ */
 async function doLogin(){
@@ -375,6 +410,10 @@ function enterInspection(){
   Object.keys(clState).forEach(k=>delete clState[k]);
   Object.keys(eqState).forEach(k=>delete eqState[k]);
   photos.length=0;
+  // รีเซ็ตสถานะ GPS ทุกครั้งที่เข้าสถานีใหม่ — ถ้าไม่รีเซ็ต ค่าที่ค้างจากสถานีก่อน
+  // (ok=true) จะทำให้กดบันทึกได้ก่อนที่ GPS ของสถานีนี้จะยืนยันเสร็จ = ข้าม geofence
+  gps = {lat:null,lng:null,distance:null,ok:false};
+  gpsOverride = {reason:'', distance:null, lat:null, lng:null, at:null};
 
   const eqRows = (s.equipment||[]).map(e=>{
     const ic = e.isBrass
@@ -383,22 +422,22 @@ function enterInspection(){
     return `<div class="eq" data-eqid="${esc(e.id)}">
       <div class="eq-ic ${e.isBrass?'brass':''}">${ic}</div>
       <div class="eq-info"><b>${esc(e.name)}</b><span>${esc(e.type||'อุปกรณ์')}${e.isBrass?' · ทองเหลือง':''}${e.lastSeenAt?' · เห็นล่าสุดแล้ว':''}</span></div>
-      <div class="eq-stat">
-        <button data-eq="${esc(e.id)}" data-v="present" title="อยู่ครบ"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg></button>
-        <button data-eq="${esc(e.id)}" data-v="damaged" title="ชำรุด"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 9v4m0 4h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg></button>
-        <button data-eq="${esc(e.id)}" data-v="missing" title="หาย"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+      <div class="eq-stat" role="group" aria-label="สถานะ: ${esc(e.name)}">
+        <button type="button" data-eq="${esc(e.id)}" data-v="present" title="อยู่ครบ" aria-pressed="false" aria-label="${esc(e.name)} — อยู่ครบ"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true" focusable="false"><path d="M20 6L9 17l-5-5"/></svg></button>
+        <button type="button" data-eq="${esc(e.id)}" data-v="damaged" title="ชำรุด" aria-pressed="false" aria-label="${esc(e.name)} — ชำรุด"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true" focusable="false"><path d="M12 9v4m0 4h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg></button>
+        <button type="button" data-eq="${esc(e.id)}" data-v="missing" title="หาย" aria-pressed="false" aria-label="${esc(e.name)} — หาย"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true" focusable="false"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
       </div></div>`;
   }).join('') || '<p class="hint">สถานีนี้ยังไม่ได้ลงทะเบียนอุปกรณ์ใน Admin</p>';
 
   const clRows = CHECKLIST.map(c=>`
     <div class="cl-item">
-      <div class="cl-top"><span class="cl-code ${c.brass?'brass':''}">${c.code}</span><span class="cl-label">${esc(c.label)}</span></div>
-      <div class="cl-buttons">
-        <button class="tog" data-cl="${c.code}" data-v="pass">ผ่าน</button>
-        <button class="tog" data-cl="${c.code}" data-v="fail">ไม่ผ่าน</button>
-        <button class="tog" data-cl="${c.code}" data-v="na">N/A</button>
+      <div class="cl-top"><span class="cl-code ${c.brass?'brass':''}">${c.code}</span><span class="cl-label">${esc(c.label)}${REF_IMAGES[c.code]?` <button type="button" class="ex-btn" data-ex="${esc(c.code)}" aria-label="ดูรูปตัวอย่างอุปกรณ์ข้อ ${esc(c.code)}">📷 ดูตัวอย่าง</button>`:''}</span></div>
+      <div class="cl-buttons" role="group" aria-label="ผลการตรวจข้อ ${esc(c.code)}: ${esc(c.label)}">
+        <button type="button" class="tog" data-cl="${c.code}" data-v="pass" aria-pressed="false">ผ่าน</button>
+        <button type="button" class="tog" data-cl="${c.code}" data-v="fail" aria-pressed="false">ไม่ผ่าน</button>
+        <button type="button" class="tog" data-cl="${c.code}" data-v="na" aria-pressed="false">N/A</button>
       </div>
-      <div class="cl-note" id="note-${c.code}"><input type="text" placeholder="หมายเหตุ ${c.code}…"></div>
+      <div class="cl-note" id="note-${c.code}"><label class="sr-only" for="notein-${c.code}">หมายเหตุข้อ ${esc(c.code)}</label><input type="text" id="notein-${c.code}" placeholder="หมายเหตุ ${esc(c.code)}…"></div>
     </div>`).join('');
 
   $('scrInspect').innerHTML = `
@@ -465,19 +504,23 @@ function enterInspection(){
     <button class="btn btn-ghost" id="btnCancel" style="margin-top:10px">ยกเลิก / สแกนสถานีอื่น</button>
   `;
 
+  // ปุ่มดูรูปตัวอย่างอุปกรณ์ (B5/B6) — รูปมาจาก settings/referenceImages ที่ Admin ตั้งไว้
+  $('clBody').querySelectorAll('[data-ex]').forEach(b=>b.addEventListener('click',()=>openExample(b.dataset.ex)));
   // wire checklist toggles
   $('clBody').querySelectorAll('.tog').forEach(b=>b.addEventListener('click',()=>{
     const code=b.dataset.cl, v=b.dataset.v;
-    document.querySelectorAll(`[data-cl="${code}"]`).forEach(x=>x.removeAttribute('data-on'));
-    b.setAttribute('data-on',v); clState[code]=clState[code]||{}; clState[code].status=v;
+    document.querySelectorAll(`[data-cl="${code}"]`).forEach(x=>{ x.removeAttribute('data-on'); x.setAttribute('aria-pressed','false'); });
+    b.setAttribute('data-on',v); b.setAttribute('aria-pressed','true');
+    clState[code]=clState[code]||{}; clState[code].status=v;
     $('note-'+code).classList.toggle('show', v==='fail');
     updateResult();
   }));
   // wire equipment toggles
   $('eqBody').querySelectorAll('[data-eq]').forEach(b=>b.addEventListener('click',()=>{
     const id=b.dataset.eq, v=b.dataset.v;
-    document.querySelectorAll(`[data-eq="${id}"]`).forEach(x=>x.removeAttribute('data-on'));
-    b.setAttribute('data-on',v); eqState[id]=v; updateResult();
+    document.querySelectorAll(`[data-eq="${id}"]`).forEach(x=>{ x.removeAttribute('data-on'); x.setAttribute('aria-pressed','false'); });
+    b.setAttribute('data-on',v); b.setAttribute('aria-pressed','true');
+    eqState[id]=v; updateResult();
   }));
   // pressure warn (I7)
   $('pressure').addEventListener('input',e=>{
@@ -490,8 +533,11 @@ function enterInspection(){
   // save everything BEFORE the camera/gallery opens — Android may kill the tab while camera is open
   $('photoCamBtn').addEventListener('click',e=>{ e.preventDefault(); saveDraft(true); openCamera(); });
   $('photoGalBtn').addEventListener('click',()=>saveDraft(true));
-  $('scrInspect').addEventListener('input',()=>saveDraft());
-  $('scrInspect').addEventListener('click',()=>setTimeout(()=>saveDraft(),0));
+  // ใช้ oninput/onclick แบบกำหนดทับ (ไม่ใช่ addEventListener) เพราะ #scrInspect เป็น
+  // element เดิมที่ถูกใช้ซ้ำทุกครั้งที่เข้าสถานี — addEventListener จะสะสม listener
+  // เพิ่มขึ้นเรื่อย ๆ ทำให้ saveDraft ถูกเรียกซ้ำหลายรอบต่อการพิมพ์ 1 ครั้ง
+  $('scrInspect').oninput=()=>saveDraft();
+  $('scrInspect').onclick=()=>setTimeout(()=>saveDraft(),0);
   $('btnSubmit').addEventListener('click', submitInspection);
   $('btnCancel').addEventListener('click', ()=>{ clearDraft(s.id); location.href=location.pathname; });
 
@@ -539,14 +585,7 @@ function restoreDraft(d){
   updatePhotoCount(); updateResult();
   toast('กู้คืนข้อมูลที่กรอกไว้แล้ว ✓ (ถ้ารูปล่าสุดไม่ขึ้น กรุณาถ่ายใหม่)');
 }
-function toast(msg,err){
-  let t=$('fhsToast'); if(!t){ t=document.createElement('div'); t.id='fhsToast';
-    t.style.cssText='position:fixed;left:50%;bottom:22px;transform:translateX(-50%);max-width:92vw;padding:11px 16px;border-radius:11px;color:#fff;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.25);transition:opacity .3s;text-align:center;pointer-events:none';
-    document.body.appendChild(t); }
-  t.style.background=err?'#D62828':'#0E8A5F'; t.textContent=msg; t.style.opacity='1';
-  const camOn=$('camModal')?.classList.contains('on'); t.style.top=camOn?'70px':'auto'; t.style.bottom=camOn?'auto':'22px';
-  clearTimeout(t._h); t._h=setTimeout(()=>t.style.opacity='0',4200);
-}
+/* toast() ย้ายไป src/shared.js แล้ว — ใช้ร่วมกับหน้าอื่น + มี aria-live ในตัว */
 
 /* ============ SIGNATURE PAD (J1) ============ */
 let sigHasInk=false;
@@ -666,6 +705,9 @@ function captureFrame(){
 $('camShot').addEventListener('click',captureFrame);
 $('camDone').addEventListener('click',closeCamera);
 $('camNative').addEventListener('click',()=>{ closeCamera(); openNativeCamera(); });
+$('exClose').addEventListener('click',closeExample);
+$('exModal').addEventListener('click',e=>{ if(e.target===$('exModal')) closeExample(); });   // แตะฉากหลัง = ปิด
+document.addEventListener('keydown',e=>{ if(e.key==='Escape' && $('exModal').classList.contains('on')) closeExample(); });
 $('camTorch').addEventListener('click',async()=>{ try{ camTorchOn=!camTorchOn; await camStream.getVideoTracks()[0].applyConstraints({advanced:[{torch:camTorchOn}]}); $('camTorch').textContent=camTorchOn?'🔦 ปิดไฟ':'🔦 ไฟฉาย'; }catch(e){} });
 window.addEventListener('pagehide',()=>{ saveDraft(true); closeCamera(); });
 document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden') saveDraft(true); });   // สลับแอป/ปิดจอ → บันทึกทันที
@@ -701,6 +743,13 @@ async function submitInspection(){
   const errs=[];
 
   // validation (I4)
+  // GPS gate (A5) — ต้องยืนยันว่าอยู่ที่สถานีจริง ถ้าไม่ได้ต้องระบุเหตุผล (บันทึกไว้ด้วย)
+  const gpsBlocked = !gps.ok && !gpsOverride.reason;
+  if(gpsBlocked){
+    errs.push(gps.distance!=null
+      ? `อยู่นอกระยะที่กำหนด — ห่างจากสถานี ${gps.distance} ม. (ต้องไม่เกิน ${GPS_WARN_METERS} ม.) ไปยืนใกล้สถานีแล้วลองใหม่`
+      : `ยืนยันตำแหน่งไม่สำเร็จ — เปิด GPS / อนุญาตการเข้าถึงตำแหน่ง แล้วรอสักครู่ก่อนกดบันทึก (ต้องอยู่ในระยะ ${GPS_WARN_METERS} ม. จากสถานี)`);
+  }
   const unset = CHECKLIST.filter(c=>!clState[c.code]?.status);
   if(unset.length) errs.push(`ยังตรวจไม่ครบ: ${unset.map(c=>c.code).join(', ')}`);
   const eqTotal=(CURRENT_STATION.equipment||[]).length;
@@ -709,7 +758,35 @@ async function submitInspection(){
   if(photos.length===0) errs.push('ต้องแนบรูปหลักฐานอย่างน้อย 1 รูป');
   if(!sigHasInk) errs.push('ต้องเซ็นลายเซ็นผู้ตรวจ');
 
-  if(errs.length){ alertBox.innerHTML=`<div class="alert err"><div>${errs.map(esc).join('<br>')}</div></div>`; window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'}); return; }
+  if(errs.length){
+    // ถ้าติดเพียงเพราะ GPS ให้ทางเลือก "ระบุเหตุผลแล้วบันทึกต่อ" พร้อมประทับร่องรอยไว้ในเอกสาร
+    const canOverride = gpsBlocked && CURRENT_STATION.gps && RULES.allowGpsOverride;
+    alertBox.innerHTML=`<div class="alert err"><div>${errs.map(esc).join('<br>')}</div>${
+      canOverride ? `<div style="margin-top:10px"><button type="button" class="btn btn-ghost btn-sm" id="gpsOverrideBtn" style="width:auto">📍 ยืนยันตรวจจากระยะไกล (ต้องระบุเหตุผล)</button>
+      <div id="gpsOverrideBox" style="display:none;margin-top:8px">
+        <label for="gpsOverrideReason" style="font-size:12px">เหตุผลที่บันทึกจากระยะไกล <span class="req">*</span></label>
+        <input type="text" id="gpsOverrideReason" placeholder="เช่น ในคลังสัญญาณ GPS อ่อนมาก ยืนยันตำแหน่งไม่ได้">
+        <div id="gpsOverrideErr"></div>
+      </div></div>` : ''}</div>`;
+    const ob=$('gpsOverrideBtn');
+    if(ob) ob.addEventListener('click',()=>{
+      const box=$('gpsOverrideBox'); box.style.display='block';
+      const inp=$('gpsOverrideReason'); inp.focus();
+      const save=()=>{
+        const reason=inp.value.trim();
+        const need=RULES.gpsOverrideMinReasonChars;
+        if(reason.length<need){ $('gpsOverrideErr').innerHTML=`<div class="hint" style="color:var(--red)">กรุณาระบุเหตุผลอย่างน้อย ${need} ตัวอักษร (บันทึกไว้ในผลการตรวจเพื่อตรวจสอบย้อนหลัง)</div>`; return false; }
+        gpsOverride={ reason, distance:gps.distance, lat:gps.lat, lng:gps.lng, at:new Date().toISOString() };
+        return true;
+      };
+      inp.onkeydown=e=>{ if(e.key==='Enter'){ e.preventDefault(); if(save()) submitInspection(); } };
+      inp.onblur=save;
+      ob.textContent='📍 บันทึกต่อจากระยะไกล';
+      ob.onclick=()=>{ if(save()) submitInspection(); };
+    });
+    window.scrollTo({top:document.body.scrollHeight,behavior: prefersReducedMotion()?'auto':'smooth'});
+    return;
+  }
 
   // compute result + missing items
   const missingItems=[];
@@ -745,6 +822,9 @@ async function submitInspection(){
       inspectorId:CURRENT_USER.id, inspectorName:CURRENT_USER.name,
       serverTimestamp:serverTimestamp(), clientTime:new Date().toISOString(),
       gps:{lat:gps.lat,lng:gps.lng}, gpsDistanceM:gps.distance,
+      // A5: ถ้าบันทึกจากระยะไกล จะมีก้อนนี้ติดไปด้วยเสมอ → ตรวจสอบย้อนหลังได้
+      gpsVerified: gps.ok,
+      gpsOverride: gpsOverride.reason ? { ...gpsOverride } : null,
       checklist, pressureValue: $('pressure').value!==''?parseFloat($('pressure').value):null,
       sealNumber: $('sealNo').value.trim(), photos, signatureUrl, result, equipmentSnapshot, missingItems,
       notes: $('notes').value.trim(), createdAt:serverTimestamp()
@@ -816,13 +896,51 @@ function onScan(text){
   goToStation(sid.toUpperCase());
 }
 function stopScanner(){ if(scanner){ const sc=scanner; scanner=null; sc.stop().then(()=>sc.clear()).catch(()=>{}); } }
+/* กลับไปหน้าแรกพร้อมบอกสาเหตุ — ของเดิมไม่มี ทำให้เวลาโหลดสถานีไม่สำเร็จ
+ * (เช่น ออฟไลน์/สิทธิ์ Firestore ไม่ผ่าน) ผู้ใช้ค้างอยู่หน้า "กำลังเชื่อมต่อระบบ…" ตลอดไป */
+function backToScan(msg){
+  show('scrScan');
+  const area=$('scanArea'); if(area) area.style.display='none';
+  const btn=$('btnStartScan'); if(btn) btn.style.display='flex';
+  if(msg) toast(msg, true, 6000);
+}
+
+/* รูปตัวอย่างอุปกรณ์จาก Admin (settings/referenceImages) */
+async function loadRefImages(){
+  try{ const snap=await getDoc(doc(db,'settings','referenceImages')); REF_IMAGES = snap.exists()?(snap.data()||{}):{}; }
+  catch(e){ REF_IMAGES={}; }
+}
+function openExample(code){
+  const url=REF_IMAGES[code]; if(!url) return;
+  const cap = EXAMPLE_CAPTIONS[code] ? (EXAMPLE_CAPTIONS[code].th || code) : 'ตัวอย่างอุปกรณ์';
+  const modal=$('exModal');
+  $('exImg').src=url; $('exCap').textContent=cap;
+  modal.classList.add('on'); modal.setAttribute('aria-hidden','false');
+  $('exClose').focus();
+}
+function closeExample(){
+  const modal=$('exModal'); if(!modal) return;
+  modal.classList.remove('on'); modal.setAttribute('aria-hidden','true');
+  $('exImg').removeAttribute('src');
+}
+
+/** ตรวจรูปแบบรหัสสถานี — กันค่าแปลก ๆ จาก QR ที่สแกนได้ (เช่น URL ยาว ๆ) */
+const STATION_ID_RE = /^[A-Z0-9][A-Z0-9._-]{1,39}$/;
+
 async function goToStation(sid){
+  sid = String(sid||'').trim().toUpperCase();
   if(!sid) return;
+  if(!STATION_ID_RE.test(sid)){ backToScan('รหัสสถานีไม่ถูกต้อง: '+sid); return; }
+
   stopScanner();
   show('scrLoading');
-  const st=await loadStation(sid);
-  if(!st){ show('scrScan'); $('scanArea').style.display='none'; $('btnStartScan').style.display='flex'; alert('ไม่พบสถานี '+sid+' ในระบบ'); return; }
+  let st;
+  try{ st=await loadStation(sid); }
+  catch(e){ backToScan('โหลดข้อมูลสถานีไม่สำเร็จ: '+(e?.message||e)); return; }
+  if(!st){ backToScan('ไม่พบสถานี '+sid+' ในระบบ'); return; }
+
   CURRENT_STATION=st;
+  await loadRefImages();       // ต้องโหลดก่อน render เพื่อให้ปุ่ม "ดูตัวอย่าง" ขึ้น
   // already logged in?
   const saved=getSavedUser();
   if(saved){ CURRENT_USER=saved; renderWho(); enterInspection(); }
@@ -871,7 +989,16 @@ window.addEventListener('unhandledrejection',e=>{ console.error(e.reason); });
   else{ show('scrScan'); }
 })();
 </script>
-<div id="camModal" role="dialog" aria-label="กล้องถ่ายรูปหลักฐาน">
+<!-- รูปตัวอย่างอุปกรณ์ (B5/B6) — ผู้ตรวจกดดูเพื่อเทียบว่าอุปกรณ์ถูกต้องไหม -->
+<div class="ex-modal" id="exModal" role="dialog" aria-modal="true" aria-labelledby="exCap" aria-hidden="true">
+  <div class="ex-box">
+    <button class="ex-close" id="exClose" type="button" aria-label="ปิดรูปตัวอย่าง">✕</button>
+    <img id="exImg" alt="รูปตัวอย่างอุปกรณ์อ้างอิง">
+    <div class="ex-cap" id="exCap"></div>
+  </div>
+</div>
+
+<div id="camModal" role="dialog" aria-modal="true" aria-label="กล้องถ่ายรูปหลักฐาน">
   <video id="camVideo" playsinline autoplay muted></video>
   <div id="camFlash"></div>
   <div id="camMsg"></div>

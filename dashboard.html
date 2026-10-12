@@ -2,10 +2,19 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Command Center · FHS · BevChain</title>
+<meta name="description" content="ศูนย์ควบคุมการตรวจสอบสถานีหัวดับเพลิง — แผนที่ สถิติ เคส CCTV แผนตรวจ และการแจ้งเตือน">
+<meta name="robots" content="noindex, nofollow">
+<meta name="format-detection" content="telephone=no">
+<meta name="color-scheme" content="light">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#15234A">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://unpkg.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@500;600;700&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -31,6 +40,25 @@ body{font-family:"IBM Plex Sans Thai",sans-serif;background:var(--bg);color:var(
 .appsw a:hover{background:rgba(255,255,255,.12);color:#fff}
 .appsw a.cur{background:#fff;color:var(--navy)}
 .wrap{max-width:1140px;margin:0 auto;padding:22px 18px 60px}
+
+/* ---- accessibility ---- */
+:focus-visible{outline:3px solid var(--amber);outline-offset:2px;border-radius:6px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.skip-link{position:absolute;left:-9999px;top:0;z-index:9999;background:var(--navy);color:#fff;padding:12px 18px;border-radius:0 0 10px 0;font-weight:600;text-decoration:none}
+.skip-link:focus{left:0}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+}
+/* ปุ่ม/ตัวกรองขนาดแตะขั้นต่ำ 44px ตาม WCAG 2.5.8 */
+.btn,.tab,.appsw a{min-height:40px}
+/* ปุ่มสลับภาษา */
+#langBtn{border:1px solid rgba(255,255,255,.3);border-radius:7px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer}
+#langBtn:hover{background:rgba(255,255,255,.12)}
+@media print{
+  .topbar,.tabs,.filters,.appsw,.btn{display:none!important}
+  .page{display:block!important}
+}
 
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:11px 18px;border:none;border-radius:10px;font:inherit;font-weight:600;font-size:14px;cursor:pointer;font-family:"Bai Jamjuree";transition:filter .15s,transform .08s}
 .btn:active{transform:scale(.98)}
@@ -183,104 +211,117 @@ tr:hover td{background:var(--surface-2);cursor:pointer}
 <div id="gate">
   <div class="box">
     <div style="text-align:center;margin-bottom:16px"><svg width="48" height="48" viewBox="0 0 64 64" fill="none"><path d="M32 6l22 8v16c0 14-9 23-22 28C19 53 10 44 10 30V14l22-8z" fill="#1E2761"/><rect x="22" y="26" width="20" height="14" rx="2" fill="#CADCFC"/><circle cx="32" cy="33" r="3" fill="#1E2761"/></svg></div>
-    <h1>Command Center</h1>
+    <h1 data-i18n="gate_h">Command Center</h1>
     <p>Security &amp; Compliance · FHS</p>
-    <div id="gateAlert"></div>
-    <div style="margin-bottom:14px"><label>รหัสพนักงาน</label><input type="text" id="gId" class="mono" style="text-transform:uppercase;width:100%" placeholder="EMP-1001"></div>
-    <div style="margin-bottom:18px"><label>รหัสผ่าน</label><input type="password" id="gPw" style="width:100%" placeholder="••••••••"></div>
-    <button class="btn btn-primary" style="width:100%" id="gBtn">เข้าสู่ระบบ</button>
+    <div id="gateAlert" role="alert" aria-live="assertive"></div>
+    <div style="margin-bottom:14px"><label for="gId" data-i18n="f_empid">รหัสพนักงาน</label><input type="text" id="gId" class="mono" style="text-transform:uppercase;width:100%" placeholder="EMP-1001" autocomplete="username" required></div>
+    <div style="margin-bottom:18px"><label for="gPw" data-i18n="f_pw">รหัสผ่าน</label><input type="password" id="gPw" style="width:100%" placeholder="••••••••" autocomplete="current-password" required></div>
+    <button class="btn btn-primary" style="width:100%" id="gBtn" type="button" data-i18n="signin">เข้าสู่ระบบ</button>
   </div>
 </div>
 
+<a class="skip-link" href="#mainContent" data-i18n="skip_to_content">ข้ามไปที่เนื้อหาหลัก</a>
 <div class="topbar">
-  <div class="logo"><svg viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="7" fill="#1E2761"/><rect x="9" y="11" width="14" height="10" rx="2" fill="#D62828"/><circle cx="16" cy="16" r="2.4" fill="#fff"/></svg>
+  <div class="logo"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false"><rect width="32" height="32" rx="7" fill="#1E2761"/><rect x="9" y="11" width="14" height="10" rx="2" fill="#D62828"/><circle cx="16" cy="16" r="2.4" fill="#fff"/></svg>
     <div><b>FHS Command Center</b><span>SECURITY &amp; COMPLIANCE</span></div></div>
-  <nav class="appsw"><a href="index.html">ตรวจ</a><a href="dashboard.html" class="cur">Dashboard</a><a href="report.html">รายงาน</a><a href="admin.html">Admin</a></nav>
-  <div class="right"><span id="adminName"></span><a id="logout">ออก</a></div>
+  <nav class="appsw" aria-label="สลับหน้าจอ">
+    <a href="index.html" data-i18n="nav_inspect">ตรวจ</a>
+    <a href="dashboard.html" class="cur" aria-current="page">Dashboard</a>
+    <a href="report.html" data-i18n="nav_report">รายงาน</a>
+    <a href="admin.html">Admin</a>
+    <a href="manual-inspector.html" data-i18n="nav_manual">คู่มือ</a>
+  </nav>
+  <div class="right">
+    <a id="langBtn" role="button" tabindex="0" aria-label="Switch language">EN</a>
+    <span id="adminName"></span>
+    <a id="logout" data-i18n="signout">ออก</a>
+  </div>
 </div>
 
-<div class="wrap">
-  <div class="tabs">
-    <button class="tab on" data-tab="dash">📊 ภาพรวม</button>
-    <button class="tab" data-tab="cases">🎥 สอบสวน CCTV <span class="dot" id="caseDot" style="display:none">0</span></button>
-    <button class="tab" data-tab="history">📋 ประวัติการตรวจ</button>
-    <button class="tab" data-tab="plan">🗓 แผนการตรวจ</button>
-    <button class="tab" data-tab="alerts">🔔 แจ้งเตือน <span class="dot" id="alertDot" style="display:none">0</span></button>
+<div class="wrap" id="mainContent">
+  <div class="tabs" role="tablist" aria-label="ส่วนต่าง ๆ ของ Command Center">
+    <button class="tab on" id="tab-dash" data-tab="dash" type="button" role="tab" aria-selected="true" aria-controls="page-dash" data-i18n="tab_dash">📊 ภาพรวม</button>
+    <button class="tab" id="tab-cases" data-tab="cases" type="button" role="tab" aria-selected="false" aria-controls="page-cases"><span data-i18n="tab_cases">🎥 สอบสวน CCTV</span> <span class="dot" id="caseDot" style="display:none">0</span></button>
+    <button class="tab" id="tab-history" data-tab="history" type="button" role="tab" aria-selected="false" aria-controls="page-history" data-i18n="tab_history">📋 ประวัติการตรวจ</button>
+    <button class="tab" id="tab-plan" data-tab="plan" type="button" role="tab" aria-selected="false" aria-controls="page-plan" data-i18n="tab_plan">🗓 แผนการตรวจ</button>
+    <button class="tab" id="tab-alerts" data-tab="alerts" type="button" role="tab" aria-selected="false" aria-controls="page-alerts"><span data-i18n="tab_alerts">🔔 แจ้งเตือน</span> <span class="dot" id="alertDot" style="display:none">0</span></button>
   </div>
 
   <!-- DASHBOARD -->
-  <div class="page on" id="page-dash">
+  <div class="page on" id="page-dash" role="tabpanel" aria-labelledby="tab-dash">
     <div class="stats" id="statCards"></div>
     <div class="grid2">
       <div class="panel">
-        <div class="panel-h"><h3>แผนที่สถานี</h3><span class="sub" id="mapSub"></span></div>
-        <div id="map"></div>
+        <div class="panel-h"><h3 data-i18n="h_map">แผนที่สถานี</h3><span class="sub" id="mapSub"></span></div>
+        <div id="map" role="img" aria-label="แผนที่ตำแหน่งสถานีหัวดับเพลิง"></div>
         <div class="legend">
-          <span><i style="background:#0E8A5F"></i>ผ่าน/ปกติ</span>
-          <span><i style="background:#E65100"></i>เกินกำหนดตรวจ</span>
-          <span><i style="background:#D62828"></i>ไม่ผ่าน/มีเคสเปิด</span>
-          <span><i style="background:#64708A"></i>ยังไม่เคยตรวจ</span>
+          <span><i style="background:#0E8A5F" aria-hidden="true"></i><span data-i18n="lg_ok">ผ่าน/ปกติ</span></span>
+          <span><i style="background:#E65100" aria-hidden="true"></i><span data-i18n="lg_over">เกินกำหนดตรวจ</span></span>
+          <span><i style="background:#D62828" aria-hidden="true"></i><span data-i18n="lg_fail">ไม่ผ่าน/มีเคสเปิด</span></span>
+          <span><i style="background:#64708A" aria-hidden="true"></i><span data-i18n="lg_never">ยังไม่เคยตรวจ</span></span>
         </div>
       </div>
       <div class="panel">
-        <div class="panel-h"><h3>สถิติปัญหา/ของหาย รายสถานี</h3><span class="sub">D9</span></div>
-        <div class="panel-b" id="issueChart"><div class="empty">ไม่มีข้อมูล</div></div>
+        <div class="panel-h"><h3 data-i18n="h_issue">สถิติปัญหา/ของหาย รายสถานี</h3><span class="sub">D9</span></div>
+        <div class="panel-b" id="issueChart"><div class="empty" data-i18n="nodata">ไม่มีข้อมูล</div></div>
       </div>
     </div>
     <div class="panel">
-      <div class="panel-h"><h3>กิจกรรมล่าสุด</h3><span class="sub">10 รายการ</span></div>
-      <div id="recentList"><div class="empty">กำลังโหลด…</div></div>
+      <div class="panel-h"><h3 data-i18n="h_recent">กิจกรรมล่าสุด</h3><span class="sub" data-i18n="sub_recent">10 รายการ</span></div>
+      <div id="recentList"><div class="empty" data-i18n="loading">กำลังโหลด…</div></div>
     </div>
   </div>
 
   <!-- CASES -->
-  <div class="page" id="page-cases">
+  <div class="page" id="page-cases" role="tabpanel" aria-labelledby="tab-cases">
     <div class="filters">
-      <select id="caseFilter"><option value="open">เปิดอยู่ (investigating)</option><option value="all">ทั้งหมด</option><option value="found">พบแล้ว</option><option value="replaced">เปลี่ยนใหม่</option><option value="closed">ปิดเคส</option></select>
-      <button class="btn btn-green btn-sm" id="exportCases" style="margin-left:auto">⬇ Export Excel</button>
+      <label class="sr-only" for="caseFilter" data-i18n="lbl_casefilter">กรองตามสถานะเคส</label>
+      <select id="caseFilter"><option value="open" data-i18n="cf_open">เปิดอยู่ (investigating)</option><option value="all" data-i18n="cf_all">ทั้งหมด</option><option value="found" data-i18n="cf_found">พบแล้ว</option><option value="replaced" data-i18n="cf_repl">เปลี่ยนใหม่</option><option value="closed" data-i18n="cf_closed">ปิดเคส</option></select>
+      <button class="btn btn-green btn-sm" id="exportCases" style="margin-left:auto" type="button"><span aria-hidden="true">⬇</span> <span data-i18n="export_excel">Export Excel</span></button>
     </div>
-    <div class="panel" id="caseList"><div class="empty">กำลังโหลด…</div></div>
+    <div class="panel" id="caseList"><div class="empty" data-i18n="loading">กำลังโหลด…</div></div>
   </div>
 
   <!-- HISTORY -->
-  <div class="page" id="page-history">
+  <div class="page" id="page-history" role="tabpanel" aria-labelledby="tab-history">
     <div class="filters">
-      <input type="text" id="histSearch" placeholder="ค้นหา สถานี/ผู้ตรวจ…" style="flex:1;min-width:160px">
-      <select id="histSite"><option value="">ทุกไซต์</option></select>
-      <select id="histResult"><option value="">ทุกผล</option><option value="pass">ผ่าน</option><option value="fail">ไม่ผ่าน</option><option value="needs_repair">ต้องแก้ไข</option></select>
-      <button class="btn btn-green btn-sm" id="exportHist">⬇ Export Excel</button>
+      <label class="sr-only" for="histSearch" data-i18n="hs_search">ค้นหา สถานี/ผู้ตรวจ</label>
+      <input type="text" id="histSearch" placeholder="ค้นหา สถานี/ผู้ตรวจ…" data-i18n-ph="hs_search" style="flex:1;min-width:160px">
+      <select id="histSite" aria-label="ไซต์"><option value="" data-i18n="all_sites">ทุกไซต์</option></select>
+      <select id="histResult" aria-label="ผลการตรวจ"><option value="" data-i18n="all_results">ทุกผล</option><option value="pass" data-i18n="r_pass">ผ่าน</option><option value="fail" data-i18n="r_fail">ไม่ผ่าน</option><option value="needs_repair" data-i18n="r_repair">ต้องแก้ไข</option></select>
+      <button class="btn btn-green btn-sm" id="exportHist" type="button"><span aria-hidden="true">⬇</span> <span data-i18n="export_excel">Export Excel</span></button>
     </div>
     <div class="hint" id="histScope" style="margin:-4px 0 10px;font-size:12.5px;color:var(--muted)"></div>
-    <div class="panel" style="overflow-x:auto"><table id="histTable"><thead><tr><th>วันเวลา</th><th>สถานี</th><th>ไซต์</th><th>ผู้ตรวจ</th><th>ผล</th><th>ของหาย</th><th>รูป</th></tr></thead><tbody id="histBody"><tr><td colspan="7"><div class="empty">กำลังโหลด…</div></td></tr></tbody></table></div>
+    <div class="panel" style="overflow-x:auto"><table id="histTable"><caption class="sr-only" data-i18n="cap_hist">ตารางประวัติการตรวจสอบ</caption><thead><tr><th scope="col" data-i18n="th_datetime">วันเวลา</th><th scope="col" data-i18n="th_station">สถานี</th><th scope="col" data-i18n="th_site">ไซต์</th><th scope="col" data-i18n="th_inspector">ผู้ตรวจ</th><th scope="col" data-i18n="th_result">ผล</th><th scope="col" data-i18n="th_missing">ของหาย</th><th scope="col" data-i18n="th_photo">รูป</th></tr></thead><tbody id="histBody"><tr><td colspan="7"><div class="empty" data-i18n="loading">กำลังโหลด…</div></td></tr></tbody></table></div>
   </div>
 
   <!-- PLAN -->
-  <div class="page" id="page-plan">
+  <div class="page" id="page-plan" role="tabpanel" aria-labelledby="tab-plan">
     <div class="stats" id="planStats" style="grid-template-columns:repeat(3,1fr)"></div>
     <div class="filters">
-      <select id="planSite"><option value="">ทุกไซต์</option></select>
-      <select id="planAssignee"><option value="">ผู้รับผิดชอบทั้งหมด</option></select>
-      <select id="planStatus"><option value="">ทุกสถานะ</option><option value="overdue">เกินกำหนด</option><option value="soon">ใกล้ครบ (≤2 วัน)</option><option value="ontrack">ตรงเวลา</option><option value="never">ยังไม่เคยตรวจ</option></select>
-      <button class="btn btn-green btn-sm" id="exportPlan" style="margin-left:auto">⬇ Export Excel</button>
+      <select id="planSite" aria-label="ไซต์"><option value="" data-i18n="all_sites">ทุกไซต์</option></select>
+      <select id="planAssignee" aria-label="ผู้รับผิดชอบ"><option value="" data-i18n="all_assignees">ผู้รับผิดชอบทั้งหมด</option></select>
+      <select id="planStatus" aria-label="สถานะ"><option value="" data-i18n="all_status">ทุกสถานะ</option><option value="overdue" data-i18n="ps_over">เกินกำหนด</option><option value="soon" data-i18n="ps_soon">ใกล้ครบ (≤2 วัน)</option><option value="ontrack" data-i18n="ps_ok">ตรงเวลา</option><option value="never" data-i18n="ps_never">ยังไม่เคยตรวจ</option></select>
+      <button class="btn btn-green btn-sm" id="exportPlan" type="button"><span aria-hidden="true">⬇</span> <span data-i18n="export_excel">Export Excel</span></button>
     </div>
-    <div class="panel" style="overflow-x:auto"><table id="planTable"><thead><tr><th>สถานี</th><th>ไซต์</th><th>ผู้รับผิดชอบ</th><th>ความถี่</th><th>ตรวจล่าสุด</th><th>ครบกำหนด</th><th>สถานะ</th></tr></thead><tbody id="planBody"><tr><td colspan="7"><div class="empty">กำลังโหลด…</div></td></tr></tbody></table></div>
+    <div class="panel" style="overflow-x:auto"><table id="planTable"><caption class="sr-only" data-i18n="cap_plan">ตารางแผนการตรวจสอบตามรอบ</caption><thead><tr><th scope="col" data-i18n="th_station">สถานี</th><th scope="col" data-i18n="th_site">ไซต์</th><th scope="col" data-i18n="th_assignee">ผู้รับผิดชอบ</th><th scope="col" data-i18n="th_freq">ความถี่</th><th scope="col" data-i18n="th_last">ตรวจล่าสุด</th><th scope="col" data-i18n="th_due">ครบกำหนด</th><th scope="col" data-i18n="th_status">สถานะ</th></tr></thead><tbody id="planBody"><tr><td colspan="7"><div class="empty" data-i18n="loading">กำลังโหลด…</div></td></tr></tbody></table></div>
   </div>
 
   <!-- ALERTS -->
-  <div class="page" id="page-alerts">
-    <div id="alertsBody"><div class="empty">กำลังโหลด…</div></div>
+  <div class="page" id="page-alerts" role="tabpanel" aria-labelledby="tab-alerts">
+    <div id="alertsBody"><div class="empty" data-i18n="loading">กำลังโหลด…</div></div>
   </div>
 </div>
 
 <!-- CASE / INVESTIGATION MODAL -->
-<div class="modal" id="caseModal"><div class="modal-box">
-  <div class="modal-h"><h3>ใบสอบสวน CCTV</h3><button class="x" data-close>✕</button></div>
+<div class="modal" id="caseModal" role="dialog" aria-modal="true" aria-labelledby="caseModalTitle"><div class="modal-box">
+  <div class="modal-h"><h3 id="caseModalTitle" data-i18n="m_case">ใบสอบสวน CCTV</h3><button class="x" data-close type="button" aria-label="ปิดหน้าต่าง">✕</button></div>
   <div class="modal-b" id="caseBody"></div>
 </div></div>
 
 <!-- INSPECTION DETAIL MODAL -->
-<div class="modal" id="inspModal"><div class="modal-box">
-  <div class="modal-h"><h3>รายละเอียดการตรวจ</h3><button class="x" data-close>✕</button></div>
+<div class="modal" id="inspModal" role="dialog" aria-modal="true" aria-labelledby="inspModalTitle"><div class="modal-box">
+  <div class="modal-h"><h3 id="inspModalTitle" data-i18n="m_insp">รายละเอียดการตรวจ</h3><button class="x" data-close type="button" aria-label="ปิดหน้าต่าง">✕</button></div>
   <div class="modal-b" id="inspBody"></div>
 </div></div>
 
@@ -291,30 +332,100 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { getFirestore, doc, getDoc, updateDoc, collection, getDocs, serverTimestamp, query, where, orderBy, Timestamp }
   from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
-/* ====== CONFIG — ใช้ค่าเดียวกับ index.html / admin.html ====== */
-const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyBusmdWb1BuElcAgZ8IC4-bwUW0p8X0ifg",
-  authDomain: "bevchain-fhs.firebaseapp.com",
-  projectId: "bevchain-fhs",
-  storageBucket: "bevchain-fhs.firebasestorage.app",
-  messagingSenderId: "568964415233",
-  appId: "1:568964415233:web:4be7220d2d14644fbce500"
-};
-const OVERDUE_DAYS = 7;        // สถานีไม่ถูกตรวจเกินกี่วัน = เกินกำหนด (G2)
-const STALE_CASE_DAYS = 14;    // เคสเปิดค้างเกินกี่วัน = ค้างนาน (G3)
-const HISTORY_DAYS = 180;      // โหลดประวัติการตรวจย้อนหลังกี่วัน (กดโหลดทั้งหมดได้ในแท็บประวัติ)
+/* ====== CONFIG — รวมไว้ที่ src/config.js ที่เดียว (เดิมคัดลอกไว้ทุกหน้า) ====== */
+import { FIREBASE_CONFIG, RULES } from './src/config.js';
+import { esc, cld, thumb, sha256, tsDate, fmt as fmtDate, fmtD as fmtDShared, daysAgo, isoDay,
+         store, toast, verifyAdminSession, readAdminSession, writeAdminSession,
+         clearAdminSession, prefersReducedMotion } from './src/shared.js';
+import { createI18n, mergeDict } from './src/i18n.js';
+
+const OVERDUE_DAYS = RULES.overdueDays;        // สถานีไม่ถูกตรวจเกินกี่วัน = เกินกำหนด (G2)
+const STALE_CASE_DAYS = RULES.staleCaseDays;   // เคสเปิดค้างเกินกี่วัน = ค้างนาน (G3)
+const HISTORY_DAYS = RULES.historyDays;        // โหลดประวัติย้อนหลังกี่วัน (กดโหลดทั้งหมดได้)
+const HISTORY_MAX_ROWS = RULES.historyMaxRows;
 /* ============================================================ */
 
 const app=initializeApp(FIREBASE_CONFIG); const db=getFirestore(app);
 const $=id=>document.getElementById(id);
-const esc=s=>{const d=document.createElement('div');d.textContent=s==null?'':String(s);return d.innerHTML;};
-async function sha256(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');}
-const tsDate=ts=>ts?(ts.toDate?ts.toDate():new Date(ts)):null;
-const fmt=d=>d?d.toLocaleString('th-TH',{day:'2-digit',month:'short',year:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
-const fmtD=d=>d?d.toLocaleDateString('th-TH',{day:'2-digit',month:'short',year:'2-digit'}):'—';
-const daysAgo=d=>d?Math.floor((Date.now()-d.getTime())/86400000):null;
-// Cloudinary: ขอรูปย่อแทนรูปเต็ม (โหลดเร็วขึ้นมาก) — คลิกยังเปิดรูปเต็มได้
-const cld=(u,t)=>u&&u.includes('/image/upload/')?u.replace('/image/upload/',`/image/upload/${t}/`):u;
+/* esc / sha256 / tsDate / daysAgo / cld / fmt* ย้ายไป src/shared.js แล้ว
+ * หมายเหตุสำคัญ: esc() เวอร์ชันใหม่ escape เครื่องหมายคำพูดด้วย (" ') เพราะค่า
+ * จาก Firestore ถูกใส่ลงใน attribute หลายจุด — ของเดิมไม่ escape ทำให้ inject ได้ */
+
+/* ===== i18n (TH/EN) — ใช้คีย์ fhs_lang ร่วมกับ admin / report =====
+ * helper แปลแบบ inline ชื่อ TL() เท่านั้น ❌ ห้ามใช้ชื่อ L (ชนกับ Leaflet)      */
+const i18n = createI18n(mergeDict({
+  th: {
+    gate_h:'Command Center',
+    tab_dash:'📊 ภาพรวม', tab_cases:'🎥 สอบสวน CCTV', tab_history:'📋 ประวัติการตรวจ',
+    tab_plan:'🗓 แผนการตรวจ', tab_alerts:'🔔 แจ้งเตือน',
+    h_map:'แผนที่สถานี', h_issue:'สถิติปัญหา/ของหาย รายสถานี', h_recent:'กิจกรรมล่าสุด', sub_recent:'10 รายการ',
+    lg_ok:'ผ่าน/ปกติ', lg_over:'เกินกำหนดตรวจ', lg_fail:'ไม่ผ่าน/มีเคสเปิด', lg_never:'ยังไม่เคยตรวจ',
+    nodata:'ไม่มีข้อมูล',
+    cf_open:'เปิดอยู่ (investigating)', cf_all:'ทั้งหมด', cf_found:'พบแล้ว', cf_repl:'เปลี่ยนใหม่', cf_closed:'ปิดเคส',
+    lbl_casefilter:'กรองตามสถานะเคส', export_excel:'Export Excel',
+    hs_search:'ค้นหา สถานี/ผู้ตรวจ…', all_sites:'ทุกไซต์', all_results:'ทุกผล',
+    r_pass:'ผ่าน', r_fail:'ไม่ผ่าน', r_repair:'ต้องแก้ไข',
+    th_datetime:'วันเวลา', th_station:'สถานี', th_site:'ไซต์', th_inspector:'ผู้ตรวจ', th_result:'ผล',
+    th_missing:'ของหาย', th_photo:'รูป', th_assignee:'ผู้รับผิดชอบ', th_freq:'ความถี่',
+    th_last:'ตรวจล่าสุด', th_due:'ครบกำหนด', th_status:'สถานะ',
+    cap_hist:'ตารางประวัติการตรวจสอบ', cap_plan:'ตารางแผนการตรวจสอบตามรอบ',
+    all_assignees:'ผู้รับผิดชอบทั้งหมด', all_status:'ทุกสถานะ',
+    ps_over:'เกินกำหนด', ps_soon:'ใกล้ครบ (≤2 วัน)', ps_ok:'ตรงเวลา', ps_never:'ยังไม่เคยตรวจ',
+    m_case:'ใบสอบสวน CCTV', m_insp:'รายละเอียดการตรวจ',
+  },
+  en: {
+    gate_h:'Command Center',
+    tab_dash:'📊 Overview', tab_cases:'🎥 CCTV cases', tab_history:'📋 History',
+    tab_plan:'🗓 Plan', tab_alerts:'🔔 Alerts',
+    h_map:'Station map', h_issue:'Issues / losses by station', h_recent:'Recent activity', sub_recent:'10 items',
+    lg_ok:'Pass / OK', lg_over:'Overdue', lg_fail:'Fail / open case', lg_never:'Never inspected',
+    nodata:'No data',
+    cf_open:'Open (investigating)', cf_all:'All', cf_found:'Found', cf_repl:'Replaced', cf_closed:'Closed',
+    lbl_casefilter:'Filter by case status', export_excel:'Export Excel',
+    hs_search:'Search station / inspector…', all_sites:'All sites', all_results:'All results',
+    r_pass:'Pass', r_fail:'Fail', r_repair:'Needs repair',
+    th_datetime:'Date/time', th_station:'Station', th_site:'Site', th_inspector:'Inspector', th_result:'Result',
+    th_missing:'Missing', th_photo:'Photos', th_assignee:'Assignee', th_freq:'Frequency',
+    th_last:'Last inspected', th_due:'Due', th_status:'Status',
+    cap_hist:'Inspection history table', cap_plan:'Inspection schedule table',
+    all_assignees:'All assignees', all_status:'All statuses',
+    ps_over:'Overdue', ps_soon:'Due soon (≤2 days)', ps_ok:'On track', ps_never:'Never inspected',
+    m_case:'CCTV investigation', m_insp:'Inspection detail',
+  },
+}), { onChange: () => { if (ADMIN) refreshAll(); } });
+
+const t  = (k) => i18n.t(k);
+const TL = (en, th) => i18n.TL(en, th);
+const fmt  = (d) => fmtDate(d, i18n.lang);
+const fmtD = (d) => fmtDShared(d, i18n.lang);   // คงชื่อเดิม fmtD ไว้ให้โค้ดที่เหลือใช้ได้
+/* ป้ายผลการตรวจ / สถานะเคส / สถานะแผน ตามภาษา */
+const resultLabel = (r) => TL({pass:'Pass',needs_repair:'Needs repair',fail:'Fail'}[r] || r,
+                             {pass:'ผ่าน',needs_repair:'ต้องแก้ไข',fail:'ไม่ผ่าน'}[r] || r);
+const caseStatusLabel = (s) => TL({investigating:'Investigating',found:'Found',replaced:'Replaced',closed:'Closed'}[s] || s,
+                                  {investigating:'กำลังสอบสวน',found:'พบแล้ว',replaced:'เปลี่ยนใหม่',closed:'ปิดเคส'}[s] || s);
+const planStatusLabel = (s) => TL({overdue:'Overdue',soon:'Due soon',ontrack:'On track',never:'Never inspected'}[s] || s,
+                                  {overdue:'เกินกำหนด',soon:'ใกล้ครบ',ontrack:'ตรงเวลา',never:'ยังไม่เคยตรวจ'}[s] || s);
+
+/* ป้ายชื่อรายการตรวจ B1–B13 — ต้องมี ไม่งั้น modal "รายละเอียดการตรวจ"
+ * จะโชว์แค่รหัส B1/B2/… โดยไม่มีคำอธิบายว่าตรวจอะไร (feature นี้หายไปตอนอัปโหลดทับ) */
+const CHECKLIST_LABELS = {
+  B1:'ตู้/สถานีเข้าถึงได้ ไม่มีของวางบัง', B2:'กระจก/ประตูตู้สมบูรณ์ (กรณี break-glass)',
+  B3:'สายดับเพลิงครบ ไม่ชำรุด/ไม่ขึ้นรา/ไม่รั่ว', B4:'หัวฉีดทองเหลืองอยู่ครบ',
+  B5:'วาล์ว/landing valve ใช้งานได้ ไม่เป็นสนิม ไม่รั่ว', B6:'ข้อต่อ/coupling สมบูรณ์',
+  B7:'ป้าย/สัญลักษณ์มองเห็นชัด', B8:'ไฟส่องสว่างบริเวณเพียงพอ',
+  B11:'ป้ายวันตรวจล่าสุด / tag อัปเดต', B12:'ถังดับเพลิงข้างเคียง (ถ้ามี) แรงดัน+วันหมดอายุปกติ',
+  B13:'ขวาน/อุปกรณ์เสริมในตู้ครบ',
+};
+const CHECKLIST_LABELS_EN = {
+  B1:'Cabinet/station accessible, nothing blocking', B2:'Glass/door intact (break-glass)',
+  B3:'Hose complete, no damage/mould/leak', B4:'Brass nozzle present',
+  B5:'Valve/landing valve works, no rust/leak', B6:'Coupling intact',
+  B7:'Signage clearly visible', B8:'Adequate area lighting',
+  B11:'Last-inspection tag updated', B12:'Nearby extinguisher (if any) pressure+expiry OK',
+  B13:'Axe/accessories in cabinet complete',
+};
+const clLabel = (code) => (i18n.lang === 'en' ? CHECKLIST_LABELS_EN : CHECKLIST_LABELS)[code] || code;
+
 let XLSX_P=null;
 function loadXLSX(){ return XLSX_P ||= new Promise((res,rej)=>{ if(window.XLSX) return res(window.XLSX); const s=document.createElement('script'); s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'; s.onload=()=>res(window.XLSX); s.onerror=()=>{XLSX_P=null;rej(new Error('โหลดตัว Export ไม่สำเร็จ'));}; document.head.appendChild(s); }); }
 let ALL_HISTORY=false;
@@ -324,18 +435,24 @@ let STATIONS=[],INSPECTIONS=[],CASES=[],CAMERAS=[],USERS=[],ADMIN=null,map=null,
 /* ===== GATE ===== */
 async function gateLogin(){
   const id=$('gId').value.trim().toUpperCase(),pw=$('gPw').value,a=$('gateAlert');a.innerHTML='';
-  if(!id||!pw){a.innerHTML='<div class="alert err">กรอกข้อมูลให้ครบ</div>';return;}
+  if(!id||!pw){a.innerHTML=`<div class="alert err">${esc(t('err_fill'))}</div>`;return;}
   const btn=$('gBtn');btn.disabled=true;btn.innerHTML='<div class="spinner"></div>';
   try{
-    const snap=await getDoc(doc(db,'users',id)); if(!snap.exists())throw new Error('ไม่พบผู้ใช้');
+    const snap=await getDoc(doc(db,'users',id)); if(!snap.exists())throw new Error(t('err_nouser'));
     const u=snap.data();
-    if(!['admin','viewer'].includes(u.role))throw new Error('บัญชีนี้ไม่มีสิทธิ์เข้า Command Center');
-    if((await sha256((u.salt||'')+pw))!==u.passwordHash)throw new Error('รหัสผ่านไม่ถูกต้อง');
-    ADMIN={id,name:u.name||id,role:u.role}; sessionStorage.setItem('fhs_admin',JSON.stringify(ADMIN)); boot();
+    if(!['admin','viewer'].includes(u.role))throw new Error(TL('This account cannot access Command Center','บัญชีนี้ไม่มีสิทธิ์เข้า Command Center'));
+    if(u.active===false)throw new Error(TL('This account is disabled','บัญชีนี้ถูกระงับการใช้งาน'));
+    if((await sha256((u.salt||'')+pw))!==u.passwordHash)throw new Error(t('err_wrongpw'));
+    ADMIN={id,name:u.name||id,role:u.role};
+    writeAdminSession(ADMIN);
+    boot();
   }catch(e){a.innerHTML=`<div class="alert err">${esc(e.message)}</div>`;}
-  finally{btn.disabled=false;btn.textContent='เข้าสู่ระบบ';}
+  finally{btn.disabled=false;btn.textContent=t('signin');}
 }
 function boot(){ $('gate').style.display='none'; $('adminName').textContent=`${ADMIN.name} · ${ADMIN.role||'admin'}`; loadAll(); }
+
+/** วาดใหม่ทั้งหมด — ใช้ทั้งตอนโหลดเสร็จและตอนสลับภาษา */
+function refreshAll(){ renderDash(); renderCases(); renderHistory(); renderPlan(); renderAlerts(); renderBadges(); if(map) setTimeout(()=>map.invalidateSize(),50); }
 
 /* ===== LOAD ===== */
 async function loadAll(){
@@ -349,13 +466,33 @@ async function loadAll(){
   CASES=cs.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(tsDate(b.reportedMissingAt)?.getTime()||0)-(tsDate(a.reportedMissingAt)?.getTime()||0));
   CAMERAS=cam.docs.map(d=>({id:d.id,...d.data()}));
   USERS=us.docs.map(d=>({id:d.id,...d.data()}));
-  // history site filter options
+  populateFilters();
+  refreshAll();
+}
+
+/** ตัวเลือกใน dropdown — ต้องสร้างใหม่ทุกครั้งที่สลับภาษา (คำว่า "ทุกไซต์" เปลี่ยน) */
+function populateFilters(){
   const sites=[...new Set(STATIONS.map(s=>s.site).filter(Boolean))];
-  $('histSite').innerHTML='<option value="">ทุกไซต์</option>'+sites.map(s=>`<option>${esc(s)}</option>`).join('');
-  $('planSite').innerHTML='<option value="">ทุกไซต์</option>'+sites.map(s=>`<option>${esc(s)}</option>`).join('');
+  const siteOpts=`<option value="">${esc(t('all_sites'))}</option>`+sites.map(s=>`<option>${esc(s)}</option>`).join('');
+  $('histSite').innerHTML=siteOpts;
+  $('planSite').innerHTML=siteOpts;
   const assignees=[...new Map(STATIONS.filter(s=>s.assignedTo).map(s=>[s.assignedTo,s.assignedToName||s.assignedTo])).entries()];
-  $('planAssignee').innerHTML='<option value="">ผู้รับผิดชอบทั้งหมด</option>'+assignees.map(([id,nm])=>`<option value="${esc(id)}">${esc(nm)}</option>`).join('')+'<option value="_none">— ยังไม่มอบหมาย —</option>';
-  renderDash(); renderCases(); renderHistory(); renderPlan(); renderAlerts(); renderBadges();
+  $('planAssignee').innerHTML=`<option value="">${esc(t('all_assignees'))}</option>`+
+    assignees.map(([id,nm])=>`<option value="${esc(id)}">${esc(nm)}</option>`).join('')+
+    `<option value="_none">${TL('— Unassigned —','— ยังไม่มอบหมาย —')}</option>`;
+  renderHistScope();
+}
+
+/** ข้อความบอกขอบเขตประวัติที่แสดงอยู่ (+ ลิงก์โหลดทั้งหมด) */
+function renderHistScope(){
+  const el=$('histScope'); if(!el) return;
+  el.innerHTML = ALL_HISTORY
+    ? TL(`Showing all history (${INSPECTIONS.length} records · table shows up to ${HISTORY_MAX_ROWS} rows — export includes everything)`,
+         `แสดงประวัติทั้งหมด (${INSPECTIONS.length} รายการ · ตารางแสดงสูงสุด ${HISTORY_MAX_ROWS} แถว — Export ได้ครบ)`)
+    : TL(`Showing the last ${HISTORY_DAYS} days (${INSPECTIONS.length} records) · <a href="#" id="loadAllHist" style="color:var(--navy);font-weight:600">load all history</a>`,
+         `แสดง ${HISTORY_DAYS} วันล่าสุด (${INSPECTIONS.length} รายการ) · <a href="#" id="loadAllHist" style="color:var(--navy);font-weight:600">โหลดประวัติทั้งหมด</a>`);
+  const a=$('loadAllHist');
+  if(a) a.onclick=async e=>{ e.preventDefault(); a.textContent=t('loading'); ALL_HISTORY=true; await loadAll(); };
 }
 
 /* ===== METRICS / DASHBOARD ===== */
@@ -388,17 +525,18 @@ function renderDash(){
   const openCases=CASES.filter(c=>c.status==='investigating').length;
   const overdue=STATIONS.filter(s=>{const li=tsDate(s.lastInspectionAt);return !li||daysAgo(li)>OVERDUE_DAYS;}).length;
 
+  const siteCount=[...new Set(STATIONS.map(s=>s.site).filter(Boolean))].length;
   $('statCards').innerHTML=`
-    <div class="stat s-navy"><div class="bar"></div><div class="lab">สถานีทั้งหมด</div><div class="val">${total}</div><div class="sub">${[...new Set(STATIONS.map(s=>s.site).filter(Boolean))].length} ไซต์</div></div>
-    <div class="stat ${compliance>=80?'s-green':compliance>=50?'s-amber':'s-red'}"><div class="bar"></div><div class="lab">Compliance (${OVERDUE_DAYS} วัน)</div><div class="val">${compliance}%</div><div class="sub">ตรวจตามกำหนด ${inspected}/${total}</div></div>
-    <div class="stat ${openCases?'s-red':'s-green'}"><div class="bar"></div><div class="lab">🎥 เคสของหายเปิดอยู่</div><div class="val">${openCases}</div><div class="sub">รอสอบสวน CCTV</div></div>
-    <div class="stat ${overdue?'s-amber':'s-green'}"><div class="bar"></div><div class="lab">เกินกำหนดตรวจ</div><div class="val">${overdue}</div><div class="sub">สถานีต้องตรวจด่วน</div></div>`;
+    <div class="stat s-navy"><div class="bar"></div><div class="lab">${TL('Total stations','สถานีทั้งหมด')}</div><div class="val">${total}</div><div class="sub">${siteCount} ${TL('sites','ไซต์')}</div></div>
+    <div class="stat ${compliance>=80?'s-green':compliance>=50?'s-amber':'s-red'}"><div class="bar"></div><div class="lab">${TL(`Compliance (${OVERDUE_DAYS} days)`,`Compliance (${OVERDUE_DAYS} วัน)`)}</div><div class="val">${compliance}%</div><div class="sub">${TL('inspected on schedule','ตรวจตามกำหนด')} ${inspected}/${total}</div></div>
+    <div class="stat ${openCases?'s-red':'s-green'}"><div class="bar"></div><div class="lab">🎥 ${TL('Open loss cases','เคสของหายเปิดอยู่')}</div><div class="val">${openCases}</div><div class="sub">${TL('awaiting CCTV review','รอสอบสวน CCTV')}</div></div>
+    <div class="stat ${overdue?'s-amber':'s-green'}"><div class="bar"></div><div class="lab">${TL('Overdue inspections','เกินกำหนดตรวจ')}</div><div class="val">${overdue}</div><div class="sub">${TL('stations needing attention','สถานีต้องตรวจด่วน')}</div></div>`;
 
   renderMap(); renderIssueChart(); renderRecent();
 }
 function renderMap(){
   const geo=STATIONS.filter(s=>s.gps&&s.gps.lat);
-  $('mapSub').textContent=`${geo.length}/${STATIONS.length} มีพิกัด`;
+  $('mapSub').textContent=`${geo.length}/${STATIONS.length} ${TL('have GPS','มีพิกัด')}`;
   if(!map){ map=L.map('map',{scrollWheelZoom:false}).setView([13.7563,100.5018],11);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:19}).addTo(map); }
   markers.forEach(m=>map.removeLayer(m)); markers=[];
@@ -407,8 +545,9 @@ function renderMap(){
   geo.forEach(s=>{
     const col=STATUS_COLOR[stationStatus(s)];
     const m=L.circleMarker([s.gps.lat,s.gps.lng],{radius:9,fillColor:col,color:'#fff',weight:2,fillOpacity:.9}).addTo(map);
-    const li=tsDate(s.lastInspectionFor);
-    m.bindPopup(`<b>${esc(s.id)}</b><br>${esc(s.name||'')}<br>ตรวจล่าสุด: ${fmt(tsDate(s.lastInspectionAt))}<br>ผล: ${esc(s.lastResult||'ยังไม่ตรวจ')}`);
+    // หมายเหตุ: ของเดิมมี `const li=tsDate(s.lastInspectionFor)` ซึ่งอ้างฟิลด์ที่ไม่มีจริง
+    // (lastInspectionFor เป็นชื่อฟังก์ชัน ไม่ใช่ฟิลด์) และไม่ได้ใช้ค่า → ลบทิ้ง
+    m.bindPopup(`<b>${esc(s.id)}</b><br>${esc(s.name||'')}<br>${TL('Last inspected','ตรวจล่าสุด')}: ${fmt(tsDate(s.lastInspectionAt))}<br>${TL('Result','ผล')}: ${esc(s.lastResult?resultLabel(s.lastResult):TL('not inspected','ยังไม่ตรวจ'))}`);
     markers.push(m); grp.push([s.gps.lat,s.gps.lng]);
   });
   if(grp.length) map.fitBounds(grp,{padding:[40,40],maxZoom:15});
@@ -420,7 +559,7 @@ function renderIssueChart(){
   INSPECTIONS.forEach(i=>{ const n=(i.missingItems?.length||0)+(i.result==='fail'?1:0); if(n)cnt[i.stationId]=(cnt[i.stationId]||0)+n; });
   CASES.forEach(c=>{ cnt[c.stationId]=(cnt[c.stationId]||0)+1; });
   const arr=Object.entries(cnt).sort((a,b)=>b[1]-a[1]).slice(0,8);
-  if(!arr.length){ $('issueChart').innerHTML='<div class="empty">ยังไม่มีปัญหาบันทึก ✓</div>'; return; }
+  if(!arr.length){ $('issueChart').innerHTML=`<div class="empty">${TL('No issues recorded ✓','ยังไม่มีปัญหาบันทึก ✓')}</div>`; return; }
   const max=Math.max(...arr.map(a=>a[1]));
   $('issueChart').innerHTML=arr.map(([sid,n])=>{
     const pct=Math.round(n/max*100); const col=n>=max*0.66?'var(--red)':n>=max*0.33?'var(--amber)':'var(--navy-2)';
@@ -428,14 +567,14 @@ function renderIssueChart(){
   }).join('');
 }
 function renderRecent(){
-  if(!INSPECTIONS.length){ $('recentList').innerHTML='<div class="empty">ยังไม่มีการตรวจ</div>'; return; }
+  if(!INSPECTIONS.length){ $('recentList').innerHTML=`<div class="empty">${TL('No inspections yet','ยังไม่มีการตรวจ')}</div>`; return; }
   $('recentList').innerHTML=INSPECTIONS.slice(0,10).map(i=>{
     const c=i.result==='pass'?'green':'red';
     const ic=i.result==='pass'?'#0E8A5F':'#D62828';
     return `<div class="row" data-insp="${esc(i.id)}" style="cursor:pointer">
       <div class="av" style="background:rgba(${c==='green'?'14,138,95':'214,40,40'},.12);color:${ic}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">${i.result==='pass'?'<path d="M20 6L9 17l-5-5"/>':'<path d="M12 9v4m0 4h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/>'}</svg></div>
-      <div class="main"><b>${esc(i.stationId)} <span class="badge ${c}">${i.result==='pass'?'ผ่าน':i.result==='needs_repair'?'ต้องแก้ไข':'ไม่ผ่าน'}</span>${i.missingItems?.length?` <span class="badge red">ของหาย ${i.missingItems.length}</span>`:''}</b>
-        <div class="meta">${esc(i.inspectorName||'')} · ${fmt(tsDate(i.createdAt))} ${i.gpsDistanceM!=null?'· '+i.gpsDistanceM+'ม.':''}</div></div>
+      <div class="main"><b>${esc(i.stationId)} <span class="badge ${c}">${esc(resultLabel(i.result))}</span>${i.missingItems?.length?` <span class="badge red">${TL('Missing','ของหาย')} ${i.missingItems.length}</span>`:''}</b>
+        <div class="meta">${esc(i.inspectorName||'')} · ${fmt(tsDate(i.createdAt))} ${i.gpsDistanceM!=null?`· ${i.gpsDistanceM} ${TL('m','ม.')}`:''}</div></div>
       <div class="badge gray">${(i.photos?.length||0)} 📷</div></div>`;
   }).join('');
   $('recentList').querySelectorAll('[data-insp]').forEach(r=>r.onclick=()=>openInsp(r.dataset.insp));
@@ -454,15 +593,14 @@ function renderCases(){
   if(f==='open')list=list.filter(c=>c.status==='investigating');
   else if(f!=='all')list=list.filter(c=>c.status===f);
   const el=$('caseList');
-  if(!list.length){ el.innerHTML='<div class="empty">ไม่มีเคสในหมวดนี้ ✓</div>'; return; }
+  if(!list.length){ el.innerHTML=`<div class="empty">${TL('No cases in this category ✓','ไม่มีเคสในหมวดนี้ ✓')}</div>`; return; }
   const sc={investigating:'amber',found:'green',replaced:'navy',closed:'gray'};
-  const sl={investigating:'กำลังสอบสวน',found:'พบแล้ว',replaced:'เปลี่ยนใหม่',closed:'ปิดเคส'};
   el.innerHTML=list.map(c=>{
     const rep=tsDate(c.reportedMissingAt); const stale=c.status==='investigating'&&daysAgo(rep)>STALE_CASE_DAYS;
     return `<div class="row" data-case="${esc(c.id)}" style="cursor:pointer">
-      <div class="av" style="background:rgba(214,40,40,.1);color:#D62828"><svg width="18" height="18" viewBox="0 0 24 24" fill="#D62828"><path d="M12 2C9 6 7 8 7 11.5A5 5 0 0 0 12 16a5 5 0 0 0 5-4.5C17 8 15 6 12 2z"/></svg></div>
-      <div class="main"><b>${esc(c.itemName||'อุปกรณ์')} <span class="badge ${sc[c.status]||'gray'}">${sl[c.status]||c.status}</span>${stale?' <span class="badge red">ค้าง '+daysAgo(rep)+' วัน</span>':''}</b>
-        <div class="meta"><span class="mono">${esc(c.stationId)}</span> · แจ้ง ${fmt(rep)} · โดย ${esc(c.reportedBy||'—')} · 🎥 ${(c.cctvCameras||[]).length} กล้อง</div></div>
+      <div class="av" style="background:rgba(214,40,40,.1);color:#D62828" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="#D62828"><path d="M12 2C9 6 7 8 7 11.5A5 5 0 0 0 12 16a5 5 0 0 0 5-4.5C17 8 15 6 12 2z"/></svg></div>
+      <div class="main"><b>${esc(c.itemName||TL('Item','อุปกรณ์'))} <span class="badge ${sc[c.status]||'gray'}">${esc(caseStatusLabel(c.status))}</span>${stale?` <span class="badge red">${TL('stale','ค้าง')} ${daysAgo(rep)} ${TL('days','วัน')}</span>`:''}</b>
+        <div class="meta"><span class="mono">${esc(c.stationId)}</span> · ${TL('reported','แจ้ง')} ${fmt(rep)} · ${TL('by','โดย')} ${esc(c.reportedBy||'—')} · 🎥 ${(c.cctvCameras||[]).length} ${TL('cameras','กล้อง')}</div></div>
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64708A" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></div>`;
   }).join('');
   el.querySelectorAll('[data-case]').forEach(r=>r.onclick=()=>openCase(r.dataset.case));
@@ -480,52 +618,51 @@ function openCase(id){
   const winStart=c.cctvWindow?.start?new Date(c.cctvWindow.start):null;
   const winEnd=c.cctvWindow?.end?new Date(c.cctvWindow.end):rep;
   let durTxt='—';
-  if(winStart&&winEnd){ const h=Math.round((winEnd-winStart)/3600000); durTxt=h<48?`${h} ชม.`:`${Math.round(h/24)} วัน`; }
+  if(winStart&&winEnd){ const h=Math.round((winEnd-winStart)/3600000); durTxt=h<48?`${h} ${TL('hrs','ชม.')}`:`${Math.round(h/24)} ${TL('days','วัน')}`; }
   const cams=(c.cctvCameras||[]).map(cid=>{ const cam=CAMERAS.find(x=>x.id===cid); return {id:cid,name:cam?.name||'',loc:cam?.location||''}; });
   const tl=stationTimeline(c.stationId,c.itemId);
-  const sl={investigating:'กำลังสอบสวน',found:'พบแล้ว',replaced:'เปลี่ยนใหม่',closed:'ปิดเคส'};
 
   $('caseBody').innerHTML=`
-    <div class="inv-head"><div class="t">${esc(c.itemName||'อุปกรณ์')} หาย</div><div class="s">${esc(c.stationName||'')} · ${esc(c.stationId)} · เคส ${esc(c.id.slice(0,8).toUpperCase())}</div></div>
+    <div class="inv-head"><div class="t">${esc(c.itemName||TL('Item','อุปกรณ์'))} ${TL('missing','หาย')}</div><div class="s">${esc(c.stationName||'')} · ${esc(c.stationId)} · ${TL('case','เคส')} ${esc(c.id.slice(0,8).toUpperCase())}</div></div>
     <div class="kv">
-      <div class="k">สถานะปัจจุบัน</div><div class="v">${sl[c.status]||c.status}</div>
-      <div class="k">เห็นครั้งสุดท้าย</div><div class="v">${seen?fmt(seen):'ไม่มีข้อมูล'} ${c.lastSeenBy?'· โดย '+esc(c.lastSeenBy):''}</div>
-      <div class="k">แจ้งหาย</div><div class="v">${fmt(rep)} · โดย ${esc(c.reportedBy||'—')}</div>
+      <div class="k">${TL('Current status','สถานะปัจจุบัน')}</div><div class="v">${esc(caseStatusLabel(c.status))}</div>
+      <div class="k">${TL('Last seen','เห็นครั้งสุดท้าย')}</div><div class="v">${seen?fmt(seen):TL('no data','ไม่มีข้อมูล')} ${c.lastSeenBy?`· ${TL('by','โดย')} ${esc(c.lastSeenBy)}`:''}</div>
+      <div class="k">${TL('Reported missing','แจ้งหาย')}</div><div class="v">${fmt(rep)} · ${TL('by','โดย')} ${esc(c.reportedBy||'—')}</div>
     </div>
     <div class="win">
-      <div class="wt">🎥 ช่วงเวลาที่ต้องตรวจ CCTV (D3)</div>
-      <div style="font-size:14px;font-weight:600">${winStart?fmt(winStart):'(ไม่ทราบจุดเริ่ม — ตรวจย้อนจากการตรวจก่อนหน้า)'} &nbsp;→&nbsp; ${fmt(winEnd)}</div>
-      <div class="hint" style="margin-top:4px">ช่วงเวลาโดยประมาณ: <b>${durTxt}</b> — อุปกรณ์หายไประหว่างนี้</div>
+      <div class="wt">🎥 ${TL('CCTV time window to review (D3)','ช่วงเวลาที่ต้องตรวจ CCTV (D3)')}</div>
+      <div style="font-size:14px;font-weight:600">${winStart?fmt(winStart):TL('(start unknown — check back from previous inspection)','(ไม่ทราบจุดเริ่ม — ตรวจย้อนจากการตรวจก่อนหน้า)')} &nbsp;→&nbsp; ${fmt(winEnd)}</div>
+      <div class="hint" style="margin-top:4px">${TL('Approximate window','ช่วงเวลาโดยประมาณ')}: <b>${durTxt}</b> — ${TL('the item went missing during this period','อุปกรณ์หายไประหว่างนี้')}</div>
     </div>
-    <div style="margin-bottom:6px"><label>กล้องที่ต้องเปิดดู (D4)</label></div>
-    <div class="cam-list" style="margin-bottom:16px">${cams.length?cams.map(cm=>`<span class="cam-pill" title="${esc(cm.name)} ${esc(cm.loc)}">🎥 ${esc(cm.id)}</span>`).join(''):'<span class="hint">สถานีนี้ยังไม่ได้ผูกกล้องใน Admin</span>'}</div>
-    <div style="margin-bottom:6px"><label>ไทม์ไลน์สถานี (D6) — สถานะอุปกรณ์ย้อนหลัง</label></div>
-    <div class="timeline">${tl.length?tl.map(t=>`<div class="tl-item ${t.status==='missing'?'miss':t.status==='present'?'ok':''}"><div class="tt">${t.status==='present'?'✓ พบอุปกรณ์':t.status==='missing'?'✕ ไม่พบ':'— ไม่ระบุ'}</div><div class="td">${fmt(t.date)} · ${esc(t.by||'')}</div></div>`).join(''):'<div class="hint">ไม่มีประวัติ</div>'}</div>
-    <div style="margin-bottom:6px"><label>อัปเดตสถานะเคส (D7)</label></div>
-    <div class="life">
-      ${['investigating','found','replaced','closed'].map(s=>`<button data-s="${s}" class="${c.status===s?'on':''}">${sl[s]}</button>`).join('')}
+    <div style="margin-bottom:6px"><label>${TL('Cameras to review (D4)','กล้องที่ต้องเปิดดู (D4)')}</label></div>
+    <div class="cam-list" style="margin-bottom:16px">${cams.length?cams.map(cm=>`<span class="cam-pill" title="${esc(cm.name)} ${esc(cm.loc)}">🎥 ${esc(cm.id)}</span>`).join(''):`<span class="hint">${TL('No cameras linked to this station in Admin','สถานีนี้ยังไม่ได้ผูกกล้องใน Admin')}</span>`}</div>
+    <div style="margin-bottom:6px"><label>${TL('Station timeline (D6) — item status history','ไทม์ไลน์สถานี (D6) — สถานะอุปกรณ์ย้อนหลัง')}</label></div>
+    <div class="timeline">${tl.length?tl.map(x=>`<div class="tl-item ${x.status==='missing'?'miss':x.status==='present'?'ok':''}"><div class="tt">${x.status==='present'?TL('✓ found','✓ พบอุปกรณ์'):x.status==='missing'?TL('✕ not found','✕ ไม่พบ'):TL('— n/a','— ไม่ระบุ')}</div><div class="td">${fmt(x.date)} · ${esc(x.by||'')}</div></div>`).join(''):`<div class="hint">${TL('No history','ไม่มีประวัติ')}</div>`}</div>
+    <div style="margin-bottom:6px"><label>${TL('Update case status (D7)','อัปเดตสถานะเคส (D7)')}</label></div>
+    <div class="life" role="group" aria-label="${TL('Case status','สถานะเคส')}">
+      ${['investigating','found','replaced','closed'].map(s=>`<button type="button" data-s="${s}" class="${c.status===s?'on':''}" aria-pressed="${c.status===s}">${esc(caseStatusLabel(s))}</button>`).join('')}
     </div>
-    <div style="margin-bottom:12px"><textarea id="caseNote" placeholder="บันทึกผลการสอบสวน / หมายเหตุ…" style="width:100%;min-height:70px">${esc(c.notes||'')}</textarea></div>
+    <div style="margin-bottom:12px"><label class="sr-only" for="caseNote">${TL('Investigation notes','บันทึกผลการสอบสวน')}</label><textarea id="caseNote" placeholder="${TL('Investigation notes…','บันทึกผลการสอบสวน / หมายเหตุ…')}" style="width:100%;min-height:70px">${esc(c.notes||'')}</textarea></div>
     <div style="display:flex;gap:10px">
-      <button class="btn btn-ghost btn-sm" id="printInv">🖨 พิมพ์ใบสอบสวน (D5)</button>
-      <button class="btn btn-primary btn-sm" id="saveCase" style="margin-left:auto" ${ADMIN.role!=='admin'?'disabled title="เฉพาะ admin"':''}>บันทึก</button>
+      <button class="btn btn-ghost btn-sm" id="printInv" type="button">🖨 ${TL('Print sheet (D5)','พิมพ์ใบสอบสวน (D5)')}</button>
+      <button class="btn btn-primary btn-sm" id="saveCase" type="button" style="margin-left:auto" ${ADMIN.role!=='admin'?`disabled title="${TL('admin only','เฉพาะ admin')}"`:''}>${t('save')}</button>
     </div>`;
 
   let newStatus=c.status;
   $('caseBody').querySelectorAll('.life button').forEach(b=>b.onclick=()=>{
     if(ADMIN.role!=='admin')return;
-    $('caseBody').querySelectorAll('.life button').forEach(x=>x.classList.remove('on'));
-    b.classList.add('on'); newStatus=b.dataset.s;
+    $('caseBody').querySelectorAll('.life button').forEach(x=>{ x.classList.remove('on'); x.setAttribute('aria-pressed','false'); });
+    b.classList.add('on'); b.setAttribute('aria-pressed','true'); newStatus=b.dataset.s;
   });
   $('printInv').onclick=()=>printInvestigation(c,cams,winStart,winEnd,durTxt);
   $('saveCase').onclick=async()=>{
     const btn=$('saveCase');btn.disabled=true;btn.innerHTML='<div class="spinner"></div>';
     try{
       await updateDoc(doc(db,'cases',c.id),{status:newStatus,notes:$('caseNote').value.trim(),updatedAt:serverTimestamp(),updatedBy:ADMIN.name});
-      $('caseModal').classList.remove('on'); await loadAll();
-    }catch(e){ btn.disabled=false; btn.textContent='บันทึก'; alert('บันทึกไม่สำเร็จ: '+e.message); }
+      closeModal($('caseModal')); await loadAll();
+    }catch(e){ btn.disabled=false; btn.textContent=t('save'); toast(TL('Save failed: ','บันทึกไม่สำเร็จ: ')+(e?.message||e), true); }
   };
-  $('caseModal').classList.add('on');
+  openModal('caseModal');
 }
 function printInvestigation(c,cams,winStart,winEnd,durTxt){
   const seen=c.lastSeenAt?new Date(c.lastSeenAt):null, rep=tsDate(c.reportedMissingAt);
@@ -552,12 +689,6 @@ function printInvestigation(c,cams,winStart,winEnd,durTxt){
 }
 
 /* ===== HISTORY (F5/F7) ===== */
-function renderHistScope(){
-  const el=$('histScope'); if(!el) return;
-  el.innerHTML = ALL_HISTORY ? `แสดงประวัติทั้งหมด (${INSPECTIONS.length} รายการ · ตารางแสดงสูงสุด 200 แถว — Export ได้ครบ)`
-    : `แสดง ${HISTORY_DAYS} วันล่าสุด (${INSPECTIONS.length} รายการ) · <a href="#" id="loadAllHist" style="color:var(--navy);font-weight:600">โหลดประวัติทั้งหมด</a>`;
-  const a=$('loadAllHist'); if(a) a.onclick=async e=>{ e.preventDefault(); a.textContent='กำลังโหลด…'; ALL_HISTORY=true; await loadAll(); };
-}
 function renderHistory(){
   const q=$('histSearch').value.trim().toLowerCase(), site=$('histSite').value, res=$('histResult').value;
   let list=INSPECTIONS.filter(i=>{
@@ -567,11 +698,11 @@ function renderHistory(){
     return true;
   });
   const tb=$('histBody');
-  if(!list.length){ tb.innerHTML='<tr><td colspan="7"><div class="empty">ไม่พบรายการ</div></td></tr>'; renderHistScope(); return; }
-  tb.innerHTML=list.slice(0,200).map(i=>`<tr data-insp="${esc(i.id)}">
+  if(!list.length){ tb.innerHTML=`<tr><td colspan="7"><div class="empty">${TL('No records found','ไม่พบรายการ')}</div></td></tr>`; renderHistScope(); return; }
+  tb.innerHTML=list.slice(0,HISTORY_MAX_ROWS).map(i=>`<tr data-insp="${esc(i.id)}" tabindex="0">
     <td style="white-space:nowrap">${fmt(tsDate(i.createdAt))}</td>
     <td class="mono">${esc(i.stationId)}</td><td>${esc(i.site||'')}</td><td>${esc(i.inspectorName||'')}</td>
-    <td class="tag-result ${i.result}">${i.result==='pass'?'ผ่าน':i.result==='needs_repair'?'ต้องแก้ไข':'ไม่ผ่าน'}</td>
+    <td class="tag-result ${i.result}">${esc(resultLabel(i.result))}</td>
     <td>${i.missingItems?.length?`<span class="badge red">${i.missingItems.length}</span>`:'—'}</td>
     <td>${i.photos?.length||0} 📷</td></tr>`).join('');
   tb.querySelectorAll('[data-insp]').forEach(r=>r.onclick=()=>openInsp(r.dataset.insp));
@@ -580,24 +711,46 @@ function renderHistory(){
 function openInsp(id){
   const i=INSPECTIONS.find(x=>x.id===id); if(!i)return;
   const cl=i.checklist||{};
-  const clHtml=Object.entries(cl).map(([code,v])=>`<div class="cl-line"><span class="cc ${v.status}">${esc(code)}</span><span style="flex:1">${v.status==='pass'?'ผ่าน':v.status==='fail'?'ไม่ผ่าน':'N/A'}${v.note?' — '+esc(v.note):''}</span></div>`).join('');
-  const eq=(i.equipmentSnapshot||[]).map(e=>`<span class="badge ${e.status==='present'?'green':e.status==='missing'?'red':'amber'}">${esc(e.name)}: ${e.status==='present'?'ครบ':e.status==='missing'?'หาย':'ชำรุด'}</span>`).join(' ');
+  const clHtml=Object.entries(cl).map(([code,v])=>`<div class="cl-line" style="align-items:flex-start"><span class="cc ${v.status}">${esc(code)}</span><span style="flex:1">${esc(clLabel(code))}<b style="display:block;margin-top:2px;color:${v.status==='pass'?'var(--green)':v.status==='fail'?'var(--red)':'var(--muted)'}">${v.status==='pass'?TL('✓ Pass','✓ ผ่าน'):v.status==='fail'?TL('✕ Fail','✕ ไม่ผ่าน'):'N/A'}${v.note?' — '+esc(v.note):''}</b></span></div>`).join('');
+  const eqLabel={present:TL('present','ครบ'),missing:TL('missing','หาย'),damaged:TL('damaged','ชำรุด')};
+  const eq=(i.equipmentSnapshot||[]).map(e=>`<span class="badge ${e.status==='present'?'green':e.status==='missing'?'red':'amber'}">${esc(e.name)}: ${esc(eqLabel[e.status]||e.status)}</span>`).join(' ');
   $('inspBody').innerHTML=`
     <div class="inv-head"><div class="t">${esc(i.stationId)}</div><div class="s">${esc(i.stationName||'')} · ${esc(i.site||'')}</div></div>
     <div class="kv">
-      <div class="k">ผู้ตรวจ</div><div class="v">${esc(i.inspectorName||'')}</div>
-      <div class="k">วันเวลา</div><div class="v">${fmt(tsDate(i.createdAt))}</div>
-      <div class="k">ผล</div><div class="v tag-result ${i.result}">${i.result==='pass'?'ผ่าน':i.result==='needs_repair'?'ต้องแก้ไข':'ไม่ผ่าน'}</div>
-      <div class="k">GPS</div><div class="v">${i.gpsDistanceM!=null?'ห่าง '+i.gpsDistanceM+' ม.':'—'}</div>
-      <div class="k">แรงดัน</div><div class="v">${i.pressureValue!=null?i.pressureValue+' bar':'—'}</div>
-      <div class="k">ซีล</div><div class="v mono">${esc(i.sealNumber||'—')}</div>
+      <div class="k">${TL('Inspector','ผู้ตรวจ')}</div><div class="v">${esc(i.inspectorName||'')}</div>
+      <div class="k">${t('th_datetime')}</div><div class="v">${fmt(tsDate(i.createdAt))}</div>
+      <div class="k">${TL('Result','ผล')}</div><div class="v tag-result ${i.result}">${esc(resultLabel(i.result))}</div>
+      <div class="k">GPS</div><div class="v">${i.gpsDistanceM!=null?`${TL('away','ห่าง')} ${i.gpsDistanceM} ${TL('m','ม.')}`:'—'}${i.gpsOverride?` <span class="badge amber" title="${esc(i.gpsOverride.reason||'')}">${TL('remote override','ยืนยันระยะไกล')}</span>`:''}</div>
+      <div class="k">${TL('Pressure','แรงดัน')}</div><div class="v">${i.pressureValue!=null?i.pressureValue+' bar':'—'}</div>
+      <div class="k">${TL('Seal','ซีล')}</div><div class="v mono">${esc(i.sealNumber||'—')}</div>
     </div>
-    ${eq?`<div style="margin-bottom:6px"><label>อุปกรณ์</label></div><div style="margin-bottom:16px;display:flex;flex-wrap:wrap;gap:6px">${eq}</div>`:''}
-    <div style="margin-bottom:6px"><label>รายการตรวจ</label></div><div style="margin-bottom:16px">${clHtml||'<span class="hint">—</span>'}</div>
-    ${i.notes?`<div style="margin-bottom:6px"><label>หมายเหตุ</label></div><div style="margin-bottom:16px;font-size:13.5px">${esc(i.notes)}</div>`:''}
-    ${i.photos?.length?`<div style="margin-bottom:6px"><label>รูปหลักฐาน (${i.photos.length})</label></div><div class="photos">${i.photos.map(p=>`<img loading="lazy" src="${esc(cld(p.url,'c_fill,w_300,h_300,q_auto,f_auto'))}" onclick="window.open('${esc(p.url)}','_blank')">`).join('')}</div>`:''}
-    ${i.signatureUrl?`<div style="margin-top:14px;margin-bottom:6px"><label>ลายเซ็นผู้ตรวจ</label></div><img src="${esc(i.signatureUrl)}" style="max-width:240px;border:1px solid var(--line);border-radius:9px;background:#fff;padding:6px">`:''}`;
-  $('inspModal').classList.add('on');
+    ${eq?`<div style="margin-bottom:6px"><label>${TL('Equipment','อุปกรณ์')}</label></div><div style="margin-bottom:16px;display:flex;flex-wrap:wrap;gap:6px">${eq}</div>`:''}
+    <div style="margin-bottom:6px"><label>${TL('Checklist','รายการตรวจ')}</label></div><div style="margin-bottom:16px">${clHtml||'<span class="hint">—</span>'}</div>
+    ${i.notes?`<div style="margin-bottom:6px"><label>${TL('Note','หมายเหตุ')}</label></div><div style="margin-bottom:16px;font-size:13.5px">${esc(i.notes)}</div>`:''}
+    ${i.photos?.length?`<div style="margin-bottom:6px"><label>${TL('Evidence photos','รูปหลักฐาน')} (${i.photos.length})</label></div><div class="photos">${i.photos.map((p,n)=>`<img loading="lazy" src="${esc(cld(p.url,{w:300,h:300}))}" data-full="${esc(p.url)}" alt="${TL('Evidence photo','รูปหลักฐาน')} ${n+1}">`).join('')}</div>`:''}
+    ${i.signatureUrl?`<div style="margin-top:14px;margin-bottom:6px"><label>${TL('Inspector signature','ลายเซ็นผู้ตรวจ')}</label></div><img src="${esc(i.signatureUrl)}" alt="${TL('Inspector signature','ลายเซ็นผู้ตรวจ')}" style="max-width:240px;border:1px solid var(--line);border-radius:9px;background:#fff;padding:6px">`:''}`;
+  // เปิดรูปด้วย listener + data-full ไม่ใช่ inline onclick ที่ต่อสตริง JS
+  // (ของเดิม: onclick="window.open('${esc(url)}')" — ถ้า URL มี ' จะหลุดออกมา inject JS ได้)
+  $('inspBody').querySelectorAll('.photos img[data-full]').forEach(im=>{
+    im.style.cursor='zoom-in';
+    im.onclick=()=>window.open(im.dataset.full,'_blank','noopener');
+  });
+  openModal('inspModal');
+}
+
+/* modal helper — จัดการ aria + คืนโฟกัสให้ element เดิมตอนปิด */
+let _lastFocus=null;
+function openModal(id){
+  _lastFocus=document.activeElement;
+  const m=$(id); if(!m) return;
+  m.classList.add('on');
+  const f=m.querySelector('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])');
+  if(f) setTimeout(()=>f.focus(),30);
+}
+function closeModal(el){
+  const m=el?.classList?el:null; if(!m) return;
+  m.classList.remove('on');
+  if(_lastFocus && _lastFocus.focus) _lastFocus.focus();
 }
 
 /* ===== ALERTS (G1–G4) ===== */
@@ -619,31 +772,40 @@ function getAlerts(){
 function countAlerts(){ const a=getAlerts(); return a.missing.length+a.overdue.length+a.stale.length+a.seal.length; }
 function renderAlerts(){
   const a=getAlerts(); const el=$('alertsBody'); let html='';
-  if(!countAlerts()){ el.innerHTML='<div class="empty">ไม่มีการแจ้งเตือน ทุกอย่างปกติ ✓</div>'; return; }
-  if(a.missing.length){ html+=`<div class="alert-grp"><div class="gh">🎥 อุปกรณ์หาย — รอสอบสวน <span class="ct">${a.missing.length}</span></div><div class="panel">${a.missing.map(c=>`<div class="row" data-case="${esc(c.id)}" style="cursor:pointer"><div class="av" style="background:rgba(214,40,40,.1);color:#D62828">!</div><div class="main"><b>${esc(c.itemName)}</b><div class="meta">${esc(c.stationId)} · แจ้ง ${fmt(tsDate(c.reportedMissingAt))}</div></div><span class="badge amber">เปิดเคส CCTV</span></div>`).join('')}</div></div>`; }
-  if(a.overdue.length){ html+=`<div class="alert-grp"><div class="gh">⏰ สถานีเกินกำหนดตรวจ (>${OVERDUE_DAYS} วัน) <span class="ct">${a.overdue.length}</span></div><div class="panel">${a.overdue.map(o=>`<div class="row"><div class="av" style="background:rgba(230,81,0,.13);color:#E65100">${o.days??'∞'}</div><div class="main"><b>${esc(o.s.id)} <span class="badge navy">${esc(o.s.site||'')}</span></b><div class="meta">${esc(o.s.name||'')} · ${o.days!=null?'ตรวจล่าสุด '+o.days+' วันก่อน':'ยังไม่เคยตรวจ'}</div></div><span class="badge amber">ตรวจด่วน</span></div>`).join('')}</div></div>`; }
-  if(a.stale.length){ html+=`<div class="alert-grp"><div class="gh">🐌 เคสค้างนาน (>${STALE_CASE_DAYS} วัน) <span class="ct">${a.stale.length}</span></div><div class="panel">${a.stale.map(c=>`<div class="row" data-case="${esc(c.id)}" style="cursor:pointer"><div class="av" style="background:rgba(214,40,40,.1);color:#D62828">${daysAgo(tsDate(c.reportedMissingAt))}</div><div class="main"><b>${esc(c.itemName)} @ ${esc(c.stationId)}</b><div class="meta">เปิดมาแล้ว ${daysAgo(tsDate(c.reportedMissingAt))} วัน ยังไม่ปิด</div></div><span class="badge red">เร่งติดตาม</span></div>`).join('')}</div></div>`; }
-  if(a.seal.length){ html+=`<div class="alert-grp"><div class="gh">🔒 ซีลเปลี่ยน/ไม่ตรงกับครั้งก่อน <span class="ct">${a.seal.length}</span></div><div class="panel">${a.seal.map(x=>`<div class="row"><div class="av" style="background:rgba(230,81,0,.13);color:#E65100">🔒</div><div class="main"><b>${esc(x.s.id)}</b><div class="meta">ซีลล่าสุด <span class="mono">${esc(x.now)}</span> · ก่อนหน้า <span class="mono">${esc(x.prev)}</span></div></div><span class="badge amber">ตรวจสอบ</span></div>`).join('')}</div></div>`; }
+  if(!countAlerts()){ el.innerHTML=`<div class="empty">${TL('No alerts — all good ✓','ไม่มีการแจ้งเตือน ทุกอย่างปกติ ✓')}</div>`; return; }
+  if(a.missing.length){ html+=`<div class="alert-grp"><div class="gh">🎥 ${TL('Missing items — awaiting investigation','อุปกรณ์หาย — รอสอบสวน')} <span class="ct">${a.missing.length}</span></div><div class="panel">${a.missing.map(c=>`<div class="row" data-case="${esc(c.id)}" style="cursor:pointer"><div class="av" style="background:rgba(214,40,40,.1);color:#D62828" aria-hidden="true">!</div><div class="main"><b>${esc(c.itemName)}</b><div class="meta">${esc(c.stationId)} · ${TL('reported','แจ้ง')} ${fmt(tsDate(c.reportedMissingAt))}</div></div><span class="badge amber">${TL('CCTV case open','เปิดเคส CCTV')}</span></div>`).join('')}</div></div>`; }
+  if(a.overdue.length){ html+=`<div class="alert-grp"><div class="gh">⏰ ${TL(`Stations overdue (>${OVERDUE_DAYS} days)`,`สถานีเกินกำหนดตรวจ (>${OVERDUE_DAYS} วัน)`)} <span class="ct">${a.overdue.length}</span></div><div class="panel">${a.overdue.map(o=>`<div class="row"><div class="av" style="background:rgba(230,81,0,.13);color:#E65100">${o.days??'∞'}</div><div class="main"><b>${esc(o.s.id)} <span class="badge navy">${esc(o.s.site||'')}</span></b><div class="meta">${esc(o.s.name||'')} · ${o.days!=null?`${TL('last inspected','ตรวจล่าสุด')} ${o.days} ${TL('days ago','วันก่อน')}`:TL('never inspected','ยังไม่เคยตรวจ')}</div></div><span class="badge amber">${TL('inspect now','ตรวจด่วน')}</span></div>`).join('')}</div></div>`; }
+  if(a.stale.length){ html+=`<div class="alert-grp"><div class="gh">🐌 ${TL(`Stale cases (>${STALE_CASE_DAYS} days)`,`เคสค้างนาน (>${STALE_CASE_DAYS} วัน)`)} <span class="ct">${a.stale.length}</span></div><div class="panel">${a.stale.map(c=>`<div class="row" data-case="${esc(c.id)}" style="cursor:pointer"><div class="av" style="background:rgba(214,40,40,.1);color:#D62828">${daysAgo(tsDate(c.reportedMissingAt))}</div><div class="main"><b>${esc(c.itemName)} @ ${esc(c.stationId)}</b><div class="meta">${TL('open for','เปิดมาแล้ว')} ${daysAgo(tsDate(c.reportedMissingAt))} ${TL('days — still open','วัน ยังไม่ปิด')}</div></div><span class="badge red">${TL('follow up','เร่งติดตาม')}</span></div>`).join('')}</div></div>`; }
+  if(a.seal.length){ html+=`<div class="alert-grp"><div class="gh">🔒 ${TL('Seal changed / mismatched','ซีลเปลี่ยน/ไม่ตรงกับครั้งก่อน')} <span class="ct">${a.seal.length}</span></div><div class="panel">${a.seal.map(x=>`<div class="row"><div class="av" style="background:rgba(230,81,0,.13);color:#E65100" aria-hidden="true">🔒</div><div class="main"><b>${esc(x.s.id)}</b><div class="meta">${TL('latest seal','ซีลล่าสุด')} <span class="mono">${esc(x.now)}</span> · ${TL('previous','ก่อนหน้า')} <span class="mono">${esc(x.prev)}</span></div></div><span class="badge amber">${TL('check','ตรวจสอบ')}</span></div>`).join('')}</div></div>`; }
   el.innerHTML=html;
   el.querySelectorAll('[data-case]').forEach(r=>r.onclick=()=>openCase(r.dataset.case));
 }
 
 /* ===== EXPORT (H1–H3) ===== */
-async function exportExcel(rows,name){ let XLSX; try{ XLSX=await loadXLSX(); }catch(e){ alert(e.message+' — ตรวจสอบอินเทอร์เน็ตแล้วลองใหม่'); return; } const ws=XLSX.utils.aoa_to_sheet(rows); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'data'); XLSX.writeFile(wb,name); }
+async function exportExcel(rows,name){
+  let XLSX;
+  try{ XLSX=await loadXLSX(); }
+  catch(e){ toast((e?.message||e)+TL(' — check your connection and try again',' — ตรวจสอบอินเทอร์เน็ตแล้วลองใหม่'), true); return; }
+  const ws=XLSX.utils.aoa_to_sheet(rows); const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'data'); XLSX.writeFile(wb,name);
+}
 function exportHistory(){
-  const head=['วันเวลา','รหัสสถานี','ชื่อสถานี','ไซต์','ผู้ตรวจ','ผล','แรงดัน(bar)','ซีล','ของหาย','ระยะ GPS(ม.)','จำนวนรูป','หมายเหตุ'];
+  const head=[TL('Date/time','วันเวลา'),TL('Station ID','รหัสสถานี'),TL('Station name','ชื่อสถานี'),TL('Site','ไซต์'),
+    TL('Inspector','ผู้ตรวจ'),TL('Result','ผล'),TL('Pressure (bar)','แรงดัน(bar)'),TL('Seal','ซีล'),
+    TL('Missing','ของหาย'),TL('GPS distance (m)','ระยะ GPS(ม.)'),TL('Photos','จำนวนรูป'),TL('Notes','หมายเหตุ')];
   const rows=[head,...INSPECTIONS.map(i=>[fmt(tsDate(i.createdAt)),i.stationId,i.stationName||'',i.site||'',i.inspectorName||'',
-    i.result==='pass'?'ผ่าน':i.result==='needs_repair'?'ต้องแก้ไข':'ไม่ผ่าน',i.pressureValue??'',i.sealNumber||'',
+    resultLabel(i.result),i.pressureValue??'',i.sealNumber||'',
     (i.missingItems||[]).map(m=>m.name).join('; '),i.gpsDistanceM??'',(i.photos||[]).length,i.notes||''])];
-  exportExcel(rows,`FHS_inspections_${new Date().toISOString().slice(0,10)}.xlsx`);
+  exportExcel(rows,`FHS_inspections_${isoDay()}.xlsx`);
 }
 function exportCases(){
-  const head=['เลขเคส','รหัสสถานี','ชื่อสถานี','อุปกรณ์','สถานะ','เห็นล่าสุด','โดย','แจ้งหาย','โดย','กล้อง','CCTV เริ่ม','CCTV ถึง','หมายเหตุ'];
-  const sl={investigating:'กำลังสอบสวน',found:'พบแล้ว',replaced:'เปลี่ยนใหม่',closed:'ปิดเคส'};
-  const rows=[head,...CASES.map(c=>[c.id.slice(0,8).toUpperCase(),c.stationId,c.stationName||'',c.itemName||'',sl[c.status]||c.status,
+  const head=[TL('Case no.','เลขเคส'),TL('Station ID','รหัสสถานี'),TL('Station name','ชื่อสถานี'),TL('Item','อุปกรณ์'),
+    TL('Status','สถานะ'),TL('Last seen','เห็นล่าสุด'),TL('by','โดย'),TL('Reported missing','แจ้งหาย'),TL('by','โดย'),
+    TL('Cameras','กล้อง'),TL('CCTV from','CCTV เริ่ม'),TL('CCTV to','CCTV ถึง'),TL('Notes','หมายเหตุ')];
+  const rows=[head,...CASES.map(c=>[c.id.slice(0,8).toUpperCase(),c.stationId,c.stationName||'',c.itemName||'',caseStatusLabel(c.status),
     c.lastSeenAt?fmt(new Date(c.lastSeenAt)):'',c.lastSeenBy||'',fmt(tsDate(c.reportedMissingAt)),c.reportedBy||'',
     (c.cctvCameras||[]).join('; '),c.cctvWindow?.start?fmt(new Date(c.cctvWindow.start)):'',c.cctvWindow?.end?fmt(new Date(c.cctvWindow.end)):'',c.notes||''])];
-  exportExcel(rows,`FHS_cases_${new Date().toISOString().slice(0,10)}.xlsx`);
+  exportExcel(rows,`FHS_cases_${isoDay()}.xlsx`);
 }
 
 /* ===== INSPECTION PLAN (J7 — รอบ/แผนการตรวจ) ===== */
@@ -667,39 +829,62 @@ function renderPlan(){
   const soon=all.filter(p=>p.status==='soon').length;
   const noAsg=STATIONS.filter(s=>!s.assignedTo).length;
   $('planStats').innerHTML=`
-    <div class="stat ${overdue?'s-red':'s-green'}"><div class="bar"></div><div class="lab">เกินกำหนดตรวจ</div><div class="val">${overdue}</div><div class="sub">ตามรอบของแต่ละสถานี</div></div>
-    <div class="stat ${soon?'s-amber':'s-green'}"><div class="bar"></div><div class="lab">ใกล้ครบกำหนด (≤2 วัน)</div><div class="val">${soon}</div><div class="sub">ควรวางแผนตรวจ</div></div>
-    <div class="stat ${noAsg?'s-amber':'s-navy'}"><div class="bar"></div><div class="lab">ยังไม่มอบหมายผู้ตรวจ</div><div class="val">${noAsg}</div><div class="sub">กำหนดได้ใน Admin</div></div>`;
+    <div class="stat ${overdue?'s-red':'s-green'}"><div class="bar"></div><div class="lab">${TL('Overdue','เกินกำหนดตรวจ')}</div><div class="val">${overdue}</div><div class="sub">${TL('per each station cycle','ตามรอบของแต่ละสถานี')}</div></div>
+    <div class="stat ${soon?'s-amber':'s-green'}"><div class="bar"></div><div class="lab">${TL('Due soon (≤2 days)','ใกล้ครบกำหนด (≤2 วัน)')}</div><div class="val">${soon}</div><div class="sub">${TL('plan inspections ahead','ควรวางแผนตรวจ')}</div></div>
+    <div class="stat ${noAsg?'s-amber':'s-navy'}"><div class="bar"></div><div class="lab">${TL('Unassigned inspector','ยังไม่มอบหมายผู้ตรวจ')}</div><div class="val">${noAsg}</div><div class="sub">${TL('set in Admin','กำหนดได้ใน Admin')}</div></div>`;
   const list=planList(); const tb=$('planBody');
-  if(!list.length){ tb.innerHTML='<tr><td colspan="7"><div class="empty">ไม่พบสถานีตามเงื่อนไข</div></td></tr>'; return; }
+  if(!list.length){ tb.innerHTML=`<tr><td colspan="7"><div class="empty">${TL('No stations match the filters','ไม่พบสถานีตามเงื่อนไข')}</div></td></tr>`; return; }
   const bc={overdue:'red',soon:'amber',ontrack:'green',never:'gray'};
-  const bl={overdue:'เกินกำหนด',soon:'ใกล้ครบ',ontrack:'ตรงเวลา',never:'ยังไม่เคยตรวจ'};
   tb.innerHTML=list.map(({s,p})=>`<tr>
     <td class="mono">${esc(s.id)}<div style="font-size:11px;color:var(--muted)">${esc(s.name||'')}</div></td>
     <td>${esc(s.site||'')}</td>
-    <td>${s.assignedToName?esc(s.assignedToName):'<span class="badge amber">ยังไม่มอบหมาย</span>'}</td>
-    <td>ทุก ${freqOf(s)} วัน</td>
+    <td>${s.assignedToName?esc(s.assignedToName):`<span class="badge amber">${TL('Unassigned','ยังไม่มอบหมาย')}</span>`}</td>
+    <td>${TL('Every','ทุก')} ${freqOf(s)} ${TL('days','วัน')}</td>
     <td style="white-space:nowrap">${fmt(tsDate(s.lastInspectionAt))}</td>
     <td style="white-space:nowrap">${p.due?fmtD(p.due):'—'}</td>
-    <td><span class="badge ${bc[p.status]}">${bl[p.status]}${p.status==='overdue'?' '+p.overBy+'ว':''}</span></td>
+    <td><span class="badge ${bc[p.status]}">${esc(planStatusLabel(p.status))}${p.status==='overdue'?` ${p.overBy}${TL('d','ว')}`:''}</span></td>
   </tr>`).join('');
 }
 function exportPlan(){
-  const head=['รหัสสถานี','ชื่อสถานี','ไซต์','ผู้รับผิดชอบ','ความถี่(วัน)','ตรวจล่าสุด','ครบกำหนด','สถานะ'];
-  const bl={overdue:'เกินกำหนด',soon:'ใกล้ครบ',ontrack:'ตรงเวลา',never:'ยังไม่เคยตรวจ'};
-  const rows=[head,...planList().map(({s,p})=>[s.id,s.name||'',s.site||'',s.assignedToName||'(ยังไม่มอบหมาย)',freqOf(s),
-    fmt(tsDate(s.lastInspectionAt)),p.due?fmtD(p.due):'',bl[p.status]+(p.status==='overdue'?` (${p.overBy} วัน)`:'')])];
-  exportExcel(rows,`FHS_plan_${new Date().toISOString().slice(0,10)}.xlsx`);
+  const head=[TL('Station ID','รหัสสถานี'),TL('Station name','ชื่อสถานี'),TL('Site','ไซต์'),TL('Assignee','ผู้รับผิดชอบ'),
+    TL('Frequency (days)','ความถี่(วัน)'),TL('Last inspected','ตรวจล่าสุด'),TL('Due','ครบกำหนด'),TL('Status','สถานะ')];
+  const rows=[head,...planList().map(({s,p})=>[s.id,s.name||'',s.site||'',s.assignedToName||TL('(unassigned)','(ยังไม่มอบหมาย)'),freqOf(s),
+    fmt(tsDate(s.lastInspectionAt)),p.due?fmtD(p.due):'',
+    planStatusLabel(p.status)+(p.status==='overdue'?` (${p.overBy} ${TL('days','วัน')})`:'')])];
+  exportExcel(rows,`FHS_plan_${isoDay()}.xlsx`);
 }
 
 /* ===== WIRING ===== */
-document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
-  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+document.querySelectorAll('.tab').forEach(tab=>tab.onclick=()=>{
+  document.querySelectorAll('.tab').forEach(x=>{ x.classList.remove('on'); x.setAttribute('aria-selected','false'); });
   document.querySelectorAll('.page').forEach(x=>x.classList.remove('on'));
-  t.classList.add('on'); $('page-'+t.dataset.tab).classList.add('on');
-  if(t.dataset.tab==='dash'&&map)setTimeout(()=>map.invalidateSize(),100);
+  tab.classList.add('on'); tab.setAttribute('aria-selected','true');
+  $('page-'+tab.dataset.tab).classList.add('on');
+  if(tab.dataset.tab==='dash'&&map)setTimeout(()=>map.invalidateSize(),100);
 });
-document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>b.closest('.modal').classList.remove('on'));
+// ลูกศรซ้าย/ขวาเลื่อนแท็บได้เหมือน native tablist
+document.querySelector('.tabs')?.addEventListener('keydown',e=>{
+  if(e.key!=='ArrowRight' && e.key!=='ArrowLeft') return;
+  const tabs=[...document.querySelectorAll('.tab')];
+  const i=tabs.indexOf(document.activeElement); if(i<0) return;
+  e.preventDefault();
+  const next=tabs[(i + (e.key==='ArrowRight'?1:tabs.length-1)) % tabs.length];
+  next.focus(); next.click();
+});
+document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>closeModal(b.closest('.modal')));
+// คลิกฉากหลังปิด modal + ปุ่ม Esc (ช่วยผู้ใช้คีย์บอร์ด/screen reader)
+document.querySelectorAll('.modal').forEach(m=>{
+  m.addEventListener('click',e=>{ if(e.target===m) closeModal(m); });
+});
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Escape') return;
+  const open=document.querySelector('.modal.on'); if(open) closeModal(open);
+});
+// กัน Tab หลุดออกนอก modal ที่เปิดอยู่ (focus trap แบบง่าย)
+document.addEventListener('focusin',e=>{
+  const open=document.querySelector('.modal.on'); if(!open) return;
+  if(!open.contains(e.target)){ const f=open.querySelector('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])'); if(f) f.focus(); }
+});
 $('caseFilter').onchange=renderCases;
 ['histSearch','histSite','histResult'].forEach(id=>$(id).addEventListener('input',renderHistory));
 $('exportHist').onclick=exportHistory;
@@ -708,9 +893,26 @@ $('exportCases').onclick=exportCases;
 $('exportPlan').onclick=exportPlan;
 $('gBtn').onclick=gateLogin;
 $('gPw').addEventListener('keydown',e=>{if(e.key==='Enter')gateLogin();});
-$('logout').onclick=()=>{sessionStorage.removeItem('fhs_admin');location.reload();};
+$('logout').onclick=()=>{ clearAdminSession(); sessionStorage.removeItem('fhs_user'); location.reload(); };
 
-(function(){ const s=sessionStorage.getItem('fhs_admin'); if(s){ ADMIN=JSON.parse(s); boot(); } })();
+i18n.bind();   // ผูกปุ่ม EN/ไทย + แปล markup ครั้งแรก
+
+/* ── บูต ──────────────────────────────────────────────────────────────────
+ * ⚠️ ช่องโหว่ที่แก้: ของเดิมอ่าน sessionStorage.fhs_admin แล้วเชื่อทันที
+ *    ถ้า admin ถูกระงับ/ลดสิทธิ์ ผู้ใช้ที่เปิดแท็บค้างไว้จะยังเข้าได้จนกว่าจะออกเอง
+ *    ตอนนี้ตรวจกับ Firestore ซ้ำทุกครั้ง (verifyAdminSession) และล้าง session ถ้าไม่ผ่าน
+ *    ถ้าออฟไลน์จะยอมให้ใช้ session เดิมต่อแบบไม่ต่ออายุ                              */
+(async function init(){
+  const s = readAdminSession();
+  if(!s) return;                       // ยังไม่ล็อกอิน → แสดงหน้า gate ตามปกติ
+  const verified = await verifyAdminSession(db);
+  if(verified){ ADMIN=verified; boot(); }
+  else{
+    // session ใช้ไม่ได้แล้ว — ล้างแล้วโชว์หน้า login พร้อมเหตุผล
+    const a=$('gateAlert');
+    if(a) a.innerHTML=`<div class="alert warn">${esc(TL('Your session has expired or access was revoked — please sign in again','เซสชันหมดอายุหรือสิทธิ์ถูกยกเลิก — กรุณาเข้าสู่ระบบใหม่'))}</div>`;
+  }
+})();
 </script>
 </body>
 </html>

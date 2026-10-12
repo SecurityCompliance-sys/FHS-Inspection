@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ไม่พบหน้านี้ · FHS · BevChain</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="theme-color" content="#15234A">
+<style>
+:root{
+  --bg:#E9ECF2;--surface:#FFFFFF;--surface-2:#F4F6FA;--ink:#0F1A2E;--navy:#15234A;--navy-2:#1E2761;
+  --red:#D62828;--amber:#E65100;--green:#0E8A5F;--line:#D7DDE8;--muted:#64708A;--ice:#CADCFC;
+  --shadow:0 1px 2px rgba(15,26,46,.06),0 8px 24px rgba(15,26,46,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"IBM Plex Sans Thai",system-ui,sans-serif;background:var(--bg);color:var(--ink);
+  line-height:1.6;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:24px;text-align:center}
+.hazard{height:6px;background:repeating-linear-gradient(135deg,var(--amber) 0 14px,var(--ink) 14px 28px);
+  position:fixed;top:0;left:0;right:0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);
+  padding:34px 28px;max-width:460px;width:100%}
+.code{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:52px;color:var(--navy);letter-spacing:.06em;line-height:1}
+h1{font-family:"Bai Jamjuree",system-ui,sans-serif;font-weight:700;font-size:20px;color:var(--navy);margin:14px 0 6px}
+p{color:var(--muted);font-size:14px}
+.links{display:flex;flex-direction:column;gap:10px;margin-top:22px}
+a{display:flex;align-items:center;justify-content:center;gap:8px;padding:13px 18px;border-radius:11px;
+  text-decoration:none;font-weight:600;font-size:14.5px;font-family:"Bai Jamjuree",sans-serif;
+  border:1.5px solid var(--line);background:var(--surface);color:var(--navy);transition:filter .15s,transform .08s}
+a.pri{background:var(--navy);color:#fff;border-color:var(--navy)}
+a:hover{filter:brightness(1.06)}
+a:active{transform:scale(.985)}
+.foot{margin-top:20px;font-size:11.5px;color:var(--muted)}
+[lang]{unicode-bidi:isolate}
+#en{display:none}
+html[data-l="en"] #th{display:none}
+html[data-l="en"] #en{display:block}
+button.lang{position:fixed;top:18px;right:18px;background:var(--surface);border:1px solid var(--line);
+  border-radius:8px;padding:7px 12px;font:inherit;font-size:12px;font-weight:700;color:var(--navy);cursor:pointer}
+</style>
+</head>
+<body>
+<div class="hazard"></div>
+<button class="lang" id="langBtn" type="button">EN</button>
+
+<main class="card">
+  <div class="code" aria-hidden="true">404</div>
+
+  <div id="th">
+    <h1>ไม่พบหน้านี้ในระบบ</h1>
+    <p>ลิงก์อาจถูกพิมพ์ผิด หรือหน้านี้ถูกย้าย/เปลี่ยนชื่อไปแล้ว<br>ตรวจสอบที่อยู่แล้วลองอีกครั้ง</p>
+  </div>
+  <div id="en">
+    <h1>Page not found</h1>
+    <p>The link may be mistyped, or this page was moved or renamed.<br>Check the address and try again.</p>
+  </div>
+
+  <nav class="links">
+    <a class="pri" href="index.html"><span id="th2">เริ่มตรวจสถานี</span><span id="en2" style="display:none">Start inspection</span></a>
+    <a href="dashboard.html">Command Center</a>
+    <a href="report.html"><span id="th3">รายงานประจำสัปดาห์</span><span id="en3" style="display:none">Weekly report</span></a>
+    <a href="manual-inspector.html"><span id="th4">คู่มือผู้ตรวจ</span><span id="en4" style="display:none">Inspector manual</span></a>
+  </nav>
+</main>
+
+<p class="foot">BevChain Thailand · Security &amp; Compliance Dept.<br>Fire Hose Station Inspection System</p>
+
+<script>
+/* หน้าสแตติกนี้ไม่โหลดโมดูล จึงสลับภาษาด้วยตัวเองแบบเบาสุด */
+(function(){
+  var KEY='fhs_lang';
+  function get(){ try{ return JSON.parse(localStorage.getItem(KEY))||'th'; }catch(e){ return 'th'; } }
+  function set(l){ try{ localStorage.setItem(KEY, JSON.stringify(l)); }catch(e){} }
+  function apply(l){
+    document.documentElement.setAttribute('data-l', l);
+    document.documentElement.lang = l;
+    document.getElementById('langBtn').textContent = l==='th' ? 'EN' : 'ไทย';
+    ['2','3','4'].forEach(function(n){
+      var th=document.getElementById('th'+n), en=document.getElementById('en'+n);
+      if(th&&en){ th.style.display = l==='th'?'':'none'; en.style.display = l==='en'?'':'none'; }
+    });
+  }
+  var l=get();
+  apply(l);
+  document.getElementById('langBtn').addEventListener('click', function(){
+    l = l==='th' ? 'en' : 'th'; set(l); apply(l);
+  });
+})();
+</script>
+</body>
+</html>

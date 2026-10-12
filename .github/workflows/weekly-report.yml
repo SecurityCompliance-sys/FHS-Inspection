@@ -1,0 +1,105 @@
+name: FHS Weekly Report (auto send)
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  ส่งอีเมลรายงาน FHS ของ "สัปดาห์ที่แล้ว" อัตโนมัติ
+#
+#  เวลารัน: cron "0 1 * * 1" UTC = จันทร์ 08:00 น. Asia/Bangkok
+#  (GitHub cron ไม่การันตีตรงนาที — อาจดีเลย์ได้ถึง ~15 นาทีตอนโหลดสูง)
+#
+#  กลไก: Playwright เปิด report.html?autosend=1 แล้วรอ #autoResult[data-status]
+#         กลายเป็น success / partial / failure
+#
+#  ⚠️ ก่อนใช้งานจริงครั้งแรก ให้รันด้วย dryrun=1 ก่อนเสมอ (แท็บ Actions →
+#     Run workflow → ติ๊ก dryrun) เพื่อยืนยันว่าตั้งค่า EmailJS ใน src/config.js
+#     ครบแล้วและตัวเลือกผู้รับถูกต้อง โดยยังไม่ส่งอีเมลจริง
+# ─────────────────────────────────────────────────────────────────────────────
+on:
+  schedule:
+    - cron: "0 1 * * 1"
+  workflow_dispatch:
+    inputs:
+      week:
+        description: "week offset (0=this week, 1=last week, 2=two weeks ago)"
+        required: false
+        default: "1"
+        type: choice
+        options: ["0", "1", "2"]
+      dryrun:
+        description: "dry run — ไม่ส่งอีเมลจริง แค่ log (แนะนำสำหรับทดสอบ)"
+        required: false
+        default: false
+        type: boolean
+      notify:
+        description: "อีเมลปลายทางสำหรับข้อความสรุปผลการรัน"
+        required: false
+        default: "Jakkaphan_boonnarangsri@bevchain.co.th"
+        type: string
+
+# อนุญาตให้รันซ้อนกันไม่ได้ (กันอีเมลซ้ำ) แต่ไม่ยกเลิกรอบที่กำลังรันอยู่
+concurrency:
+  group: fhs-weekly-report
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  send:
+    name: Send weekly report
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+
+    env:
+      FHS_REPORT_URL: https://securitycompliance-sys.github.io/FHS-Inspection/report.html
+      FHS_WEEK: ${{ github.event.inputs.week || '1' }}
+      FHS_NOTIFY_TO: ${{ github.event.inputs.notify || 'Jakkaphan_boonnarangsri@bevchain.co.th' }}
+      FHS_DRYRUN: ${{ github.event.inputs.dryrun == 'true' && '1' || '0' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # cache ตัว browser (~150MB) เพราะเป็นขั้นที่ช้าที่สุดของการรัน
+      # ไม่ใช้ cache: npm ของ setup-node เพราะ repo นี้ไม่ commit lock file
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-1.47.2-${{ runner.os }}
+
+      - name: Verify the deployed report page is reachable
+        run: |
+          code=$(curl -sS -o /tmp/report-probe.html -w '%{http_code}' -L --max-time 45 "$FHS_REPORT_URL")
+          echo "HTTP $code from $FHS_REPORT_URL"
+          if [ "$code" != "200" ]; then
+            echo "::error::report.html ตอบ HTTP $code — ตรวจสอบว่า GitHub Pages deploy สำเร็จแล้ว"
+            exit 1
+          fi
+          if ! grep -q 'id="autoResult"' /tmp/report-probe.html; then
+            echo "::error::report.html ที่ deploy ไม่มี #autoResult — เวอร์ชันที่ขึ้นเว็บยังไม่ได้อัปเดต ให้ push แล้วรอ Pages build ก่อน"
+            exit 1
+          fi
+
+      - name: Install Playwright + Chromium
+        run: |
+          npm install --no-save playwright@1.47.2
+          npx playwright install --with-deps chromium
+
+      - name: Run auto-send
+        id: run
+        run: node scripts/send-weekly.mjs
+
+      - name: Upload debug artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-debug-${{ github.run_id }}
+          path: |
+            artifacts/**
+          if-no-files-found: ignore
+          retention-days: 14
