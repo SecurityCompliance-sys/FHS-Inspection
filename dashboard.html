@@ -277,6 +277,8 @@ tr:hover td{background:var(--surface-2);cursor:pointer}
     <div class="filters">
       <label class="sr-only" for="caseFilter" data-i18n="lbl_casefilter">กรองตามสถานะเคส</label>
       <select id="caseFilter"><option value="open" data-i18n="cf_open">เปิดอยู่ (investigating)</option><option value="all" data-i18n="cf_all">ทั้งหมด</option><option value="found" data-i18n="cf_found">พบแล้ว</option><option value="replaced" data-i18n="cf_repl">เปลี่ยนใหม่</option><option value="closed" data-i18n="cf_closed">ปิดเคส</option></select>
+      <label class="sr-only" for="caseSite" data-i18n="cf_site_lbl">กรองตามคลัง/ไซต์</label>
+      <select id="caseSite"><option value="" data-i18n="all_sites">ทุกไซต์</option></select>
       <button class="btn btn-green btn-sm" id="exportCases" style="margin-left:auto" type="button"><span aria-hidden="true">⬇</span> <span data-i18n="export_excel">Export Excel</span></button>
     </div>
     <div class="panel" id="caseList"><div class="empty" data-i18n="loading">กำลังโหลด…</div></div>
@@ -361,7 +363,7 @@ const i18n = createI18n(mergeDict({
     h_map:'แผนที่สถานี', h_issue:'สถิติปัญหา/ของหาย รายสถานี', h_recent:'กิจกรรมล่าสุด', sub_recent:'10 รายการ',
     lg_ok:'ผ่าน/ปกติ', lg_over:'เกินกำหนดตรวจ', lg_fail:'ไม่ผ่าน/มีเคสเปิด', lg_never:'ยังไม่เคยตรวจ',
     nodata:'ไม่มีข้อมูล',
-    cf_open:'เปิดอยู่ (investigating)', cf_all:'ทั้งหมด', cf_found:'พบแล้ว', cf_repl:'เปลี่ยนใหม่', cf_closed:'ปิดเคส',
+    cf_open:'เปิดอยู่ (investigating)', cf_all:'ทั้งหมด', cf_site_lbl:'กรองตามคลัง/ไซต์', cf_found:'พบแล้ว', cf_repl:'เปลี่ยนใหม่', cf_closed:'ปิดเคส',
     lbl_casefilter:'กรองตามสถานะเคส', export_excel:'Export Excel',
     hs_search:'ค้นหา สถานี/ผู้ตรวจ…', all_sites:'ทุกไซต์', all_results:'ทุกผล',
     r_pass:'ผ่าน', r_fail:'ไม่ผ่าน', r_repair:'ต้องแก้ไข',
@@ -380,7 +382,7 @@ const i18n = createI18n(mergeDict({
     h_map:'Station map', h_issue:'Issues / losses by station', h_recent:'Recent activity', sub_recent:'10 items',
     lg_ok:'Pass / OK', lg_over:'Overdue', lg_fail:'Fail / open case', lg_never:'Never inspected',
     nodata:'No data',
-    cf_open:'Open (investigating)', cf_all:'All', cf_found:'Found', cf_repl:'Replaced', cf_closed:'Closed',
+    cf_open:'Open (investigating)', cf_all:'All', cf_site_lbl:'Filter by warehouse / site', cf_found:'Found', cf_repl:'Replaced', cf_closed:'Closed',
     lbl_casefilter:'Filter by case status', export_excel:'Export Excel',
     hs_search:'Search station / inspector…', all_sites:'All sites', all_results:'All results',
     r_pass:'Pass', r_fail:'Fail', r_repair:'Needs repair',
@@ -476,6 +478,11 @@ function populateFilters(){
   const siteOpts=`<option value="">${esc(t('all_sites'))}</option>`+sites.map(s=>`<option>${esc(s)}</option>`).join('');
   $('histSite').innerHTML=siteOpts;
   $('planSite').innerHTML=siteOpts;
+  if($('caseSite')){
+    const keep=$('caseSite').value;           // คงตัวกรองที่ผู้ใช้เลือกไว้ตอนรีเฟรช
+    $('caseSite').innerHTML=siteOpts;
+    $('caseSite').value=keep;
+  }
   const assignees=[...new Map(STATIONS.filter(s=>s.assignedTo).map(s=>[s.assignedTo,s.assignedToName||s.assignedTo])).entries()];
   $('planAssignee').innerHTML=`<option value="">${esc(t('all_assignees'))}</option>`+
     assignees.map(([id,nm])=>`<option value="${esc(id)}">${esc(nm)}</option>`).join('')+
@@ -589,9 +596,16 @@ function renderBadges(){
 }
 function renderCases(){
   const f=$('caseFilter').value;
+  const site=$('caseSite')?$('caseSite').value:'';
   let list=CASES.slice();
   if(f==='open')list=list.filter(c=>c.status==='investigating');
   else if(f!=='all')list=list.filter(c=>c.status===f);
+  /* กรองตามคลัง/ไซต์: เคสเก็บ site ไว้เอง ถ้าไม่มีก็เทียบจากรหัสสถานี (เคสเก่าบาง
+   * รายการไม่มี field site) — เดิมตัวกรองนี้หายไปตอนอัปโหลดทับ repo */
+  if(site){
+    const siteOf=new Map(STATIONS.map(s=>[s.id,s.site]));
+    list=list.filter(c=>(c.site||siteOf.get(c.stationId))===site);
+  }
   const el=$('caseList');
   if(!list.length){ el.innerHTML=`<div class="empty">${TL('No cases in this category ✓','ไม่มีเคสในหมวดนี้ ✓')}</div>`; return; }
   const sc={investigating:'amber',found:'green',replaced:'navy',closed:'gray'};
@@ -886,6 +900,7 @@ document.addEventListener('focusin',e=>{
   if(!open.contains(e.target)){ const f=open.querySelector('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])'); if(f) f.focus(); }
 });
 $('caseFilter').onchange=renderCases;
+$('caseSite').onchange=renderCases;
 ['histSearch','histSite','histResult'].forEach(id=>$(id).addEventListener('input',renderHistory));
 $('exportHist').onclick=exportHistory;
 $('exportCases').onclick=exportCases;
