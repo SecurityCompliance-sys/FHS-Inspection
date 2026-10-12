@@ -209,6 +209,26 @@
   }
 }
 
+/* Stronger overrides to counter inline page styles that reset .topbar/.wrap padding.
+   Some pages include large inline <style> blocks after this file, so we use a
+   higher-specificity selector plus !important to ensure safe-area insets apply. */
+
+body.fhs-has-liquid-nav .topbar {
+  padding: calc(14px + env(safe-area-inset-top, 0px)) 20px 14px 20px !important;
+  top: env(safe-area-inset-top, 0px) !important; /* ensure sticky offset clears the notch */
+}
+
+body.fhs-has-liquid-nav .wrap {
+  padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px)) !important; /* keep content above floating nav */
+}
+
+/* Ensure modals / gate boxes also clear safe areas on small screens */
+body.fhs-has-liquid-nav #gate .box,
+body.fhs-has-liquid-nav .modal-box {
+  margin-top: calc(12px + env(safe-area-inset-top, 0px)) !important;
+  margin-bottom: calc(12px + env(safe-area-inset-bottom, 0px)) !important;
+}
+
 @media (max-width: 360px) {
   .fhs-liquid-nav__link {
     gap: 3px;
