@@ -31,6 +31,8 @@ index.html … manual-inspector.html   หน้าเว็บ (ไม่มี
 src/config.js        ⭐ ศูนย์รวมค่าตั้งต้นทั้งหมด (Firebase / Cloudinary / EmailJS / ผู้รับ / กฎธุรกิจ)
 src/shared.js        ฟังก์ชันที่ใช้ร่วมกัน (esc, cld, วันที่, session, toast, …)
 src/i18n.js          ระบบแปลภาษา (createI18n, COMMON, data-i18n)
+src/liquid-nav.css   app switcher แบบ glass; desktop อยู่ header, mobile เป็น floating tab bar
+src/liquid-nav.js    ย่อ/ขยาย mobile nav ตามการ scroll และรองรับ reduced motion
 sw.js                Service Worker — precache + offline (ต้อง bump CACHE เมื่อแก้ไฟล์ใน CORE)
 manifest.json        PWA manifest
 scripts/check.mjs    ด่านตรวจพื้นฐาน (syntax, import/export, คีย์แปล, manifest, หาความลับหลุด)
@@ -126,7 +128,7 @@ exit code ของ `scripts/send-weekly.mjs`: `0` = ส่งครบทุก
 
 ## ข้อควรระวัง
 
-- **ถ้าแก้ไฟล์ใดในรายการ `CORE` ของ `sw.js` ต้อง bump `CACHE`** (`fhs-v7` → `fhs-v8`)
+- **ถ้าแก้ไฟล์ใดในรายการ `CORE` ของ `sw.js` ต้อง bump `CACHE`** (`fhs-v8` → `fhs-v9`)
   ไม่งั้นเครื่องที่เคยเปิดแล้วจะยังเห็นไฟล์เก่าจาก cache
 - หน้า `report.html` และ `dashboard.html` ใช้ `TL(en, th)` สำหรับสตริงสองภาษาในโค้ด
   **ห้ามใช้ชื่อ `L`** เพราะชนกับตัวแปรของ Leaflet (เคยทำให้แผนที่พังมาแล้ว)

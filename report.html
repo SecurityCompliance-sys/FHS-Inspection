@@ -16,6 +16,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@500;600;700&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="src/liquid-nav.css">
 <script defer src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
 :root{
@@ -33,10 +34,7 @@ body{font-family:"IBM Plex Sans Thai",sans-serif;background:var(--bg);color:var(
 .logo span{display:block;font-size:10.5px;color:var(--ice);font-weight:500;letter-spacing:.04em}
 .topbar .right{margin-left:auto;display:flex;align-items:center;gap:14px;font-size:12px;color:var(--ice)}
 .topbar .right a{color:#fff;cursor:pointer;font-weight:600}
-.appsw{display:flex;gap:3px;background:rgba(255,255,255,.08);padding:3px;border-radius:10px;margin-left:8px;overflow-x:auto;-webkit-overflow-scrolling:touch}
-.appsw a{padding:6px 12px;border-radius:7px;font-size:13px;font-weight:600;color:var(--ice);text-decoration:none;font-family:"Bai Jamjuree";white-space:nowrap;transition:background .12s}
-.appsw a:hover{background:rgba(255,255,255,.12);color:#fff}
-.appsw a.cur{background:#fff;color:var(--navy)}
+
 .wrap{max-width:920px;margin:0 auto;padding:22px 18px 60px}
 
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:11px 18px;border:none;border-radius:10px;font:inherit;font-weight:600;font-size:14px;cursor:pointer;font-family:"Bai Jamjuree";transition:filter .15s,transform .08s}
@@ -116,7 +114,7 @@ td{padding:9px 11px;border-bottom:1px solid var(--line);vertical-align:middle}
 @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important}}
 @media(max-width:720px){.kpis{grid-template-columns:repeat(2,1fr)}}
 @media print{
-  body *{visibility:hidden}.hazard,.topbar,.toolbar{display:none!important}
+  body *{visibility:hidden}.hazard,.topbar,.toolbar,.fhs-liquid-nav{display:none!important}
   .wrap{max-width:100%;padding:0}
   .report,.report *{visibility:visible}
   .report{box-shadow:none;border:none;border-radius:0}
@@ -124,7 +122,7 @@ td{padding:9px 11px;border-bottom:1px solid var(--line);vertical-align:middle}
 }
 </style>
 </head>
-<body>
+<body class="fhs-has-liquid-nav">
 <div class="hazard"></div>
 
 <!-- ช่องสถานะให้สคริปต์รายงานรายสัปดาห์ (scripts/send-weekly.mjs) อ่านผล
@@ -148,12 +146,23 @@ td{padding:9px 11px;border-bottom:1px solid var(--line);vertical-align:middle}
 <div class="topbar">
   <div class="logo"><svg viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="7" fill="#1E2761"/><path d="M10 9h12M10 14h12M10 19h8" stroke="#CADCFC" stroke-width="2" stroke-linecap="round"/><circle cx="23" cy="22" r="4" fill="#D62828"/></svg>
     <div><b>Weekly Report</b><span>SECURITY &amp; COMPLIANCE</span></div></div>
-  <nav class="appsw" aria-label="สลับหน้าจอ / App switcher">
-    <a href="index.html" data-i18n="nav_inspect">ตรวจ</a>
-    <a href="dashboard.html">Dashboard</a>
-    <a href="report.html" class="cur" aria-current="page" data-i18n="nav_report">รายงาน</a>
-    <a href="admin.html">Admin</a>
-    <a href="manual-inspector.html" data-i18n="nav_manual">คู่มือ</a>
+  <nav class="fhs-liquid-nav" aria-label="App navigation">
+    <a class="fhs-liquid-nav__link" href="index.html">
+      <svg class="fhs-liquid-nav__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><circle cx="12" cy="12" r="3"/></svg>
+      <span class="fhs-liquid-nav__label" data-i18n="nav_inspect">ตรวจ</span>
+    </a>
+    <a class="fhs-liquid-nav__link" href="dashboard.html">
+      <svg class="fhs-liquid-nav__icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg>
+      <span class="fhs-liquid-nav__label" data-i18n="nav_dashboard">Dashboard</span>
+    </a>
+    <a class="fhs-liquid-nav__link" href="report.html" aria-current="page">
+      <svg class="fhs-liquid-nav__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h16"/><rect x="6" y="11" width="3" height="6" rx=".5"/><rect x="11" y="7" width="3" height="10" rx=".5"/><rect x="16" y="4" width="3" height="13" rx=".5"/></svg>
+      <span class="fhs-liquid-nav__label" data-i18n="nav_report">รายงาน</span>
+    </a>
+    <a class="fhs-liquid-nav__link" href="admin.html">
+      <svg class="fhs-liquid-nav__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 19 6v5c0 4-2.8 7.8-7 10-4.2-2.2-7-6-7-10V6l7-3Z"/><path d="M9 10.5a3 3 0 1 1 6 0c0 2-1.3 3-3 3s-3-1-3-3Z"/><path d="M8 17c1.1-1.6 2.5-2.4 4-2.4s2.9.8 4 2.4"/></svg>
+      <span class="fhs-liquid-nav__label" data-i18n="nav_admin">Admin</span>
+    </a>
   </nav>
   <div class="right">
     <a id="langBtn" role="button" tabindex="0" aria-label="Switch language">EN</a>
@@ -551,5 +560,6 @@ async function runAutoSend(params){
   }
 })();
 </script>
+<script type="module" src="src/liquid-nav.js"></script>
 </body>
 </html>

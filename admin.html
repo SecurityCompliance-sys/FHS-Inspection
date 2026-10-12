@@ -10,6 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@500;600;700&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="src/liquid-nav.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 :root{
@@ -28,10 +29,7 @@ body{font-family:"IBM Plex Sans Thai",sans-serif;background:var(--bg);color:var(
 .logo span{display:block;font-size:10.5px;color:var(--ice);font-weight:500;letter-spacing:.04em}
 .topbar .right{margin-left:auto;display:flex;align-items:center;gap:14px;font-size:12px;color:var(--ice)}
 .topbar .right a{color:#fff;cursor:pointer;font-weight:600}
-.appsw{display:flex;gap:3px;background:rgba(255,255,255,.08);padding:3px;border-radius:10px;margin-left:8px;overflow-x:auto;-webkit-overflow-scrolling:touch}
-.appsw a{padding:6px 12px;border-radius:7px;font-size:13px;font-weight:600;color:var(--ice);text-decoration:none;font-family:"Bai Jamjuree";white-space:nowrap;transition:background .12s}
-.appsw a:hover{background:rgba(255,255,255,.12);color:#fff}
-.appsw a.cur{background:#fff;color:var(--navy)}
+
 .wrap{max-width:980px;margin:0 auto;padding:22px 18px 60px}
 
 label{display:block;font-size:13px;font-weight:600;color:var(--navy);margin:0 0 6px}
@@ -131,7 +129,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--navy-2);
 }
 </style>
 </head>
-<body>
+<body class="fhs-has-liquid-nav">
 <div class="hazard"></div>
 
 <!-- LOGIN GATE -->
@@ -153,7 +151,12 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--navy-2);
     <svg viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="7" fill="#1E2761"/><path d="M16 6c-3 4-5 6-5 9.5A5 5 0 0 0 16 20a5 5 0 0 0 5-4.5C21 12 19 10 16 6z" fill="#D62828"/><rect x="9" y="23" width="14" height="2.4" rx="1.2" fill="#CADCFC"/></svg>
     <div><b>FHS Admin</b><span>SECURITY &amp; COMPLIANCE</span></div>
   </div>
-  <nav class="appsw"><a href="index.html" data-i18n="nav_inspect">ตรวจ</a><a href="dashboard.html">Dashboard</a><a href="report.html" data-i18n="nav_report">รายงาน</a><a href="admin.html" class="cur">Admin</a></nav>
+  <nav class="fhs-liquid-nav" aria-label="App navigation">
+    <a class="fhs-liquid-nav__link" href="index.html"><svg class="fhs-liquid-nav__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><circle cx="12" cy="12" r="3"/></svg><span class="fhs-liquid-nav__label" data-i18n="nav_inspect">ตรวจ</span></a>
+    <a class="fhs-liquid-nav__link" href="dashboard.html"><svg class="fhs-liquid-nav__icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg><span class="fhs-liquid-nav__label" data-i18n="nav_dashboard">Dashboard</span></a>
+    <a class="fhs-liquid-nav__link" href="report.html"><svg class="fhs-liquid-nav__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h16"/><rect x="6" y="11" width="3" height="6" rx=".5"/><rect x="11" y="7" width="3" height="10" rx=".5"/><rect x="16" y="4" width="3" height="13" rx=".5"/></svg><span class="fhs-liquid-nav__label" data-i18n="nav_report">รายงาน</span></a>
+    <a class="fhs-liquid-nav__link" href="admin.html" aria-current="page"><svg class="fhs-liquid-nav__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 19 6v5c0 4-2.8 7.8-7 10-4.2-2.2-7-6-7-10V6l7-3Z"/><path d="M9 10.5a3 3 0 1 1 6 0c0 2-1.3 3-3 3s-3-1-3-3Z"/><path d="M8 17c1.1-1.6 2.5-2.4 4-2.4s2.9.8 4 2.4"/></svg><span class="fhs-liquid-nav__label" data-i18n="nav_admin">Admin</span></a>
+  </nav>
   <div class="right"><a id="langBtn" style="border:1px solid rgba(255,255,255,.3);border-radius:7px;padding:4px 9px;font-size:11px;font-weight:700">EN</a><span id="adminName"></span><a id="logout" data-i18n="signout">ออกระบบ</a></div>
 </div>
 
@@ -317,7 +320,7 @@ let LANG = localStorage.getItem('fhs_lang') || 'th';
 const I18N = {
  th:{
   gate_sub:'เฉพาะผู้ดูแลระบบ', f_empid:'รหัสพนักงาน', f_pw:'รหัสผ่าน', signin:'เข้าสู่ระบบ',
-  gate_nouser:'ยังไม่มีผู้ใช้?', gate_seed:'สร้าง admin คนแรก', nav_inspect:'ตรวจ', nav_report:'รายงาน', signout:'ออกระบบ',
+  gate_nouser:'ยังไม่มีผู้ใช้?', gate_seed:'สร้าง admin คนแรก', nav_inspect:'ตรวจ', nav_dashboard:'Dashboard', nav_report:'รายงาน', nav_admin:'Admin', signout:'ออกระบบ',
   tab_stations:'🏭 สถานี', tab_users:'👤 ผู้ใช้', tab_cameras:'🎥 กล้อง CCTV', tab_qr:'⬛ QR & พิมพ์', tab_data:'🧹 ข้อมูล',
   h_stations:'สถานีหัวดับเพลิง', add_station:'+ เพิ่มสถานี', h_users:'ผู้ใช้งาน', add_user:'+ เพิ่มผู้ใช้',
   h_cameras:'กล้อง CCTV', add_camera:'+ เพิ่มกล้อง', h_qr:'QR Code สถานี', select_all:'เลือกทั้งหมด', print_sel:'🖨 พิมพ์ที่เลือก',
@@ -349,7 +352,7 @@ const I18N = {
  },
  en:{
   gate_sub:'Administrators only', f_empid:'Employee ID', f_pw:'Password', signin:'Sign in',
-  gate_nouser:'No users yet?', gate_seed:'Create first admin', nav_inspect:'Inspect', nav_report:'Report', signout:'Sign out',
+  gate_nouser:'No users yet?', gate_seed:'Create first admin', nav_inspect:'Inspect', nav_dashboard:'Dashboard', nav_report:'Report', nav_admin:'Admin', signout:'Sign out',
   tab_stations:'🏭 Stations', tab_users:'👤 Users', tab_cameras:'🎥 CCTV', tab_qr:'⬛ QR & Print', tab_data:'🧹 Data',
   h_stations:'Fire Hose Stations', add_station:'+ Add station', h_users:'Users', add_user:'+ Add user',
   h_cameras:'CCTV Cameras', add_camera:'+ Add camera', h_qr:'Station QR Codes', select_all:'Select all', print_sel:'🖨 Print selected',
@@ -749,5 +752,6 @@ applyLang();
   }
 })();
 </script>
+<script type="module" src="src/liquid-nav.js"></script>
 </body>
 </html>
