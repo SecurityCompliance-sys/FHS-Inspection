@@ -143,7 +143,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--navy-2);
     <div id="gateAlert"></div>
     <div class="field"><label data-i18n="f_empid">รหัสพนักงาน</label><input type="text" id="gId" class="mono" style="text-transform:uppercase" placeholder="EMP-1001"></div>
     <div class="field"><label data-i18n="f_pw">รหัสผ่าน</label><input type="password" id="gPw" placeholder="••••••••"></div>
-    <button class="btn btn-primary" style="width:100%" id="gBtn" data-i18n="signin">เข้าสู่ระบบ</button>
+    <button type="button" class="btn btn-primary" style="width:100%" id="gBtn" data-i18n="signin">เข้าสู่ระบบ</button>
     <p class="hint" style="text-align:center;margin-top:14px"><span data-i18n="gate_nouser">ยังไม่มีผู้ใช้?</span> <a id="seedLink" data-i18n="gate_seed" style="color:var(--navy-2);cursor:pointer;font-weight:600">สร้าง admin คนแรก</a></p>
   </div>
 </div>
@@ -159,28 +159,28 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--navy-2);
 
 <div class="wrap">
   <div class="tabs">
-    <button class="tab on" data-tab="stations" data-i18n="tab_stations">🏭 สถานี</button>
-    <button class="tab" data-tab="users" data-i18n="tab_users">👤 ผู้ใช้</button>
-    <button class="tab" data-tab="cameras" data-i18n="tab_cameras">🎥 กล้อง CCTV</button>
-    <button class="tab" data-tab="qr" data-i18n="tab_qr">⬛ QR &amp; พิมพ์</button>
-    <button class="tab" data-tab="data" data-i18n="tab_data">🧹 ข้อมูล</button>
+    <button type="button" class="tab on" data-tab="stations" data-i18n="tab_stations">🏭 สถานี</button>
+    <button type="button" class="tab" data-tab="users" data-i18n="tab_users">👤 ผู้ใช้</button>
+    <button type="button" class="tab" data-tab="cameras" data-i18n="tab_cameras">🎥 กล้อง CCTV</button>
+    <button type="button" class="tab" data-tab="qr" data-i18n="tab_qr">⬛ QR &amp; พิมพ์</button>
+    <button type="button" class="tab" data-tab="data" data-i18n="tab_data">🧹 ข้อมูล</button>
   </div>
 
   <!-- STATIONS -->
   <div class="page on" id="page-stations">
-    <div class="page-head"><h2 data-i18n="h_stations">สถานีหัวดับเพลิง</h2><button class="btn btn-primary" id="addStation" data-i18n="add_station">+ เพิ่มสถานี</button></div>
+    <div class="page-head"><h2 data-i18n="h_stations">สถานีหัวดับเพลิง</h2><button type="button" class="btn btn-primary" id="addStation" data-i18n="add_station">+ เพิ่มสถานี</button></div>
     <div class="card" id="stationList"><div class="empty" data-i18n="loading">กำลังโหลด…</div></div>
   </div>
 
   <!-- USERS -->
   <div class="page" id="page-users">
-    <div class="page-head"><h2 data-i18n="h_users">ผู้ใช้งาน</h2><button class="btn btn-primary" id="addUser" data-i18n="add_user">+ เพิ่มผู้ใช้</button></div>
+    <div class="page-head"><h2 data-i18n="h_users">ผู้ใช้งาน</h2><button type="button" class="btn btn-primary" id="addUser" data-i18n="add_user">+ เพิ่มผู้ใช้</button></div>
     <div class="card" id="userList"><div class="empty" data-i18n="loading">กำลังโหลด…</div></div>
   </div>
 
   <!-- CAMERAS -->
   <div class="page" id="page-cameras">
-    <div class="page-head"><h2 data-i18n="h_cameras">กล้อง CCTV</h2><button class="btn btn-primary" id="addCamera" data-i18n="add_camera">+ เพิ่มกล้อง</button></div>
+    <div class="page-head"><h2 data-i18n="h_cameras">กล้อง CCTV</h2><button type="button" class="btn btn-primary" id="addCamera" data-i18n="add_camera">+ เพิ่มกล้อง</button></div>
     <div style="margin-bottom:12px"><select id="camSiteFilter" style="max-width:240px"><option value="" data-i18n="all_camsites">ทุกคลัง</option></select></div>
     <div class="card" id="cameraList"><div class="empty" data-i18n="loading">กำลังโหลด…</div></div>
   </div>
@@ -188,8 +188,8 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--navy-2);
   <!-- QR -->
   <div class="page" id="page-qr">
     <div class="page-head"><h2 data-i18n="h_qr">QR Code สถานี</h2>
-      <button class="btn btn-ghost btn-sm" id="selectAll" data-i18n="select_all">เลือกทั้งหมด</button>
-      <button class="btn btn-primary btn-sm" id="printSel" data-i18n="print_sel">🖨 พิมพ์ที่เลือก</button>
+      <button type="button" class="btn btn-ghost btn-sm" id="selectAll" data-i18n="select_all">เลือกทั้งหมด</button>
+      <button type="button" class="btn btn-primary btn-sm" id="printSel" data-i18n="print_sel">🖨 พิมพ์ที่เลือก</button>
     </div>
     <div class="alert info" data-i18n="qr_info">QR แต่ละอันลิงก์ไปยังแอปตรวจพร้อมรหัสสถานี — สแกนด้วยกล้องมือถือเปิดฟอร์มได้เลย ฉลากพิมพ์ 2 ดวง/หน้า A4</div>
     <div class="field" style="max-width:520px"><label data-i18n="qr_url">URL แอปตรวจ (ปลายทางของ QR)</label><input type="text" id="inspectUrl" class="mono"></div>
@@ -211,7 +211,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--navy-2);
           <label class="btn btn-ghost btn-sm" style="flex:none;cursor:pointer"><span data-i18n="upload">⬆ อัปโหลด</span><input type="file" accept="image/*" id="riB5file" hidden></label></div>
         <div id="riB5prev" style="margin-top:8px"></div></div>
       <div id="riAlert"></div>
-      <button class="btn btn-primary" id="riSave" data-i18n="ref_save">บันทึกรูปตัวอย่าง</button>
+      <button type="button" class="btn btn-primary" id="riSave" data-i18n="ref_save">บันทึกรูปตัวอย่าง</button>
     </div>
     <div class="alert err" style="margin-bottom:14px" data-i18n-html="danger">⚠️ <b>Danger Zone</b> — การลบเป็นการลบถาวร กู้คืนไม่ได้ ใช้เฉพาะเมื่อแน่ใจ (เช่น ล้างข้อมูลทดสอบ)</div>
     <div class="card" style="padding:18px;max-width:560px">
@@ -220,15 +220,15 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--navy-2);
         <div class="field"><label data-i18n="to_date">ถึงวันที่ (รวมทั้งวัน)</label><input type="date" id="clrTo"></div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
-        <button class="btn btn-ghost btn-sm" id="clrLastWeek" data-i18n="last_week">สัปดาห์ที่แล้ว</button>
-        <button class="btn btn-ghost btn-sm" id="clrThisWeek" data-i18n="this_week">สัปดาห์นี้</button>
-        <button class="btn btn-ghost btn-sm" id="clrAll" data-i18n="all">ทั้งหมด</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="clrLastWeek" data-i18n="last_week">สัปดาห์ที่แล้ว</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="clrThisWeek" data-i18n="this_week">สัปดาห์นี้</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="clrAll" data-i18n="all">ทั้งหมด</button>
       </div>
       <label class="chk" style="display:flex;gap:8px;align-items:center;margin-bottom:12px"><input type="checkbox" id="clrCases" checked> <span data-i18n="clr_cases">ลบเคส CCTV ในช่วงเดียวกันด้วย</span></label>
       <div id="clrPreview" class="hint" style="margin:10px 0;font-size:14px"></div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn btn-ghost" id="clrPreviewBtn" data-i18n="clr_preview_btn">🔍 ตรวจสอบจำนวนที่จะลบ</button>
-        <button class="btn" id="clrDelBtn" style="display:none;background:var(--red);color:#fff" data-i18n="clr_del_btn">🗑 ลบข้อมูลในช่วงนี้</button>
+        <button type="button" class="btn btn-ghost" id="clrPreviewBtn" data-i18n="clr_preview_btn">🔍 ตรวจสอบจำนวนที่จะลบ</button>
+        <button type="button" class="btn" id="clrDelBtn" style="display:none;background:var(--red);color:#fff" data-i18n="clr_del_btn">🗑 ลบข้อมูลในช่วงนี้</button>
       </div>
     </div>
   </div>
@@ -236,7 +236,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--navy-2);
 
 <!-- STATION MODAL -->
 <div class="modal" id="stationModal"><div class="modal-box">
-  <div class="modal-h"><h3 id="smTitle">เพิ่มสถานี</h3><button class="x" data-close>✕</button></div>
+  <div class="modal-h"><h3 id="smTitle">เพิ่มสถานี</h3><button type="button" class="x" data-close>✕</button></div>
   <div class="modal-b">
     <div id="smAlert"></div>
     <div class="two">
@@ -249,20 +249,20 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--navy-2);
       <div class="field"><label>พิกัด Latitude</label><input type="number" id="smLat" step="any" placeholder="14.1234"></div>
       <div class="field"><label>พิกัด Longitude</label><input type="number" id="smLng" step="any" placeholder="100.5678"></div>
     </div>
-    <button class="btn btn-ghost btn-sm" id="smGps" style="margin-bottom:14px" data-i18n="sm_gps">📍 ใช้ตำแหน่งปัจจุบัน</button>
+    <button type="button" class="btn btn-ghost btn-sm" id="smGps" style="margin-bottom:14px" data-i18n="sm_gps">📍 ใช้ตำแหน่งปัจจุบัน</button>
     <div class="field"><label data-i18n="f_cams">กล้อง CCTV ที่ครอบคลุม</label><select id="smCams" multiple size="3" style="height:auto"></select><p class="hint" data-i18n="hint_multi">กด Ctrl/Cmd ค้างเพื่อเลือกหลายตัว</p></div>
     <div class="field"><label data-i18n="f_assignee">ผู้รับผิดชอบ</label><select id="smAssignee"><option value="" data-i18n="none_opt">— ไม่ระบุ —</option></select></div>
     <div class="alert info" style="margin-bottom:14px" data-i18n-html="freq_info">ความถี่การตรวจ: <b>2 ครั้ง/วัน</b> — กะกลางวัน (07:00–19:00) และกะกลางคืน (19:00–07:00) ทุกสถานี</div>
     <label style="margin-top:6px" data-i18n="f_equip">อุปกรณ์ในสถานี (รายชิ้น)</label>
     <div id="smEquip"></div>
-    <button class="btn btn-ghost btn-sm" id="smAddEq" style="margin-top:4px" data-i18n="sm_addeq">+ เพิ่มอุปกรณ์</button>
+    <button type="button" class="btn btn-ghost btn-sm" id="smAddEq" style="margin-top:4px" data-i18n="sm_addeq">+ เพิ่มอุปกรณ์</button>
   </div>
-  <div class="modal-f"><button class="btn btn-ghost" data-close data-i18n="cancel">ยกเลิก</button><button class="btn btn-primary" id="smSave" data-i18n="save">บันทึก</button></div>
+  <div class="modal-f"><button type="button" class="btn btn-ghost" data-close data-i18n="cancel">ยกเลิก</button><button type="button" class="btn btn-primary" id="smSave" data-i18n="save">บันทึก</button></div>
 </div></div>
 
 <!-- USER MODAL -->
 <div class="modal" id="userModal"><div class="modal-box">
-  <div class="modal-h"><h3 id="umTitle">เพิ่มผู้ใช้</h3><button class="x" data-close>✕</button></div>
+  <div class="modal-h"><h3 id="umTitle">เพิ่มผู้ใช้</h3><button type="button" class="x" data-close>✕</button></div>
   <div class="modal-b">
     <div id="umAlert"></div>
     <div class="two">
@@ -275,12 +275,12 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--navy-2);
     </div>
     <div class="field" style="margin-bottom:0"><label><span data-i18n="f_pw">รหัสผ่าน</span> <span style="color:var(--red)">*</span></label><input type="text" id="umPw" data-i18n-ph="ph_setpw" placeholder="ตั้งรหัสผ่าน"><p class="hint" id="umPwHint" data-i18n="umpw_hint">เว้นว่างไว้หากไม่ต้องการเปลี่ยนรหัส (โหมดแก้ไข)</p></div>
   </div>
-  <div class="modal-f"><button class="btn btn-ghost" data-close data-i18n="cancel">ยกเลิก</button><button class="btn btn-primary" id="umSave" data-i18n="save">บันทึก</button></div>
+  <div class="modal-f"><button type="button" class="btn btn-ghost" data-close data-i18n="cancel">ยกเลิก</button><button type="button" class="btn btn-primary" id="umSave" data-i18n="save">บันทึก</button></div>
 </div></div>
 
 <!-- CAMERA MODAL -->
 <div class="modal" id="cameraModal"><div class="modal-box">
-  <div class="modal-h"><h3 id="cmTitle">เพิ่มกล้อง</h3><button class="x" data-close>✕</button></div>
+  <div class="modal-h"><h3 id="cmTitle">เพิ่มกล้อง</h3><button type="button" class="x" data-close>✕</button></div>
   <div class="modal-b">
     <div id="cmAlert"></div>
     <div class="field"><label><span data-i18n="f_camid">รหัสกล้อง</span> <span style="color:var(--red)">*</span></label><input type="text" id="cmId" class="mono" style="text-transform:uppercase" placeholder="WN-CH1"></div>
@@ -288,7 +288,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--navy-2);
     <div class="field"><label data-i18n="f_camname">ชื่อ/ตำแหน่งกล้อง</label><input type="text" id="cmName" data-i18n-ph="ph_camname" placeholder="กล้องโซน A ทางเดิน"></div>
     <div class="field" style="margin-bottom:0"><label data-i18n="f_mount">จุดติดตั้ง</label><input type="text" id="cmLoc" data-i18n-ph="ph_mount" placeholder="เพดานโซน A"></div>
   </div>
-  <div class="modal-f"><button class="btn btn-ghost" data-close data-i18n="cancel">ยกเลิก</button><button class="btn btn-primary" id="cmSave" data-i18n="save">บันทึก</button></div>
+  <div class="modal-f"><button type="button" class="btn btn-ghost" data-close data-i18n="cancel">ยกเลิก</button><button type="button" class="btn btn-primary" id="cmSave" data-i18n="save">บันทึก</button></div>
 </div></div>
 
 <div class="print-area"><div class="label-sheet" id="labelSheet"></div></div>
@@ -447,8 +447,8 @@ function renderStations(){
         <div class="meta">${esc(s.name||'')} ${s.location?'· '+esc(s.location):''} · ${eqTxt} ${(s.cctvCameras||[]).length?'· 🎥 '+s.cctvCameras.map(esc).join(','):''}</div>
       </div>
       <div class="actions">
-        <button class="icbtn" data-edit-station="${esc(s.id)}" title="${t('edit')}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4z"/></svg></button>
-        <button class="icbtn danger" data-del-station="${esc(s.id)}" title="${t('del')}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>
+        <button type="button" class="icbtn" data-edit-station="${esc(s.id)}" title="${t('edit')}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4z"/></svg></button>
+        <button type="button" class="icbtn danger" data-del-station="${esc(s.id)}" title="${t('del')}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>
       </div></div>`;
   }).join('');
   el.querySelectorAll('[data-edit-station]').forEach(b=>b.onclick=()=>openStation(b.dataset.editStation));
@@ -490,7 +490,7 @@ function addEqRow(e={}){
   div.innerHTML=`<input type="text" class="eqn" placeholder="${t('ph_eqname')}" value="${esc(e.name||'')}" style="flex:2">
     <input type="text" class="eqt" placeholder="${t('ph_eqtype')}" value="${esc(e.type||'')}" style="flex:1">
     <label class="chk"><input type="checkbox" class="eqb" ${e.isBrass?'checked':''}>${t('brass')}</label>
-    <button class="icbtn danger" style="flex:none" title="${t('del')}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg></button>`;
+    <button type="button" class="icbtn danger" style="flex:none" title="${t('del')}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg></button>`;
   div.dataset.eqid=e.id||('eq-'+Math.random().toString(36).slice(2,8));
   div.querySelector('.icbtn').onclick=()=>div.remove();
   $('smEquip').appendChild(div);
@@ -566,8 +566,8 @@ function renderUsers(){
     <div class="main"><b>${esc(u.name||u.id)} ${u.active===false?`<span class="badge red">${t('suspended')}</span>`:''}</b>
       <div class="meta"><span class="mono">${esc(u.id)}</span> · <span class="badge ${rc[u.role]||'navy'}">${esc(u.role||'inspector')}</span> · ${esc(u.site||'-')}</div></div>
     <div class="actions">
-      <button class="icbtn" data-edit-user="${esc(u.id)}" title="${t('edit')}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4z"/></svg></button>
-      <button class="icbtn danger" data-del-user="${esc(u.id)}" title="${t('del')}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>
+      <button type="button" class="icbtn" data-edit-user="${esc(u.id)}" title="${t('edit')}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4z"/></svg></button>
+      <button type="button" class="icbtn danger" data-del-user="${esc(u.id)}" title="${t('del')}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>
     </div></div>`).join('');
   el.querySelectorAll('[data-edit-user]').forEach(b=>b.onclick=()=>openUser(b.dataset.editUser));
   el.querySelectorAll('[data-del-user]').forEach(b=>b.onclick=()=>delUser(b.dataset.delUser));
@@ -614,8 +614,8 @@ function renderCameras(){
       <div class="av"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#15234A" stroke-width="2"><path d="m23 7-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></div>
       <div class="main"><b>${esc(c.id)} <span class="badge navy">${esc(c.site||'-')}</span></b><div class="meta">${esc(c.name||'')} ${c.location?'· '+esc(c.location):''} · ${coverTxt}</div></div>
       <div class="actions">
-        <button class="icbtn" data-edit-camera="${esc(c.id)}" title="${t('edit')}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4z"/></svg></button>
-        <button class="icbtn danger" data-del-camera="${esc(c.id)}" title="${t('del')}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>
+        <button type="button" class="icbtn" data-edit-camera="${esc(c.id)}" title="${t('edit')}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4z"/></svg></button>
+        <button type="button" class="icbtn danger" data-del-camera="${esc(c.id)}" title="${t('del')}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>
       </div></div>`;
   }).join('');
   el.querySelectorAll('[data-edit-camera]').forEach(b=>b.onclick=()=>openCamera(b.dataset.editCamera));

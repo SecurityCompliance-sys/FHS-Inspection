@@ -151,7 +151,7 @@ kbd{font-family:"IBM Plex Mono";font-size:12px;background:var(--ink);color:#fff;
   </div>
   <div class="right">
     <a href="index.html">เปิดแอปตรวจ →</a>
-    <a href="#" onclick="window.print();return false;">🖨 พิมพ์</a>
+    <a href="#" id="printBtn" role="button">🖨 พิมพ์</a>
   </div>
 </div>
 
@@ -435,5 +435,9 @@ kbd{font-family:"IBM Plex Mono";font-size:12px;background:var(--ink);color:#fff;
   </div>
 
 </div>
+<script>
+  // เดิมใช้ onclick ในแท็กเอง ซึ่งทำให้ตั้ง CSP แบบไม่ต้องใช้ unsafe-inline ไม่ได้
+  document.getElementById('printBtn').addEventListener('click', (e) => { e.preventDefault(); window.print(); });
+</script>
 </body>
 </html>

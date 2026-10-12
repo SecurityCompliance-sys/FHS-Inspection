@@ -235,12 +235,12 @@ button,a,label,.tog,.eq-stat button,.photo-add{touch-action:manipulation}
       </div>
       <div class="card"><div class="card-b">
         <div id="scanArea" style="display:none"><div class="scan-region"><div id="reader"></div></div></div>
-        <button class="btn btn-primary" id="btnStartScan"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3m4 0v3m-7 4h3m4-4v4"/></svg>สแกน QR Code</button>
-        <button class="btn btn-ghost" id="btnNfc" style="margin-top:10px;display:none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8.7C7.5 7 9.6 6 12 6s4.5 1 6 2.7M3 5.5C5.3 3 8.5 1.7 12 1.7s6.7 1.3 9 3.8M9 12a3 3 0 0 1 6 0c0 1.5-.7 2.5-1.5 3.8"/></svg>แตะป้าย NFC</button>
+        <button type="button" class="btn btn-primary" id="btnStartScan"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3m4 0v3m-7 4h3m4-4v4"/></svg>สแกน QR Code</button>
+        <button type="button" class="btn btn-ghost" id="btnNfc" style="margin-top:10px;display:none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8.7C7.5 7 9.6 6 12 6s4.5 1 6 2.7M3 5.5C5.3 3 8.5 1.7 12 1.7s6.7 1.3 9 3.8M9 12a3 3 0 0 1 6 0c0 1.5-.7 2.5-1.5 3.8"/></svg>แตะป้าย NFC</button>
         <p class="hint" style="text-align:center;margin-top:12px">หรือพิมพ์รหัสสถานีเอง</p>
         <div style="display:flex;gap:8px;margin-top:8px">
           <input type="text" id="manualStation" placeholder="FHC-EX-01" class="mono" style="text-transform:uppercase">
-          <button class="btn btn-ghost btn-sm" id="btnManualGo" style="flex:none">ไป</button>
+          <button type="button" class="btn btn-ghost btn-sm" id="btnManualGo" style="flex:none">ไป</button>
         </div>
       </div></div>
     </div>
@@ -270,8 +270,8 @@ button,a,label,.tog,.eq-stat button,.photo-add{touch-action:manipulation}
         <h2>บันทึกการตรวจสำเร็จ</h2>
         <p class="ref" id="successRef"></p>
         <div id="successSummary" style="margin-top:18px;text-align:left"></div>
-        <button class="btn btn-primary" id="btnScanNext" style="margin-top:20px">ตรวจสถานีถัดไป</button>
-        <button class="btn btn-ghost" id="btnLogout" style="margin-top:10px">ออกจากระบบ</button>
+        <button type="button" class="btn btn-primary" id="btnScanNext" style="margin-top:20px">ตรวจสถานีถัดไป</button>
+        <button type="button" class="btn btn-ghost" id="btnLogout" style="margin-top:10px">ออกจากระบบ</button>
       </div>
     </div>
   </main>
@@ -500,8 +500,8 @@ function enterInspection(){
     </div>
 
     <div id="submitAlert" style="margin-top:14px"></div>
-    <button class="btn btn-primary" id="btnSubmit" style="margin-top:6px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>บันทึกผลการตรวจ</button>
-    <button class="btn btn-ghost" id="btnCancel" style="margin-top:10px">ยกเลิก / สแกนสถานีอื่น</button>
+    <button type="button" class="btn btn-primary" id="btnSubmit" style="margin-top:6px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>บันทึกผลการตรวจ</button>
+    <button type="button" class="btn btn-ghost" id="btnCancel" style="margin-top:10px">ยกเลิก / สแกนสถานีอื่น</button>
   `;
 
   // ปุ่มดูรูปตัวอย่างอุปกรณ์ (B5/B6) — รูปมาจาก settings/referenceImages ที่ Admin ตั้งไว้

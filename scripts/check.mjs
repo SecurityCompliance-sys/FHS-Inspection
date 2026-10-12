@@ -37,7 +37,12 @@ const exists = (p) => fs.existsSync(path.join(ROOT, p));
 const htmlFiles = fs.readdirSync(ROOT).filter((f) => f.endsWith(".html")).sort();
 
 /** ตัด comment (HTML + CSS) ก่อนตรวจ — ไม่งั้นคำอธิบายในคอมเมนต์จะถูกจับเป็นปัญหาปลอม */
-const stripComments = (html) => html.replace(/<!--[\s\S]*?-->/g, "").replace(/\/\*[\s\S]*?\*\//g, "");
+const stripComments = (html) =>
+  html
+    .replace(/<!--[\s\S]*?-->/g, "")          // HTML comment
+    .replace(/\/\*[\s\S]*?\*\//g, "")          // /* */ block comment
+    // // line comment — ต้องข้าม "://" เพื่อไม่กิน URL (https://…)
+    .replace(/(^|[^:])\/\/[^\n]*/g, "$1");
 
 /* ── 1+2. syntax ของ JavaScript ───────────────────────────────────────────── */
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "fhs-check-"));
@@ -125,6 +130,48 @@ for (const file of htmlFiles) {
   }
 }
 pass("import/export ระหว่างหน้าเว็บกับ src/ ตรงกัน");
+
+/* ── 2c. ห้ามเขียนทับชื่อที่ import มา ───────────────────────────────────────
+ * import binding เป็นค่าคงที่ — `esc = ...` จะโยน TypeError ตอนโหลดหน้า
+ * (ไม่ใช่ syntax error จึงผ่าน node --check ไปได้)                            */
+for (const file of htmlFiles) {
+  const html = stripComments(read(file));
+  const imported = new Set();
+  for (const m of html.matchAll(/import\s*\{([^}]*)\}\s*from/g)) {
+    for (const part of m[1].split(",")) {
+      const t = part.trim();
+      if (!t) continue;
+      imported.add((t.split(/\s+as\s+/)[1] || t).trim());
+    }
+  }
+  if (!imported.size) continue;
+  // หา "ชื่อ =" ที่ไม่ใช่ ==, ===, =>, <=, >=, != และไม่ใช่การประกาศ (const/let/var)
+  for (const name of imported) {
+    const re = new RegExp(`(?<![-.\\w$])(?:const|let|var)?\\s*\\b${name}\\b\\s*(?:\\+\\+|--)?\\s*=(?!=|>)`, "g");
+    for (const m of html.matchAll(re)) {
+      const before = html.slice(Math.max(0, m.index - 40), m.index);
+      if (/\b(const|let|var)\s+$/.test(before)) continue;   // ประกาศชื่อใหม่ทับ scope ใน — ต้องดูด้วยตา
+      fail(`${file}: เขียนทับชื่อ "${name}" ที่ import มา (import binding แก้ไม่ได้ → TypeError ตอนโหลด)`);
+    }
+  }
+}
+pass("ไม่มี import binding ถูกเขียนทับ");
+
+/* ── 2d. คีย์ data-i18n ต้องมีอยู่ในพจนานุกรม ────────────────────────────────
+ * คีย์ที่ไม่มีจะถูกแทนด้วย "คีย์" เองหรือสตริงว่าง → เห็นเป็นข้อความผิดปกติบนจอ
+ * ดึงคีย์จาก COMMON ใน src/i18n.js + dict ของหน้านั้น (บล็อก th:{...} )        */
+const dictKeyRe = /(?:^|[\s{,])([a-z][a-z0-9_]*)\s*:\s*(?:'[^'\n]*'|"[^"\n]*")/g;
+const keyOf = (text) => new Set([...text.matchAll(dictKeyRe)].map((m) => m[1]));
+const commonKeys = keyOf(read("src/i18n.js"));
+for (const file of htmlFiles) {
+  const html = stripComments(read(file));
+  const used = [...html.matchAll(/data-i18n(?:-html|-ph|-title|-aria|-value)?="([^"]+)"/g)].map((m) => m[1]);
+  if (!used.length) continue;
+  const dictKeys = new Set([...commonKeys, ...keyOf(html)]);
+  const missing = [...new Set(used)].filter((k) => !dictKeys.has(k));
+  if (missing.length) fail(`${file}: data-i18n ใช้คีย์ที่ไม่มีในพจนานุกรม → ${missing.join(", ")}`);
+}
+pass("คีย์ data-i18n มีอยู่ในพจนานุกรม (COMMON + dict ของหน้า)");
 
 /* ── 3. JSON ──────────────────────────────────────────────────────────────── */
 for (const f of ["manifest.json", "package.json"]) {

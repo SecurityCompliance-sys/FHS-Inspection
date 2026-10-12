@@ -1,0 +1,44 @@
+name: CI
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  repo นี้ไม่มี build step — ไฟล์ที่ commit คือไฟล์ที่ขึ้นเว็บทันที
+#  ด่านนี้จึงเป็น "build" แทน: ตรวจ syntax, ตรวจว่า import/export ตรงกัน,
+#  ตรวจคีย์แปลภาษา, ตรวจ manifest/service worker และหาความลับหลุด
+#
+#  รันทุก push และทุก pull request (ราคาถูก รันไม่ถึง 10 วินาที)
+# ─────────────────────────────────────────────────────────────────────────────
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Static checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run the quality gate
+        run: node scripts/check.mjs
+
+      # เตือนเวลา commit HTML ที่ยังอ้างแคชเก่า — เครื่องที่เคยเปิดแล้วจะเห็นไฟล์เก่า
+      - name: Service worker cache version
+        run: |
+          expected=$(node -e "console.log(require('fs').readFileSync('sw.js','utf8').match(/fhs-v(\d+)/)[1])")
+          echo "sw.js cache = fhs-v$expected"
+          echo "ℹ️  ถ้าแก้ไฟล์ใน sw.js CORE ต้อง bump เลขนี้พร้อมกัน"
