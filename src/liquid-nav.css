@@ -99,12 +99,13 @@
 
 @media (max-width: 900px) {
   .fhs-has-liquid-nav {
+    padding-top: env(safe-area-inset-top, 0px);
     padding-bottom: calc(92px + env(safe-area-inset-bottom, 0px));
   }
 
   .fhs-has-liquid-nav .topbar {
     gap: 8px;
-    padding: 11px 14px;
+    padding: calc(11px + env(safe-area-inset-top, 0px)) 14px 11px;
   }
 
   .fhs-has-liquid-nav .topbar .logo {
