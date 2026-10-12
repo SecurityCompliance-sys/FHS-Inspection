@@ -394,12 +394,17 @@ function emailjsInit(){
   catch(e){ console.error('[emailjs]',e); return false; }
 }
 
-/** ส่งหนึ่งฉบับ — ส่งชื่อตัวแปรผู้รับทั้ง to_email และ email
- *  เพราะเทมเพลต EmailJS ของแต่ละบัญชีตั้งชื่อไม่เหมือนกัน
- *  (ของเดิม: ปุ่มมือส่ง {to_email} แต่โค้ด autosend ส่ง {email} → ทางใดทางหนึ่งส่งไม่ออก) */
+/** ส่งหนึ่งฉบับ
+ *  ส่งชื่อตัวแปรผู้รับทั้ง to_email และ email เพราะเทมเพลต EmailJS ของแต่ละบัญชี
+ *  ตั้งชื่อไม่เหมือนกัน (ของเดิม: ปุ่มมือส่ง {to_email} แต่โค้ด autosend ส่ง {email}
+ *  → มีอย่างน้อยหนึ่งทางที่ผู้รับว่างและส่งไม่ออก)
+ *  EMAILJS.toEmailVar ใน src/config.js ใช้เลือกว่าชื่อใดคือชื่อ "ทางการ"           */
 async function sendOne(to, subject, html){
-  return emailjs.send(EMAILJS.serviceId, EMAILJS.templateId,
-    { subject, html_content: html, message: html, to_email: to, email: to });
+  const p = { subject, html_content: html, message: html, to_email: to, email: to };
+  if(EMAILJS.toEmailVar && EMAILJS.toEmailVar!=='to_email' && EMAILJS.toEmailVar!=='email'){
+    p[EMAILJS.toEmailVar] = to;
+  }
+  return emailjs.send(EMAILJS.serviceId, EMAILJS.templateId, p);
 }
 
 /** ไซต์ที่มีข้อมูลในสัปดาห์นั้น + _all (ผู้บริหาร/ส่วนกลาง) */
