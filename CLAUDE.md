@@ -34,8 +34,8 @@ the page. When adding a page, make sure it is picked up by both scripts (they gl
 
 CI (`.github/workflows/ci.yml`) runs both on every push and PR. Keep it green.
 
-**Service-worker cache:** `sw.js` keeps a versioned cache (`const CACHE = "fhs-v7"`). After editing
-any file listed in its `CORE` array you **must bump the version** (`fhs-v7` → `fhs-v8`) or returning
+**Service-worker cache:** `sw.js` keeps a versioned cache (`const CACHE = "fhs-v8"`). After editing
+any file listed in its `CORE` array you **must bump the version** (`fhs-v8` → `fhs-v9`) or returning
 clients keep the stale copy. Navigations are network-first with a cache fallback, so an online user
 always gets fresh HTML; the cache matters for offline and for the CDN/library URLs.
 
@@ -54,6 +54,9 @@ Every page imports from these — **do not copy config or helpers back into the 
 - **`src/i18n.js`** — `createI18n()` (returns `{ lang, t, TL, pick, applyLang, setLang, toggleLang,
   bind }`), `mergeDict()`, and `COMMON` (nav + shared strings). `data-i18n` attributes are applied by
   `applyLang()`; the EN/ไทย button is bound by `bind()`.
+- **`src/liquid-nav.css` / `src/liquid-nav.js`** — shared, prefixed app-switcher styling and
+  scroll-aware mobile floating bar. Keep real links, `aria-current`, the 44px target size, and the
+  reduced-motion behavior; these assets are in the Service Worker `CORE` list.
 
 `verifyAdminSession(db)` re-reads `users/{id}` on every page load and clears the session if the
 account was deactivated or demoted — don't reintroduce a bare `JSON.parse(sessionStorage…)` restore.
@@ -74,9 +77,11 @@ account was deactivated or demoted — don't reintroduce a bare `JSON.parse(sess
 - **`IT-HR-Approval-Document.html`** — standalone Thai approval document (Sarabun font). Not part of
   the app; unrelated to the others.
 
-Pages link to each other through the `.appsw` app-switcher nav in the top bar. They share an identical
-CSS design system (the `:root` custom properties — navy/red/amber palette, hazard stripes; Bai
-Jamjuree / IBM Plex Sans Thai / IBM Plex Mono fonts). Keep that block in sync when restyling.
+Pages link to each other through the `.fhs-liquid-nav` app switcher: in the header on desktop and
+as a floating bottom bar on narrow screens. The inspector handbook link lives in the footer of
+`index.html` (the Inspection page), not in the app switcher. Pages share an identical CSS design
+system (the `:root` custom properties — navy/red/amber palette, hazard stripes; Bai Jamjuree / IBM
+Plex Sans Thai / IBM Plex Mono fonts). Keep that block in sync when restyling.
 
 Accessibility conventions already in place — keep them when adding markup: a skip link targeting
 `#mainContent`, `.sr-only` labels, `:focus-visible` outlines, `@media (prefers-reduced-motion)`,

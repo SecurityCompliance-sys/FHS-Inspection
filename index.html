@@ -178,6 +178,8 @@ textarea{resize:vertical;min-height:74px}
 .spinner{width:20px;height:20px;border:2.5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .footer{text-align:center;font-size:10.5px;color:var(--muted);padding:18px;border-top:1px solid var(--line)}
+.footer-links{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:8px 16px;margin-top:8px}
+.footer-links a{display:inline-flex;align-items:center;min-height:44px;padding:0 2px;color:var(--muted);text-decoration:underline;text-underline-offset:3px}
 .req{color:var(--red)}
 
 /* ---- accessibility ---- */
@@ -275,7 +277,12 @@ button,a,label,.tog,.eq-stat button,.photo-add{touch-action:manipulation}
       </div>
     </div>
   </main>
-  <div class="footer">BevChain Thailand · Security &amp; Compliance Dept.<br>Fire Hose Station Inspection System v1.2 · 30/09/2026<br><a href="dashboard.html" style="color:var(--muted);text-decoration:underline">เข้าระบบหลังบ้าน (Dashboard / Admin)</a></div>
+  <div class="footer">BevChain Thailand · Security &amp; Compliance Dept.<br>Fire Hose Station Inspection System v1.2 · 30/09/2026
+    <div class="footer-links">
+      <a href="dashboard.html">เข้าระบบหลังบ้าน (Dashboard / Admin)</a>
+      <a href="manual-inspector.html">คู่มือผู้ตรวจ</a>
+    </div>
+  </div>
 </div>
 
 <script type="module">
