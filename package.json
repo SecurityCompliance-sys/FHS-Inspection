@@ -10,7 +10,9 @@
     "serve": "node scripts/serve.mjs",
     "start": "node scripts/serve.mjs",
     "weekly:dry": "FHS_DRYRUN=1 node scripts/send-weekly.mjs",
-    "weekly": "node scripts/send-weekly.mjs"
+    "weekly": "node scripts/send-weekly.mjs",
+    "test": "node scripts/smoke.mjs",
+    "verify": "node scripts/check.mjs && node scripts/smoke.mjs"
   },
   "devDependencies": {
     "playwright": "1.47.2"

@@ -33,8 +33,13 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Run the quality gate
+      - name: Run the static quality gate
         run: node scripts/check.mjs
+
+      # smoke test: โหลดสคริปต์ของทุกหน้าใน Node (DOM/stub จำลอง)
+      # จับ ReferenceError / TDZ / template literal ที่พัง ซึ่ง node --check จับไม่ได้
+      - name: Smoke test every page script
+        run: node scripts/smoke.mjs
 
       # เตือนเวลา commit HTML ที่ยังอ้างแคชเก่า — เครื่องที่เคยเปิดแล้วจะเห็นไฟล์เก่า
       - name: Service worker cache version
