@@ -1,0 +1,23 @@
+{
+  "name": "fhs-inspection",
+  "version": "1.3.0",
+  "private": true,
+  "type": "module",
+  "description": "Fire Hydrant Station (FHS) inspection PWA — BevChain Thailand, Security & Compliance",
+  "license": "UNLICENSED",
+  "scripts": {
+    "check": "node scripts/check.mjs",
+    "serve": "node scripts/serve.mjs",
+    "start": "node scripts/serve.mjs",
+    "weekly:dry": "FHS_DRYRUN=1 node scripts/send-weekly.mjs",
+    "weekly": "node scripts/send-weekly.mjs",
+    "test": "node scripts/smoke.mjs",
+    "verify": "node scripts/check.mjs && node scripts/smoke.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.47.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

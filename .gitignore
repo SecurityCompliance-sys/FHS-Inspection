@@ -1,0 +1,18 @@
+# ไฟล์ชั่วคราว / ของที่ generate ขึ้นมาเอง — ไม่ต้อง commit
+node_modules/
+package-lock.json
+npm-debug.log*
+
+# ผลลัพธ์จาก Playwright ใน workflow
+artifacts/
+
+# ไฟล์ที่ editor / ระบบปฏิบัติการสร้าง
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# ไฟล์ทดสอบเฉพาะเครื่อง (ห้าม commit ค่าจริง)
+.env
+.env.local
+config.local.js
