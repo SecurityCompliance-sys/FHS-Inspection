@@ -5,6 +5,7 @@
  * repo นี้ไม่มี build system และไม่มี test framework → สคริปต์นี้ทำหน้าที่เป็น
  * "ตาข่ายกันพลาด" ราคาถูก ก่อน push ทุกครั้ง:
  *
+ *   0. ไฟล์ครบ ไม่ถูกตัดทอน/เขียนทับด้วย snippet (ไม่มี marker ตัดทอน / U+FFFD, .html ครบตั้งแต่ doctype ถึง </html>)
  *   1. syntax ของ <script type="module"> ในทุกไฟล์ .html
  *   2. syntax ของไฟล์ .js/.mjs ใน src/ และ scripts/
  *   3. JSON ถูกต้อง (manifest.json, package.json)
@@ -43,6 +44,37 @@ const stripComments = (html) =>
     .replace(/\/\*[\s\S]*?\*\//g, "")          // /* */ block comment
     // // line comment — ต้องข้าม "://" เพื่อไม่กิน URL (https://…)
     .replace(/(^|[^:])\/\/[^\n]*/g, "$1");
+
+/* ── 0. ไฟล์ครบ ไม่ถูกตัดทอน ──────────────────────────────────────────────────
+ * เคยเกิดจริง (fce3fe2, 68d1a5d): แก้ไฟล์ผ่านเครื่องมือภายนอกแล้วได้ไฟล์ที่ (ก) เหลือแค่ snippet CSS
+ * หรือ (ข) บรรทัดยาวถูกตัดแล้วต่อท้ายด้วย marker ตัดทอน (ตัดกลางอักษรไทยจนเป็น U+FFFD) — หน้าเว็บพังทั้งหน้า
+ * แต่ error อื่น ๆ ไม่บอกสาเหตุตรง ๆ ด่านนี้จึงอยู่หน้าสุด
+ * (ห้ามพิมพ์ marker หรือ U+FFFD ตรง ๆ ในไฟล์นี้ ไม่งั้นไฟล์นี้จะโดนจับเอง — จึงประกอบค่าตอนรัน) */
+const MARKER = "[" + "...]";
+const REPLACEMENT_CHAR = String.fromCharCode(0xfffd);
+const isTruncated = (line) => line.includes(MARKER) || line.includes(REPLACEMENT_CHAR);
+const servedFiles = [
+  ...htmlFiles,
+  ...["src", "scripts"].flatMap((d) =>
+    fs.readdirSync(path.join(ROOT, d)).filter((f) => /\.(m?js|css)$/.test(f)).map((f) => `${d}/${f}`)),
+  ...["sw.js", "manifest.json", "package.json"].filter(exists),
+];
+let intact = true;
+for (const f of servedFiles) {
+  const line = read(f).split("\n").findIndex(isTruncated);
+  if (line !== -1) {
+    fail(`${f}: ไฟล์ถูกตัดทอน — บรรทัด ${line + 1} มี "${MARKER}" หรืออักขระเสีย (U+FFFD) → กู้จาก commit ก่อนหน้า อย่าแก้ต่อจากไฟล์นี้`);
+    intact = false;
+  }
+}
+for (const f of htmlFiles) {
+  const html = read(f).trim();
+  if (!/^<!doctype html>/i.test(html) || !/<\/html>$/i.test(html)) {
+    fail(`${f}: ไม่ใช่เอกสาร HTML ที่ครบ (ต้องขึ้นต้นด้วย <!doctype html> และจบด้วย </html>) — ถูกเขียนทับด้วย snippet?`);
+    intact = false;
+  }
+}
+if (intact) pass(`ไฟล์ครบ ไม่ถูกตัดทอน (${servedFiles.length} ไฟล์)`);
 
 /* ── 1+2. syntax ของ JavaScript ───────────────────────────────────────────── */
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "fhs-check-"));
