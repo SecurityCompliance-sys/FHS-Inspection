@@ -99,13 +99,11 @@
 
 @media (max-width: 900px) {
   .fhs-has-liquid-nav {
-    padding-top: env(safe-area-inset-top, 0px);
     padding-bottom: calc(92px + env(safe-area-inset-bottom, 0px));
   }
 
   .fhs-has-liquid-nav .topbar {
     gap: 8px;
-    padding: calc(11px + env(safe-area-inset-top, 0px)) 14px 11px;
   }
 
   .fhs-has-liquid-nav .topbar .logo {
@@ -209,13 +207,20 @@
   }
 }
 
+/* Top safe-area inset: applied once, as body padding-top, so the hazard stripe and header start
+   below the status bar / notch. The header must not add it again — doing both doubled the gap
+   above the header on iPhone. */
+body.fhs-has-liquid-nav {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
 /* Stronger overrides to counter inline page styles that reset .topbar/.wrap padding.
    Some pages include large inline <style> blocks after this file, so we use a
-   higher-specificity selector plus !important to ensure safe-area insets apply. */
+   higher-specificity selector plus !important. */
 
 body.fhs-has-liquid-nav .topbar {
-  padding: calc(14px + env(safe-area-inset-top, 0px)) 20px 14px 20px !important;
-  top: env(safe-area-inset-top, 0px) !important; /* ensure sticky offset clears the notch */
+  padding: 14px 20px !important;
+  top: env(safe-area-inset-top, 0px) !important; /* when stuck, sit just below the status bar */
 }
 
 body.fhs-has-liquid-nav .wrap {
